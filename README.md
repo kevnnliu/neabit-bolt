@@ -1,2 +1,2 @@
-# neabit-official
-VR game with multiplayer space fighter combat.
+# Near Orbit
+Made with Unity, uses the Oculus API and Photon Unity Networking
