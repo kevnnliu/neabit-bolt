@@ -11,8 +11,7 @@ public class GestureInput : IMoveInput {
     private float yawRate;
     private float pitchRate;
     private Transform shipTransform;
-    private Quaternion pointerRotation;
-    private bool _readInputs = false;
+    private Vector2 pitchYaw;
 
     public GestureInput(float rRate, float yRate, float pRate, Transform shipT) {
         rollRate = rRate;
@@ -23,13 +22,13 @@ public class GestureInput : IMoveInput {
 
     public bool ReadInputs {
         get {
-            return OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger) > 0.5f;
+            return OVRInput.Get(OVRInput.RawAxis1D.RHandTrigger) > 0.5f;
         }
     }
 
     public void ProcessRawInput(Transform shipT) {
         shipTransform = shipT;
-        pointerRotation = ConvertFromRaw();
+        pitchYaw = ConvertFromRaw();
     }
 
     public Quaternion GetRotationInput() {
@@ -37,44 +36,50 @@ public class GestureInput : IMoveInput {
     }
 
     public float GetThrustInput() {
-        float throttle = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y;
+        float throttle = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).y;
         return Mathf.Clamp(1 + throttle, 0f, throttleMax) * Time.deltaTime;
     }
 
     private float GetRollInput() {
-        return Mathf.Clamp(pointerRotation.eulerAngles.z, -rollRate, rollRate) * Time.deltaTime;
+        float inputReading = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch).eulerAngles.z;
+        if (inputReading > 180f) {
+            inputReading -= 360f;
+        }
+        return Mathf.Clamp(inputReading, -rollRate, rollRate) * Time.deltaTime;
     }
 
     private float GetYawInput() {
-        return Mathf.Clamp(pointerRotation.eulerAngles.y, -yawRate, yawRate) * Time.deltaTime;
+        return Mathf.Clamp(pitchYaw.x, -yawRate, yawRate) * Time.deltaTime;
     }
 
     private float GetPitchInput() {
-        return Mathf.Clamp(pointerRotation.eulerAngles.x, -pitchRate, pitchRate) * Time.deltaTime;
+        return Mathf.Clamp(pitchYaw.y, -pitchRate, pitchRate) * Time.deltaTime;
     }
 
     /// <summary>
     /// Takes the local Transform of RTouch and converts it to a pointer heading.
     /// </summary>
-    private Quaternion ConvertFromRaw() {
-        // Get local Transform and compute pointer direction in local space
-        Vector3 localControllerPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
-        Quaternion localControllerRot = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch);
-        Vector3 pointerDirection = localControllerRot * Vector3.forward;
+    private Vector2 ConvertFromRaw() {
+        // Get local controller position/rotation
+        Vector3 controllerPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
+        Quaternion controllerRot = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch);
 
-        // Convert pointer target point from local to world space
-        Vector3 localPointerTarget = localControllerPos + (pointerDirection * pointerDistance);
-        Vector3 worldPointerTarget = shipTransform.TransformPoint(localPointerTarget);
-        
-        // Compute forward vector and pointer target point vector relative to ship position
-        Vector3 relativeVector = worldPointerTarget - shipTransform.position;
-        Vector3 forwardVector = shipTransform.position + (shipTransform.forward * relativeVector.magnitude);
+        // Convert to global
+        controllerPos = shipTransform.TransformPoint(controllerPos);
+        controllerRot = shipTransform.rotation * controllerRot;
 
-        // Convert world rotation to local rotation
-        Quaternion worldRelativeRotation = Quaternion.FromToRotation(forwardVector, relativeVector);
-        Quaternion localRelativeRotation = Quaternion.Inverse(shipTransform.rotation) * worldRelativeRotation;
+        // Compute pointer vector
+        Vector3 pointerDirection = controllerRot * Vector3.forward;
+        Vector3 pointerTarget = controllerPos + (pointerDirection * pointerDistance);
+        Vector3 pointerVector = pointerTarget - shipTransform.position;
 
-        return localRelativeRotation;
+        // Compute projections and angles
+        Vector3 pointerXProj = Vector3.ProjectOnPlane(pointerVector, shipTransform.up);
+        Vector3 pointerYProj = Vector3.ProjectOnPlane(pointerVector, shipTransform.right);
+        float x = Vector3.SignedAngle(shipTransform.forward, pointerXProj, shipTransform.up);
+        float y = Vector3.SignedAngle(shipTransform.forward, pointerYProj, shipTransform.right);
+
+        return new Vector2(x, y);
     }
 
 }

@@ -8,11 +8,16 @@ public class Movement {
     private Quaternion newRotation;
     private float speedFactor = 1f;
 
+    public Movement(Transform shipT) {
+        newPosition = shipT.position;
+        newRotation = shipT.rotation;
+    }
+
     /// <summary>
-    /// Computes a new Transform from an IMoveInput instance and the current Transform.
+    /// Computes new position and rotation from an IMoveInput instance and the current Transform.
     /// </summary>
     public void ComputeNewTransform(Transform shipT, IMoveInput moveInput) {
-        newRotation = shipT.rotation * moveInput.GetRotationInput();;
+        newRotation = shipT.rotation * moveInput.GetRotationInput();
         newPosition = shipT.position + (shipT.forward * moveInput.GetThrustInput());
 
         Vector3 diff = newPosition - shipT.position;

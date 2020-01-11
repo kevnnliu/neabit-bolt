@@ -19,7 +19,7 @@ public class BaseShip : MonoBehaviour {
 
     protected virtual void LoadBaseShip() {
         moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
-        movement = new Movement();
+        movement = new Movement(transform);
         // TODO: Load ModBox instances
     }
 
@@ -32,6 +32,7 @@ public class BaseShip : MonoBehaviour {
     /// Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
     void ConvertInputs(IMoveInput moveInput) {
+        // Debug.Log(moveInput.ReadInputs);
         if (moveInput.ReadInputs) {
             moveInput.ProcessRawInput(transform);
             movement.ComputeNewTransform(transform, moveInput);
@@ -43,7 +44,7 @@ public class BaseShip : MonoBehaviour {
     /// </summary>
     void ApplyMovement(Movement movement) {
         if (movement != null) {
-            transform.position = movement.GetNewPosition();
+            // transform.position = movement.GetNewPosition();
             transform.rotation = movement.GetNewRotation();
         }
     }
