@@ -15,6 +15,6 @@ public interface IShipMod {
         get;
     }
 
-    void Activate(Movement movement, IShip properties, BaseShip ship);
+    void Activate(Movement movement, IShip properties);
     
 }

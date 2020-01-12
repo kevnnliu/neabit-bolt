@@ -12,18 +12,33 @@ public class BaseShip : MonoBehaviour {
 
     #endregion
 
-    IMoveInput moveInput;
-    Movement movement;
-    ModBox weapons;
-    ModBox specials;
+    protected IMoveInput moveInput;
+    protected Movement movement;
+    protected ModBox weapons;
+    protected ModBox specials;
 
-    protected virtual void LoadBaseShip() {
+    /// <summary>
+    /// Called by projectile or beam to show hitmarker on hit.
+    /// </summary>
+    public void HitMarker() {
+        // TODO: Implement showing hitmarker
+    }
+
+    /// <summary>
+    /// Returns the Vector3 that is being aimed at.
+    /// </summary>
+    public Vector3 AimTarget() {
+        // TODO: Return the transform to shoot at
+        throw new System.Exception("Not implemented!");
+    }
+
+    protected void LoadBaseShip() {
         moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
         movement = new Movement(transform);
         // TODO: Load ModBox instances
     }
 
-    protected virtual void CalculateMovement() {
+    protected void CalculateMovement() {
         ConvertInputs(moveInput);
         ApplyMovement(movement);
     }

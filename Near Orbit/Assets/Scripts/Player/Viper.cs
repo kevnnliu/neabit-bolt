@@ -80,12 +80,12 @@ public class Viper : BaseShip, IShip {
     #endregion
 
     void Start() {
-        base.LoadBaseShip();
+        LoadBaseShip();
     }
 
     void Update() {
         // TODO: Process mod activation before calculating movement.
-        base.CalculateMovement();
+        CalculateMovement();
     }
 
     public void TakeDamage(float damage) {

@@ -4,6 +4,12 @@ using UnityEngine;
 
 public interface IWeapMissile : IWeapon {
 
-    
+    float LockOnTime {
+        get;
+    }
+
+    void LockOn(BaseShip target);
+
+    void Fire(BaseShip target);
 
 }

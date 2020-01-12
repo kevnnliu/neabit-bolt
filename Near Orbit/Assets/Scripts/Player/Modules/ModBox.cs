@@ -31,14 +31,14 @@ public class ModBox {
     /// <summary>
     /// Activates a mod or cycles through mods depending on the input index.
     /// </summary>
-    public void ActivateMod(Movement movement, BaseShip ship, IShip properties, int inputIndex) {
+    public void ActivateMod(Movement movement, IShip properties, int inputIndex) {
         if (slots[inputIndex].IsPassive) {
-            slots[inputIndex].Activate(movement, properties, ship);
+            slots[inputIndex].Activate(movement, properties);
         }
         else {
             switch (inputIndex) {
                 case 0:
-                    slots[equippedIndex].Activate(movement, properties, ship);
+                    slots[equippedIndex].Activate(movement, properties);
                     break;
 
                 case 1:
