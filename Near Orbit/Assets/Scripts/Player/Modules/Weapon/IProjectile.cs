@@ -4,6 +4,13 @@ using UnityEngine;
 
 public interface IProjectile {
 
+    /// <summary>
+    /// Create impact object prefab (sparks, explosion, etc.) when Hit() is called.
+    /// </summary>
+    GameObject ImpactPrefab {
+        get;
+    }
+
     BaseShip Owner {
         get;
     }

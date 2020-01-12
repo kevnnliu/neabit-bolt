@@ -4,19 +4,27 @@ using UnityEngine;
 
 public class BaseProj : MonoBehaviour, IProjectile {
 
-    #region Property Fields
+    #region Serialized Fields
 
+    [SerializeField]
+    private GameObject _impactPrefab;
     [SerializeField]
     private float _muzzleVelocity;
     [SerializeField]
     private float _range;
 
+    #endregion
+
     private BaseShip _owner;
     private int _networkViewID;
 
-    #endregion
-
     #region Properties
+
+    public GameObject ImpactPrefab {
+        get {
+            return _impactPrefab;
+        }
+    }
 
     public float MuzzleVelocity {
         get {
@@ -45,7 +53,6 @@ public class BaseProj : MonoBehaviour, IProjectile {
     #endregion
 
     protected GameObject hitObject;
-
     private float damage;
 
     public void Parametrize(float dmg, BaseShip owner, int netID) {
@@ -56,7 +63,8 @@ public class BaseProj : MonoBehaviour, IProjectile {
 
     public void Hit(IShip target) {
         target.TakeDamage(damage);
-        _owner.HitMarker();
+        Owner.HitMarker();
+        Instantiate(ImpactPrefab, transform.position, transform.rotation);
         Destroy(this.gameObject);
     }
 

@@ -2,16 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjLaser : BaseProj, IProjBullet {
-
-    [SerializeField]
-    private GameObject _impactPrefab;
-
-    public GameObject ImpactPrefab {
-        get {
-            return _impactPrefab;
-        }
-    }
+public class ProjLaser : BaseProj, IProjectile {
 
     void Update() {
         if (!DidHit()) {

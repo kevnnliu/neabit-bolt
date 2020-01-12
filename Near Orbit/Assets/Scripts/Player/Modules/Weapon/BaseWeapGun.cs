@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BaseWeapGun : MonoBehaviour, IWeapGun {
 
-    #region Property Fields
+    #region Serialized Fields
 
     [SerializeField]
     private GameObject _projPrefab;
@@ -17,10 +17,10 @@ public class BaseWeapGun : MonoBehaviour, IWeapGun {
     [SerializeField]
     private bool _isPassive;
 
+    #endregion
+
     private float _damage;
     private float _delayBetweenShots;
-
-    #endregion
 
     #region Properties
 

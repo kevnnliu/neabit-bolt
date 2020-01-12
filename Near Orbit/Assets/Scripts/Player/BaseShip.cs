@@ -2,13 +2,91 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseShip : MonoBehaviour {
+public class BaseShip : MonoBehaviour, IShip {
 
-    #region Constants
+    #region Serialized Fields
 
-    const float rollRate = 10f;
-    const float yawRate = 10f;
-    const float pitchRate = 10f;
+    [SerializeField]
+    private float _speed;
+    [SerializeField]
+    private int _totalModCapacity;
+    [SerializeField]
+    private float _baseHealth;
+    [SerializeField]
+    private float _baseEnergy;
+    [SerializeField]
+    private float _energyChargeRate;
+    [SerializeField]
+    private float rollRate;
+    [SerializeField]
+    private float yawRate;
+    [SerializeField]
+    private float pitchRate;
+
+    #endregion
+
+    protected float _health;
+    protected float _energy;
+    protected bool _invincible;
+
+    #region Properties
+
+    public float BaseHealth {
+        get {
+            return _baseHealth;
+        }
+    }
+
+    public float Health { 
+        get {
+            return _health;
+        } 
+        set {
+            _health = value;
+        } 
+    }
+
+    public float BaseEnergy {
+        get {
+            return _baseEnergy;
+        }
+    }
+
+    public float Energy { 
+        get {
+            return _energy;
+        } 
+        set {
+            _energy = value;
+        } 
+    }
+
+    public float EnergyChargeRate {
+        get {
+            return _energyChargeRate;
+        }
+    }
+
+    public float Speed {
+        get {
+            return _speed;
+        }
+    }
+
+    public int TotalModCapacity {
+        get {
+            return _totalModCapacity;
+        }
+    }
+
+    public bool Invincible { 
+        get {
+            return _invincible;
+        } 
+        set {
+            _invincible = value;
+        }
+    }
 
     #endregion
 
@@ -16,6 +94,15 @@ public class BaseShip : MonoBehaviour {
     protected Movement movement;
     protected ModBox weapons;
     protected ModBox specials;
+
+    public void TakeDamage(float damage) {
+        if (!_invincible) {
+            _health -= damage;
+            if (_health <= 0f) {
+                Respawn();
+            }
+        }
+    }
 
     /// <summary>
     /// Called by projectile or beam to show hitmarker on hit.
@@ -41,6 +128,10 @@ public class BaseShip : MonoBehaviour {
     protected void CalculateMovement() {
         ConvertInputs(moveInput);
         ApplyMovement(movement);
+    }
+
+    protected void Respawn() {
+        // TODO: Implement networked respawning.
     }
 
     /// <summary>

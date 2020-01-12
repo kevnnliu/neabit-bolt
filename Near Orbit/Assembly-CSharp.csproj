@@ -342,7 +342,6 @@
      <Compile Include="Assets\Scripts\Player\Modules\Special\ISpecOff.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseProj.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseWeapGun.cs" />
-     <Compile Include="Assets\Scripts\Player\Modules\Weapon\IProjBullet.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\IProjectile.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\IProjMissile.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\IWeapBeam.cs" />
