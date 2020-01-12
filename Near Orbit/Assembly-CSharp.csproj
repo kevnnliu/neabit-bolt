@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{4E39EE23-0B54-481D-3ACE-A417886F643D}</ProjectGuid>
+    <ProjectGuid>{23ee394e-540b-1d48-3ace-a417886f643d}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -44,14 +44,6 @@
     <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>C:\Program Files\Unity\Editor\Data\Managed/UnityEngine/UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>C:\Program Files\Unity\Editor\Data\Managed/UnityEditor.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Oculus\AudioManager\Scripts\Audio\AmbienceEmitter.cs" />
      <Compile Include="Assets\Oculus\AudioManager\Scripts\Audio\AudioManager.cs" />
@@ -338,14 +330,20 @@
      <Compile Include="Assets\Scripts\Networking\GameMaster.cs" />
      <Compile Include="Assets\Scripts\Networking\Launcher.cs" />
      <Compile Include="Assets\Scripts\Player\BaseShip.cs" />
-     <Compile Include="Assets\Scripts\Player\GestureInput.cs" />
-     <Compile Include="Assets\Scripts\Player\IMoveInput.cs" />
+     <Compile Include="Assets\Scripts\Player\Control\GestureInput.cs" />
+     <Compile Include="Assets\Scripts\Player\Control\IMoveInput.cs" />
+     <Compile Include="Assets\Scripts\Player\Control\Movement.cs" />
      <Compile Include="Assets\Scripts\Player\IShip.cs" />
-     <Compile Include="Assets\Scripts\Player\IShipMod.cs" />
-     <Compile Include="Assets\Scripts\Player\ISpecial.cs" />
-     <Compile Include="Assets\Scripts\Player\IWeapon.cs" />
-     <Compile Include="Assets\Scripts\Player\ModBox.cs" />
-     <Compile Include="Assets\Scripts\Player\Movement.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\IShipMod.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\ISpecDef.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\ISpecial.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\ISpecMove.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\ISpecOff.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\IWeapBeam.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\IWeapGun.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\IWeapMissile.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\IWeapon.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\ModBox.cs" />
      <Compile Include="Assets\Scripts\Player\Viper.cs" />
      <None Include="Assets\Photon\PhotonLibs\changes-library.txt" />
      <None Include="Assets\Oculus\Avatar\Resources\Materials\Version1.5\Avatar_PC_SingleComponent.shader" />
@@ -385,29 +383,8 @@
      <None Include="Assets\Oculus\SampleFramework\Usage\HandsTrainExample\Shaders\OculusSampleTrainPropsShader.shader" />
      <None Include="Assets\Photon\PhotonUnityNetworking\changelog.txt" />
      <None Include="Assets\Oculus\SampleFramework\Usage\DistanceGrab\Materials\CrosshairZCheat.shader" />
- <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Timeline">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
- </Reference>
- <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.UI">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <Reference Include="UnityEngine">
+ <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -585,6 +562,9 @@
  </Reference>
  <Reference Include="UnityEngine.XRModule">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor">
+ <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
  </Reference>
  <Reference Include="Photon3Unity3D">
  <HintPath>C:/Projects/neabit-official/Near Orbit/Assets/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
@@ -957,53 +937,85 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Unity.Timeline.Editor.csproj">
+      <Project>{73a0bd79-a81c-e4cc-0940-500ee99998a7}</Project>
+      <Name>Unity.Timeline.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="PhotonUnityNetworking.Utilities.PhotonPlayer.Editor.csproj">
-      <Project>{CDCB7F34-E93C-05CA-FCEE-C64EB0D8C8FB}</Project>
+      <Project>{347fcbcd-3ce9-ca05-fcee-c64eb0d8c8fb}</Project>
       <Name>PhotonUnityNetworking.Utilities.PhotonPlayer.Editor</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.VSCode.Editor.csproj">
+      <Project>{ad64ad0b-8059-b181-a223-283a5dad99b0}</Project>
+      <Name>Unity.VSCode.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="PhotonUnityNetworking.Utilities.csproj">
-      <Project>{267EF4A0-48D6-FE23-05C9-7187245A4A49}</Project>
+      <Project>{a0f47e26-d648-23fe-05c9-7187245a4a49}</Project>
       <Name>PhotonUnityNetworking.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
+      <Project>{226d54db-8c88-d57d-ac47-ca5c88d87116}</Project>
+      <Name>Unity.TextMeshPro.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityEngine.UI.csproj">
+      <Project>{f2a7ad00-c939-7848-d99d-7f8dfddf8f7f}</Project>
+      <Name>UnityEngine.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.Timeline.csproj">
+      <Project>{d51a93ee-42c3-9d00-a445-d148eccc9c48}</Project>
+      <Name>Unity.Timeline</Name>
+    </ProjectReference>
     <ProjectReference Include="PhotonWebSocket.csproj">
-      <Project>{7F0B2C3E-9A13-FFEC-CAB4-10826CF0E17E}</Project>
+      <Project>{3e2c0b7f-139a-ecff-cab4-10826cf0e17e}</Project>
       <Name>PhotonWebSocket</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.CollabProxy.Editor.csproj">
+      <Project>{5c290075-a1fd-33bd-1c05-a39691327dd3}</Project>
+      <Name>Unity.CollabProxy.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="PhotonRealtime.csproj">
-      <Project>{02CBD089-39C9-FE8D-FCC5-863B82C7E1CE}</Project>
+      <Project>{89d0cb02-c939-8dfe-fcc5-863b82c7e1ce}</Project>
       <Name>PhotonRealtime</Name>
     </ProjectReference>
     <ProjectReference Include="PhotonUnityNetworking.csproj">
-      <Project>{8983C506-FAAB-599C-5F6F-0B96D4BA976F}</Project>
+      <Project>{06c58389-abfa-9c59-5f6f-0b96d4ba976f}</Project>
       <Name>PhotonUnityNetworking</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.Editor.csproj">
-      <Project>{41ECDEBB-53F5-F9D4-773D-2F8A5BEBC6C4}</Project>
+      <Project>{bbdeec41-f553-d4f9-773d-2f8a5bebc6c4}</Project>
       <Name>Oculus.VR.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.Scripts.Editor.csproj">
-      <Project>{02242660-051D-4A9C-785D-16587C7E54B2}</Project>
+      <Project>{60262402-1d05-9c4a-785d-16587c7e54b2}</Project>
       <Name>Oculus.VR.Scripts.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.csproj">
-      <Project>{4A5E5FD7-B6C4-9374-2893-B79C096A090F}</Project>
+      <Project>{d75f5e4a-c4b6-7493-2893-b79c096a090f}</Project>
       <Name>Oculus.VR</Name>
     </ProjectReference>
     <ProjectReference Include="PhotonChat.csproj">
-      <Project>{B574A69A-45D6-130D-D9BA-E53E51E84EB3}</Project>
+      <Project>{9aa674b5-d645-0d13-d9ba-e53e51e84eb3}</Project>
       <Name>PhotonChat</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.TextMeshPro.csproj">
+      <Project>{b202b21c-7acd-e817-c860-1500c8e2bacc}</Project>
+      <Name>Unity.TextMeshPro</Name>
+    </ProjectReference>
     <ProjectReference Include="PhotonUnityNetworking.Utilities.Culling.Editor.csproj">
-      <Project>{7431E199-BC71-E900-3FD0-FE8B5AB2FCA3}</Project>
+      <Project>{99e13174-71bc-00e9-3fd0-fe8b5ab2fca3}</Project>
       <Name>PhotonUnityNetworking.Utilities.Culling.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="PhotonUnityNetworking.Editor.csproj">
-      <Project>{329F72A7-8AEC-022B-1BE8-4F4347B3E8BE}</Project>
+      <Project>{a7729f32-ec8a-2b02-1be8-4f4347b3e8be}</Project>
       <Name>PhotonUnityNetworking.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityEditor.UI.csproj">
+      <Project>{6a2e029f-b2cd-c267-c458-91743443b702}</Project>
+      <Name>UnityEditor.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

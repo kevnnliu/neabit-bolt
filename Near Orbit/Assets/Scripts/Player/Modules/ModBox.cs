@@ -4,6 +4,11 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
+/// <summary>
+/// Each ship should have two ModBox instances associated with it, one for weapon mods and
+/// one for special mods. These instances should be saved after the player customizes their
+/// ship and loaded at spawn.
+/// </summary>
 [System.Serializable]
 public class ModBox {
 

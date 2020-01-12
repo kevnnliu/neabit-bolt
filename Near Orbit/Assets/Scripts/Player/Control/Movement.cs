@@ -18,7 +18,13 @@ public class Movement {
     /// </summary>
     public void ComputeNewTransform(Transform shipT, IMoveInput moveInput) {
         newRotation = shipT.rotation * moveInput.GetRotationInput();
-        newPosition = shipT.position + (shipT.forward * moveInput.GetThrustInput());
+        newPosition = shipT.position;
+
+        int layerMask = 1 << 2;
+        layerMask = ~layerMask;
+        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput(), layerMask)) {
+            newPosition += (shipT.forward * moveInput.GetThrustInput());
+        }
 
         Vector3 diff = newPosition - shipT.position;
         newPosition = shipT.position + (diff * speedFactor);
