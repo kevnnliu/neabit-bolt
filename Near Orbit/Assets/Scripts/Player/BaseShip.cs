@@ -119,6 +119,13 @@ public class BaseShip : MonoBehaviour, IShip {
         throw new System.Exception("Not implemented!");
     }
 
+    /// <summary>
+    /// Process inputs and activate mods using the ModBox instances.
+    /// </summary>
+    protected void ProcessModActivation() {
+        // TODO: Process mod activation before calculating movement
+    }
+
     protected void LoadBaseShip() {
         moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
         movement = new Movement(transform);

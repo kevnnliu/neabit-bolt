@@ -67,12 +67,12 @@ public class ModBox {
     /// </summary>
     private void SortSlots() {
         List<IShipMod> sorted = new List<IShipMod>(slots.Capacity);
-        for (int i = 0; i < slots.Capacity; i++) {
+        for (int i = 0; i < slots.Count; i++) {
             if (!slots[i].IsPassive) {
                 sorted.Add(slots[i]);
             }
         }
-        for (int j = 0; j < slots.Capacity; j++) {
+        for (int j = 0; j < slots.Count; j++) {
             if (slots[j].IsPassive) {
                 sorted.Add(slots[j]);
             }

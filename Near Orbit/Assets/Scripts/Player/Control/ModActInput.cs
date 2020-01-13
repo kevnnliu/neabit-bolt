@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Viper : BaseShip {
+public class ModActInput {
 
     void Start() {
-        LoadBaseShip();
+        
     }
 
     void Update() {
-        ProcessModActivation();
-        CalculateMovement();
+        
     }
 
+}
+
+public enum VRInput {
+    
 }

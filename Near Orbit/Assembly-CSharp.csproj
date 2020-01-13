@@ -332,6 +332,7 @@
      <Compile Include="Assets\Scripts\Player\BaseShip.cs" />
      <Compile Include="Assets\Scripts\Player\Control\GestureInput.cs" />
      <Compile Include="Assets\Scripts\Player\Control\IMoveInput.cs" />
+     <Compile Include="Assets\Scripts\Player\Control\ModActInput.cs" />
      <Compile Include="Assets\Scripts\Player\Control\Movement.cs" />
      <Compile Include="Assets\Scripts\Player\IShip.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\IShipMod.cs" />
