@@ -107,7 +107,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projPrefab: {fileID: 8763415207219295970, guid: da28124d7c6e7b44daf93ccbfd77841c,
     type: 3}
-  _baseDamage: 20
-  _baseDelayBetweenShots: 0.4
-  _energyCost: 1.5
-  _isPassive: 0
+  baseDamage: 20
+  baseDelay: 0.4
+  typeOfMod: 0
+  energyCost: 1.5
+  isPassive: 0
+  isContinuous: 0

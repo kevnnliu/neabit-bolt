@@ -57,7 +57,7 @@ public class BaseProj : MonoBehaviour {
             return;
         }
         target.TakeDamage(damage);
-        owner.HitMarker();
+        owner.ShowHitMarker();
         // Instantiate(impactPrefab, transform.position, transform.rotation);
         Destroy(this.gameObject); // TODO: Owner client bias, network destroy
     }

@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca870e510fce0624187067c7ca55d2a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _coolDown: 10
+  _typeOfMod: 1
   _energyCost: 30
   _isPassive: 1
   _isContinuous: 1

@@ -63,8 +63,8 @@ public class BaseShip : MonoBehaviour {
     /// Returns whether or not the ship can activate a mod, and if so subtracts the energy required.
     /// </summary>
     public bool SpendEnergy(IShipMod mod) {
-        if (mod.EnergyCost >= energy) {
-            float cost = mod.IsContinuous ? mod.EnergyCost * Time.deltaTime : mod.EnergyCost;
+        float cost = mod.IsContinuous ? mod.EnergyCost * Time.deltaTime : mod.EnergyCost;
+        if (energy >= cost) {
             energy -= cost;
             return true;
         }
@@ -86,7 +86,7 @@ public class BaseShip : MonoBehaviour {
     /// <summary>
     /// Called by projectile or beam to show hitmarker on hit.
     /// </summary>
-    public void HitMarker() {
+    public void ShowHitMarker() {
         // TODO: Implement showing hitmarker
     }
 
@@ -101,8 +101,8 @@ public class BaseShip : MonoBehaviour {
     /// Process inputs and activate mods using the ModBox instances, returns true if no mods were activated.
     /// </summary>
     private bool ProcessModActivation() {
-        bool didActivateWeapon = weapons.ActivateMod(this, ModActInput.WeaponActivated());
         bool didActivateSpecial = specials.ActivateMod(this, ModActInput.SpecialActivated());
+        bool didActivateWeapon = weapons.ActivateMod(this, ModActInput.WeaponActivated());
         return !didActivateWeapon && !didActivateSpecial;
     }
 

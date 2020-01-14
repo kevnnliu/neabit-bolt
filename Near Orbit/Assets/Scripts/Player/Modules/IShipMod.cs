@@ -4,6 +4,13 @@ using UnityEngine;
 
 public interface IShipMod {
 
+    ModType TypeOfMod {
+        get;
+    }
+
+    /// <summary>
+    /// If continuous, this is the energy cost per second. Else, this is the energy cost per activation.
+    /// </summary>
     float EnergyCost {
         get;
     }
@@ -24,4 +31,9 @@ public interface IShipMod {
 
     void Activate(BaseShip properties);
     
+}
+
+public enum ModType {
+    Weapon,
+    Special
 }

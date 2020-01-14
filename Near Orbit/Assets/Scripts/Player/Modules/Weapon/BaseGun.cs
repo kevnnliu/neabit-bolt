@@ -2,107 +2,91 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseGun : MonoBehaviour, IWeapon {
+public class BaseGun : MonoBehaviour, IShipMod {
 
     #region Serialized Fields
 
     [SerializeField]
     private GameObject projPrefab;
     [SerializeField]
-    private float _baseDamage;
+    private float baseDamage;
     [SerializeField]
-    private float _baseDelayBetweenShots;
+    private float baseDelay;
     [SerializeField]
-    private float _energyCost;
+    private ModType typeOfMod;
     [SerializeField]
-    private bool _isPassive;
+    private float energyCost;
     [SerializeField]
-    private bool _isContinuous;
+    private bool isPassive;
+    [SerializeField]
+    private bool isContinuous;
 
     #endregion
 
-    private float _damage;
-    private float _delayBetweenShots;
-
     #region Properties
 
-    public float BaseDamage {
+    public ModType TypeOfMod {
         get {
-            return _baseDamage;
+            return typeOfMod;
         }
-    }
-
-    public float Damage { 
-        get {
-            return _damage;
-        } 
-        set {
-            _damage = value;
-        } 
-    }
-
-    public float BaseDelayBetweenShots {
-        get {
-            return _baseDelayBetweenShots;
-        }
-    }
-
-    public float DelayBetweenShots { 
-        get {
-            return _delayBetweenShots;
-        } 
-        set {
-            _delayBetweenShots = value;
-        } 
     }
 
     public float EnergyCost {
         get {
-            return _energyCost;
+            return energyCost;
         }
     }
 
     public bool IsPassive {
         get {
-            return _isPassive;
+            return isPassive;
         }
     }
 
     public bool IsContinuous {
         get {
-            return _isContinuous;
+            return isContinuous;
         }
     }
 
     #endregion
 
+    private float damageFactor = 1f;
+    private float delayFactor = 1f;
     private float delay = 0f;
     private BaseShip owner;
 
-    public void SetOwner(BaseShip ship) {
-        owner = ship;
-    }
-
-    public void Activate(BaseShip properties) {
-        if (delay <= 0f) {
-            Fire(owner.AimTarget());
-        }
-    }
-
-    /// <summary>
-    /// To be called every frame to update the firing delay.
-    /// </summary>
-    protected void CheckDelay() {
+    void Update() {
         if (delay > 0f) {
             delay -= Time.deltaTime;
         }
     }
 
+    public void Activate(BaseShip properties) {
+        owner = properties;
+        if (delay <= 0f) {
+            Fire(owner.AimTarget());
+        }
+    }
+
+    public void AmplifyDelay(float factor) {
+        delayFactor = factor;
+    }
+
+    public void AmplifyDamage(float factor) {
+        damageFactor = factor;
+    }
+
     protected virtual void Fire(Vector3 target) {
-        delay = DelayBetweenShots;
+        delay = baseDelay * delayFactor;
+        float damage = baseDamage * damageFactor;
+
         GameObject proj = Instantiate(projPrefab, transform.position, transform.rotation);
         proj.transform.LookAt(target, transform.up);
-        proj.GetComponent<BaseProj>().Parametrize(Damage, owner, 9999); // TODO: Change 9999 to PhotonView.ViewID
+        proj.GetComponent<BaseProj>().Parametrize(damage, owner, 9999); // TODO: Change 9999 to PhotonView.ViewID
+
+        damageFactor = 1f;
+        delayFactor = 1f;
     }
 
 }
