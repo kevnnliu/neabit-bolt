@@ -4,45 +4,55 @@ using UnityEngine;
 
 /// <summary>
 /// Each ship should have two ModBox instances associated with it, one for weapon mods and
-/// one for special mods. These instances should be saved after the player customizes their
-/// ship and loaded at spawn.
+/// one for special mods. These instances should be saved during ship customization and loaded at spawn.
 /// </summary>
 [System.Serializable]
-public class ModBox {
+public class ModBox : MonoBehaviour {
 
-    private List<IShipMod> slots;
+    private IShipMod[] slots;
     private int equippedIndex;
-    private int boxCap;
-    private string shipName;
 
-    public ModBox(int cap, string shipN) {
-        slots = new List<IShipMod>(cap + 1); // Extra space, shouldn't need to resize
+    public ModBox(Transform[] mounts, Module[] mods) {
         equippedIndex = 0;
-        boxCap = cap;
-        shipName = shipN;
-    }
+        slots = new IShipMod[mods.Length];
 
-    public int GetBoxCap() {
-        return boxCap;
+        for (int i = 0; i < mods.Length; i++) {
+            GameObject prefab = Resources.Load<GameObject>(ModPrefab.Path[mods[i]]);
+            slots[i] = Instantiate(prefab, mounts[i].position, mounts[i].rotation).GetComponent<IShipMod>();
+        }
     }
 
     /// <summary>
-    /// Activates a mod or cycles through mods depending on the input index.
+    /// Activates a mod or cycles through mods based on inputIndex, returns true if a mod was activated.
     /// </summary>
-    public void ActivateMod(Movement movement, IShip properties, int inputIndex) {
-        if (slots[inputIndex].IsPassive) {
-            slots[inputIndex].Activate(movement, properties);
+    public bool ActivateMod(BaseShip properties, int inputIndex) {
+        if (inputIndex >= slots.Length) {
+            return false;
+        }
+        if (slots[inputIndex].IsPassive && properties.SpendEnergy(slots[inputIndex])) {
+            slots[inputIndex].Activate(properties);
+            return true;
         }
         else {
             switch (inputIndex) {
                 case 0:
-                    slots[equippedIndex].Activate(movement, properties);
+                    if (properties.SpendEnergy(slots[equippedIndex])) {
+                        slots[equippedIndex].Activate(properties);
+                        return true;
+                    }
                     break;
 
                 case 1:
                     equippedIndex += 1;
-                    if (equippedIndex >= slots.Capacity) {
+                    if (equippedIndex >= slots.Length) {
                         equippedIndex = 0;
+                    }
+                    break;
+
+                case 2:
+                    equippedIndex -= 1;
+                    if (equippedIndex < 0) {
+                        equippedIndex = slots.Length - 1;
                     }
                     break;
 
@@ -50,34 +60,7 @@ public class ModBox {
                     break;
             }
         }
-    }
-
-    public void EquipMod(IShipMod mod, int index) {
-        slots[index] = mod;
-        SortSlots();
-    }
-
-    public void RemoveMod(int index) {
-        slots.RemoveAt(index);
-        SortSlots();
-    }
-
-    /// <summary>
-    /// Ensures active mods are at the front and preserves order.
-    /// </summary>
-    private void SortSlots() {
-        List<IShipMod> sorted = new List<IShipMod>(slots.Capacity);
-        for (int i = 0; i < slots.Count; i++) {
-            if (!slots[i].IsPassive) {
-                sorted.Add(slots[i]);
-            }
-        }
-        for (int j = 0; j < slots.Count; j++) {
-            if (slots[j].IsPassive) {
-                sorted.Add(slots[j]);
-            }
-        }
-        slots = sorted;
+        return false;
     }
 
 }

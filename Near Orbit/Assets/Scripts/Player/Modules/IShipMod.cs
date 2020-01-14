@@ -15,6 +15,13 @@ public interface IShipMod {
         get;
     }
 
-    void Activate(Movement movement, IShip properties);
+    /// <summary>
+    /// Determines whether this mod's energy drain is multiplied by Time.deltaTime.
+    /// </summary>
+    bool IsContinuous {
+        get;
+    }
+
+    void Activate(BaseShip properties);
     
 }

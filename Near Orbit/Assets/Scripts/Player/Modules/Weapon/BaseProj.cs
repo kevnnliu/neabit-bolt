@@ -2,70 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseProj : MonoBehaviour, IProjectile {
+public class BaseProj : MonoBehaviour {
 
     #region Serialized Fields
 
     [SerializeField]
-    private GameObject _impactPrefab;
+    private GameObject impactPrefab;
     [SerializeField]
-    private float _muzzleVelocity;
+    private float projVelocity;
     [SerializeField]
-    private float _range;
+    private float range;
 
     #endregion
 
-    private BaseShip _owner;
-    private int _networkViewID;
-
-    #region Properties
-
-    public GameObject ImpactPrefab {
-        get {
-            return _impactPrefab;
-        }
-    }
-
-    public float MuzzleVelocity {
-        get {
-            return _muzzleVelocity;
-        }
-    }
-
-    public float Range {
-        get {
-            return _range;
-        }
-    }
-
-    public BaseShip Owner {
-        get {
-            return _owner;
-        }
-    }
-
-    public int NetworkViewID {
-        get {
-            return _networkViewID;
-        }
-    }
-
-    #endregion
-
-    protected GameObject hitObject;
+    /// <summary>
+    /// ID of client who owns this projectile in the network. If this projectile hits a target
+    /// on the owner client, then the hit counts (shooter bias).
+    /// </summary>
+    private int networkViewID;
+    private BaseShip owner;
+    private GameObject hitObject;
     private float damage;
 
-    public void Parametrize(float dmg, BaseShip owner, int netID) {
+    public void Parametrize(float dmg, BaseShip ship, int netID) {
         damage = dmg;
-        _owner = owner;
-        _networkViewID = netID;
+        owner = ship;
+        networkViewID = netID;
     }
 
-    public void Hit(IShip target) {
-        target.TakeDamage(damage);
-        Owner.HitMarker();
-        Instantiate(ImpactPrefab, transform.position, transform.rotation);
-        Destroy(this.gameObject);
+    protected float GetProjVelocity() {
+        return projVelocity;
     }
 
     /// <summary>
@@ -73,13 +39,27 @@ public class BaseProj : MonoBehaviour, IProjectile {
     /// </summmary>
     protected bool DidHit() {
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(transform.position, transform.forward, out hit, Range);
+        bool hitSomething = Physics.Raycast(transform.position, transform.forward, out hit, range);
         if (hitSomething) {
             // TODO: Check PhotonView.ViewID
             hitObject = hit.transform.root.gameObject;
-            return hitObject != Owner.gameObject;
+            Hit(hitObject.GetComponent<BaseShip>());
+            return hitObject != owner.gameObject;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Calls BaseShip.HitMarker() to show hitmarker, instantiates impact prefab, destroys self.
+    /// </summary>
+    private void Hit(BaseShip target) {
+        if (target == null) {
+            return;
+        }
+        target.TakeDamage(damage);
+        owner.HitMarker();
+        // Instantiate(impactPrefab, transform.position, transform.rotation);
+        Destroy(this.gameObject); // TODO: Owner client bias, network destroy
     }
 
 }

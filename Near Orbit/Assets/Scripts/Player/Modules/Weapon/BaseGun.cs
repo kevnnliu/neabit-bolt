@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseWeapGun : MonoBehaviour, IWeapGun {
+public class BaseGun : MonoBehaviour, IWeapon {
 
     #region Serialized Fields
 
     [SerializeField]
-    private GameObject _projPrefab;
+    private GameObject projPrefab;
     [SerializeField]
     private float _baseDamage;
     [SerializeField]
@@ -16,6 +16,8 @@ public class BaseWeapGun : MonoBehaviour, IWeapGun {
     private float _energyCost;
     [SerializeField]
     private bool _isPassive;
+    [SerializeField]
+    private bool _isContinuous;
 
     #endregion
 
@@ -23,12 +25,6 @@ public class BaseWeapGun : MonoBehaviour, IWeapGun {
     private float _delayBetweenShots;
 
     #region Properties
-
-    public GameObject ProjPrefab {
-        get {
-            return _projPrefab;
-        }
-    }
 
     public float BaseDamage {
         get {
@@ -72,28 +68,39 @@ public class BaseWeapGun : MonoBehaviour, IWeapGun {
         }
     }
 
+    public bool IsContinuous {
+        get {
+            return _isContinuous;
+        }
+    }
+
     #endregion
 
     private float delay = 0f;
     private BaseShip owner;
 
-    protected void SetOwner(BaseShip ship) {
+    public void SetOwner(BaseShip ship) {
         owner = ship;
     }
 
+    public void Activate(BaseShip properties) {
+        if (delay <= 0f) {
+            Fire(owner.AimTarget());
+        }
+    }
+
+    /// <summary>
+    /// To be called every frame to update the firing delay.
+    /// </summary>
     protected void CheckDelay() {
         if (delay > 0f) {
             delay -= Time.deltaTime;
         }
     }
 
-    public void Activate(Movement movement, IShip properties) {
-        Fire(owner.AimTarget());
-    }
-
-    public void Fire(Vector3 target) {
+    protected virtual void Fire(Vector3 target) {
         delay = DelayBetweenShots;
-        GameObject proj = Instantiate(ProjPrefab, transform.position, transform.rotation);
+        GameObject proj = Instantiate(projPrefab, transform.position, transform.rotation);
         proj.transform.LookAt(target, transform.up);
         proj.GetComponent<BaseProj>().Parametrize(Damage, owner, 9999); // TODO: Change 9999 to PhotonView.ViewID
     }

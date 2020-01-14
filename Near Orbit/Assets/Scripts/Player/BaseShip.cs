@@ -2,103 +2,82 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseShip : MonoBehaviour, IShip {
+public class BaseShip : MonoBehaviour {
 
     #region Serialized Fields
 
     [SerializeField]
-    private float _speed;
-    [SerializeField]
-    private int _totalModCapacity;
-    [SerializeField]
-    private float _baseHealth;
-    [SerializeField]
-    private float _baseEnergy;
-    [SerializeField]
-    private float _energyChargeRate;
+    private float speed;
     [SerializeField]
     private float rollRate;
     [SerializeField]
     private float yawRate;
     [SerializeField]
     private float pitchRate;
+    [SerializeField]
+    private int totalModCapacity;
+    [SerializeField]
+    private float baseHealth;
+    [SerializeField]
+    private float baseEnergy;
+    [SerializeField]
+    private float energyChargeRate;
+    [SerializeField]
+    private Transform[] weaponMounts;
+    [SerializeField]
+    private Transform[] specialMounts;
 
     #endregion
 
-    protected float _health;
-    protected float _energy;
-    protected bool _invincible;
+    private float health;
+    private float energy;
+    private bool invincible;
 
-    #region Properties
+    private IMoveInput moveInput;
+    private Movement movement;
+    private ModBox weapons;
+    private ModBox specials;
 
-    public float BaseHealth {
-        get {
-            return _baseHealth;
+    void Start() {
+        LoadBaseShip();
+    }
+
+    void Update() {
+        invincible = false; // TODO: Check if in safe zone (invincible)
+        if (ProcessModActivation()) {
+            energy += energyChargeRate * Time.deltaTime;
         }
+        ConvertInputs(moveInput);
+        ApplyMovement(movement);
     }
 
-    public float Health { 
-        get {
-            return _health;
-        } 
-        set {
-            _health = value;
-        } 
+    public Movement GetMovement() {
+        return movement;
     }
 
-    public float BaseEnergy {
-        get {
-            return _baseEnergy;
+    public void SetInvincibility(bool enabled) {
+        invincible = enabled;
+    }
+
+    /// <summary>
+    /// Returns whether or not the ship can activate a mod, and if so subtracts the energy required.
+    /// </summary>
+    public bool SpendEnergy(IShipMod mod) {
+        if (mod.EnergyCost >= energy) {
+            float cost = mod.IsContinuous ? mod.EnergyCost * Time.deltaTime : mod.EnergyCost;
+            energy -= cost;
+            return true;
         }
+        return false;
     }
 
-    public float Energy { 
-        get {
-            return _energy;
-        } 
-        set {
-            _energy = value;
-        } 
-    }
-
-    public float EnergyChargeRate {
-        get {
-            return _energyChargeRate;
-        }
-    }
-
-    public float Speed {
-        get {
-            return _speed;
-        }
-    }
-
-    public int TotalModCapacity {
-        get {
-            return _totalModCapacity;
-        }
-    }
-
-    public bool Invincible { 
-        get {
-            return _invincible;
-        } 
-        set {
-            _invincible = value;
-        }
-    }
-
-    #endregion
-
-    protected IMoveInput moveInput;
-    protected Movement movement;
-    protected ModBox weapons;
-    protected ModBox specials;
-
+    /// <summary>
+    /// Checks invincibility, subtracts from Health, and initiates respawn when necessary.
+    /// </summary>
     public void TakeDamage(float damage) {
-        if (!_invincible) {
-            _health -= damage;
-            if (_health <= 0f) {
+        if (!invincible) {
+            health -= damage;
+            if (health <= 0f) {
                 Respawn();
             }
         }
@@ -112,39 +91,38 @@ public class BaseShip : MonoBehaviour, IShip {
     }
 
     /// <summary>
-    /// Returns the Vector3 that is being aimed at.
+    /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        // TODO: Return the transform to shoot at
         throw new System.Exception("Not implemented!");
     }
 
     /// <summary>
-    /// Process inputs and activate mods using the ModBox instances.
+    /// Process inputs and activate mods using the ModBox instances, returns true if no mods were activated.
     /// </summary>
-    protected void ProcessModActivation() {
-        // TODO: Process mod activation before calculating movement
+    private bool ProcessModActivation() {
+        bool didActivateWeapon = weapons.ActivateMod(this, ModActInput.WeaponActivated());
+        bool didActivateSpecial = specials.ActivateMod(this, ModActInput.SpecialActivated());
+        return !didActivateWeapon && !didActivateSpecial;
     }
 
-    protected void LoadBaseShip() {
+    private void LoadBaseShip() {
         moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
         movement = new Movement(transform);
+        
         // TODO: Load ModBox instances
+        weapons = new ModBox(weaponMounts, new Module[] {Module.LaserGun});
+        specials = new ModBox(specialMounts, new Module[] {Module.Boost, Module.Shield});
     }
 
-    protected void CalculateMovement() {
-        ConvertInputs(moveInput);
-        ApplyMovement(movement);
-    }
-
-    protected void Respawn() {
-        // TODO: Implement networked respawning.
+    private void Respawn() {
+        // TODO: Implement networked respawning and reset health/energy
     }
 
     /// <summary>
     /// Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
-    void ConvertInputs(IMoveInput moveInput) {
+    private void ConvertInputs(IMoveInput moveInput) {
         if (moveInput.ReadInputs) {
             moveInput.ProcessRawInput(transform);
             movement.ComputeNewTransform(transform, moveInput);
@@ -154,7 +132,7 @@ public class BaseShip : MonoBehaviour, IShip {
     /// <summary>
     /// Applies the Movement instance by updating the ship's Transform component.
     /// </summary>
-    void ApplyMovement(Movement movement) {
+    private void ApplyMovement(Movement movement) {
         if (movement != null) {
             transform.position = movement.GetNewPosition();
             transform.rotation = movement.GetNewRotation();

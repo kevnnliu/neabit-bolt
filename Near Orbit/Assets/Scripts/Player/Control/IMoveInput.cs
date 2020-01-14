@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IMoveInput {
 
     /// <summary>
-    /// Usually always true except for no-idle inputs like GestureInput for VR.
+    /// Usually always true except for no-idle inputs like GestureInput.
     /// </summary>
     bool ReadInputs {
         get;
