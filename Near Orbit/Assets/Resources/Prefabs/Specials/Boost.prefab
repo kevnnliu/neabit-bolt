@@ -109,4 +109,4 @@ MonoBehaviour:
   _energyCost: 20
   _isPassive: 1
   _isContinuous: 1
-  speedMultiplier: 1.5
+  speedMultiplier: 1.7

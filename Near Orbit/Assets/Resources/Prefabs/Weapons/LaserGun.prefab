@@ -108,7 +108,7 @@ MonoBehaviour:
   projPrefab: {fileID: 8763415207219295970, guid: da28124d7c6e7b44daf93ccbfd77841c,
     type: 3}
   baseDamage: 20
-  baseDelay: 0.4
+  baseDelay: 0.2
   typeOfMod: 0
   energyCost: 1.5
   isPassive: 0

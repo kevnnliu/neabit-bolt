@@ -18,7 +18,9 @@ public class ModBox : MonoBehaviour {
 
         for (int i = 0; i < mods.Length; i++) {
             GameObject prefab = Resources.Load<GameObject>(ModPrefab.Path[mods[i]]);
-            slots[i] = Instantiate(prefab, mounts[i].position, mounts[i].rotation).GetComponent<IShipMod>();
+            GameObject modObject = Instantiate(prefab, mounts[i].position, mounts[i].rotation);
+            modObject.transform.parent = mounts[i];
+            slots[i] = modObject.GetComponent<IShipMod>();
         }
     }
 
@@ -29,8 +31,10 @@ public class ModBox : MonoBehaviour {
         if (inputIndex >= slots.Length) {
             return false;
         }
-        if (slots[inputIndex].IsPassive && properties.SpendEnergy(slots[inputIndex])) {
-            slots[inputIndex].Activate(properties);
+        if (slots[inputIndex].IsPassive) {
+            if (properties.SpendEnergy(slots[inputIndex])) {
+                slots[inputIndex].Activate(properties);
+            }
             return true;
         }
         else {
@@ -38,9 +42,8 @@ public class ModBox : MonoBehaviour {
                 case 0:
                     if (properties.SpendEnergy(slots[equippedIndex])) {
                         slots[equippedIndex].Activate(properties);
-                        return true;
                     }
-                    break;
+                    return true;
 
                 case 1:
                     equippedIndex += 1;

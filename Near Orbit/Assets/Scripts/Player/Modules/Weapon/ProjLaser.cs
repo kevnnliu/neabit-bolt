@@ -5,8 +5,9 @@ using UnityEngine;
 public class ProjLaser : BaseProj {
 
     void Update() {
+        BurnRange();
         if (!DidHit()) {
-            transform.position += transform.forward * GetProjVelocity() * Time.deltaTime;
+            transform.position += transform.forward * projVelocity * Time.deltaTime;
         }
     }
 

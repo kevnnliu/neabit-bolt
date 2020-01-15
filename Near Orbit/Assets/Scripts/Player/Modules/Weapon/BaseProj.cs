@@ -7,9 +7,10 @@ public class BaseProj : MonoBehaviour {
     #region Serialized Fields
 
     [SerializeField]
-    private GameObject impactPrefab;
+    protected float projVelocity;
+
     [SerializeField]
-    private float projVelocity;
+    private GameObject impactPrefab;
     [SerializeField]
     private float range;
 
@@ -30,8 +31,14 @@ public class BaseProj : MonoBehaviour {
         networkViewID = netID;
     }
 
-    protected float GetProjVelocity() {
-        return projVelocity;
+    /// <summary>
+    /// To be called by derived classes at the beginning of every frame.
+    /// </summary>
+    protected void BurnRange() {
+        range -= Time.deltaTime;
+        if (range <= 0f) {
+            Destroy(this.gameObject);
+        }
     }
 
     /// <summary>
@@ -39,7 +46,7 @@ public class BaseProj : MonoBehaviour {
     /// </summmary>
     protected bool DidHit() {
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(transform.position, transform.forward, out hit, range);
+        bool hitSomething = Physics.Raycast(transform.position, transform.forward, out hit, projVelocity * Time.deltaTime);
         if (hitSomething) {
             // TODO: Check PhotonView.ViewID
             hitObject = hit.transform.root.gameObject;
@@ -54,12 +61,11 @@ public class BaseProj : MonoBehaviour {
     /// Calls BaseShip.HitMarker() to show hitmarker, instantiates impact prefab, destroys self.
     /// </summary>
     private void Hit(BaseShip target) {
-        if (target == null) {
-            return;
+        if (target != null) {
+            target.TakeDamage(damage);
+            owner.ShowHitMarker();
         }
-        target.TakeDamage(damage);
-        owner.ShowHitMarker();
-        // Instantiate(impactPrefab, transform.position, transform.rotation);
+        Instantiate(impactPrefab, transform.position, transform.rotation);
         Destroy(this.gameObject); // TODO: Owner client bias, network destroy
     }
 

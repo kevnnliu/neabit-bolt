@@ -342,9 +342,9 @@
      <Compile Include="Assets\Scripts\Player\Modules\Special\BaseSpecial.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Special\Boost.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Special\Shield.cs" />
-     <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseGun.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseImpact.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseProj.cs" />
+     <Compile Include="Assets\Scripts\Player\Modules\Weapon\BaseWeapon.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\Weapon\ProjLaser.cs" />
      <None Include="Assets\Photon\PhotonLibs\changes-library.txt" />
      <None Include="Assets\Oculus\Avatar\Resources\Materials\Version1.5\Avatar_PC_SingleComponent.shader" />

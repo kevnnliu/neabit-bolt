@@ -7,7 +7,7 @@ public class BaseShip : MonoBehaviour {
     #region Serialized Fields
 
     [SerializeField]
-    private float speed;
+    private float thrust;
     [SerializeField]
     private float rollRate;
     [SerializeField]
@@ -26,10 +26,13 @@ public class BaseShip : MonoBehaviour {
     private Transform[] weaponMounts;
     [SerializeField]
     private Transform[] specialMounts;
+    [SerializeField]
+    private PointAim pointAim;
 
     #endregion
 
     private float health;
+    [SerializeField]
     private float energy;
     private bool invincible;
 
@@ -44,8 +47,9 @@ public class BaseShip : MonoBehaviour {
 
     void Update() {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
-        if (ProcessModActivation()) {
-            energy += energyChargeRate * Time.deltaTime;
+        if (ProcessModActivation() && energy < baseEnergy) {
+            float charge = energyChargeRate * Time.deltaTime;
+            energy = energy + charge < baseEnergy ? energy + charge : baseEnergy;
         }
         ConvertInputs(moveInput);
         ApplyMovement(movement);
@@ -63,6 +67,9 @@ public class BaseShip : MonoBehaviour {
     /// Returns whether or not the ship can activate a mod, and if so subtracts the energy required.
     /// </summary>
     public bool SpendEnergy(IShipMod mod) {
+        if (mod.TypeOfMod == ModType.Weapon && !((BaseWeapon) mod).ReadyToFire()) {
+            return false;
+        }
         float cost = mod.IsContinuous ? mod.EnergyCost * Time.deltaTime : mod.EnergyCost;
         if (energy >= cost) {
             energy -= cost;
@@ -94,7 +101,7 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        throw new System.Exception("Not implemented!");
+        return pointAim.GetAimPoint();
     }
 
     /// <summary>
@@ -107,7 +114,10 @@ public class BaseShip : MonoBehaviour {
     }
 
     private void LoadBaseShip() {
-        moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
+        health = baseHealth;
+        energy = baseEnergy;
+
+        moveInput = new GestureInput(rollRate, yawRate, pitchRate, thrust, transform);
         movement = new Movement(transform);
         
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseGun : MonoBehaviour, IShipMod {
+public class BaseWeapon : MonoBehaviour, IShipMod {
 
     #region Serialized Fields
 
@@ -62,9 +62,13 @@ public class BaseGun : MonoBehaviour, IShipMod {
         }
     }
 
+    public bool ReadyToFire() {
+        return delay <= 0f;
+    }
+
     public void Activate(BaseShip properties) {
         owner = properties;
-        if (delay <= 0f) {
+        if (ReadyToFire()) {
             Fire(owner.AimTarget());
         }
     }

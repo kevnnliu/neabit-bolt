@@ -11,22 +11,15 @@ public class PointAim : MonoBehaviour {
     private Transform headTrack;
     [SerializeField]
     private Transform reticle;
-
-    // TODO: Only for testing, remove later
     [SerializeField]
     private Transform aimPoint;
 
     private const float reticleDist = 3f;
-
-    private float aimPointDist = 5f;
+    private const float minPointDist = 4f;
+    private const float maxPointDist = 100f;
 
     void Update() {
         aimPoint.position = GetAimPoint();
-        Debug.Log(Vector3.Distance(headTrack.position, reticle.position));
-    }
-
-    public void SetPointDist(float dist) {
-        aimPointDist = dist;
     }
 
     public Vector3 GetAimPoint() {
@@ -43,9 +36,21 @@ public class PointAim : MonoBehaviour {
 
         Vector3 aimVector = (reticle.position - headTrack.position).normalized;
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(headTrack.position, aimVector, out hit, aimPointDist);
+        bool hitSomething = Physics.Raycast(headTrack.position, aimVector, out hit, maxPointDist);
 
-        return hitSomething ? hit.point : headTrack.position + (aimVector * aimPointDist);
+        if (hitSomething) {
+            if (Vector3.Distance(headTrack.position, hit.point) < minPointDist) {
+                aimVector *= minPointDist;
+            }
+            else {
+                return hit.point;
+            }
+        }
+        else {
+            aimVector *= maxPointDist;
+        }
+
+        return headTrack.position + aimVector;
     }
 
     /// <summary>

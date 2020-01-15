@@ -4,19 +4,24 @@ using UnityEngine;
 
 public class GestureInput : IMoveInput {
 
-    private const float throttleMax = 1.25f;
+    private const float throttleMax = 1.2f;
     private const float pointerDistance = 5f;
+    private const float yawBorder = 20f;
+    private const float pitchBorder = 15f;
+    private const float rollBorder = 25f;
 
-    private float rollRate;
-    private float yawRate;
-    private float pitchRate;
+    private float rollCoeff;
+    private float yawCoeff;
+    private float pitchCoeff;
+    private float thrustCoeff;
     private Transform shipTransform;
     private Vector2 pitchYaw;
 
-    public GestureInput(float rRate, float yRate, float pRate, Transform shipT) {
-        rollRate = rRate;
-        yawRate = yRate;
-        pitchRate = pRate;
+    public GestureInput(float rCoeff, float yCoeff, float pCoeff, float thrust, Transform shipT) {
+        rollCoeff = rCoeff;
+        yawCoeff = yCoeff;
+        pitchCoeff = pCoeff;
+        thrustCoeff = thrust;
         ProcessRawInput(shipT);
     }
 
@@ -37,7 +42,7 @@ public class GestureInput : IMoveInput {
 
     public float GetThrustInput() {
         float throttle = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).y;
-        return Mathf.Clamp(1 + throttle, 0f, throttleMax) * Time.deltaTime;
+        return Mathf.Clamp(0.7f + throttle, 0f, throttleMax) * thrustCoeff * Time.deltaTime;
     }
 
     private float GetRollInput() {
@@ -45,15 +50,24 @@ public class GestureInput : IMoveInput {
         if (inputReading > 180f) {
             inputReading -= 360f;
         }
-        return Mathf.Clamp(inputReading, -rollRate, rollRate) * Time.deltaTime;
+        return Smooth(inputReading, rollCoeff, rollBorder);
     }
 
     private float GetYawInput() {
-        return Mathf.Clamp(pitchYaw.x, -yawRate, yawRate) * Time.deltaTime;
+        return Smooth(pitchYaw.x, yawCoeff, yawBorder);
     }
 
     private float GetPitchInput() {
-        return Mathf.Clamp(pitchYaw.y, -pitchRate, pitchRate) * Time.deltaTime;
+        return Smooth(pitchYaw.y, pitchCoeff, pitchBorder);
+    }
+
+    /// <summary>
+    /// Smooths input along a polynomial function, multiplied by Time.deltaTime, retains sign.
+    /// </summary>
+    private float Smooth(float amount, float coeff, float border) {
+        float proportion = Mathf.Clamp(amount, -border, border) / border;
+        float smoothed = Mathf.Sign(amount) * Mathf.Pow(proportion, 2f);
+        return smoothed * coeff * Time.deltaTime;
     }
 
     /// <summary>
