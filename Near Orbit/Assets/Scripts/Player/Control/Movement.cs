@@ -20,9 +20,7 @@ public class Movement {
         newRotation = shipT.rotation * moveInput.GetRotationInput();
         newPosition = shipT.position;
 
-        int layerMask = 1 << 2;
-        layerMask = ~layerMask;
-        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput(), layerMask)) {
+        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput())) {
             newPosition += (shipT.forward * moveInput.GetThrustInput());
         }
 

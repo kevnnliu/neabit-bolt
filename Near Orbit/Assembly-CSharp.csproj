@@ -335,6 +335,7 @@
      <Compile Include="Assets\Scripts\Player\Control\IMoveInput.cs" />
      <Compile Include="Assets\Scripts\Player\Control\ModActInput.cs" />
      <Compile Include="Assets\Scripts\Player\Control\Movement.cs" />
+     <Compile Include="Assets\Scripts\Player\Control\PointAim.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\IShipMod.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\ModBox.cs" />
      <Compile Include="Assets\Scripts\Player\Modules\ModPrefab.cs" />

@@ -43,10 +43,11 @@ public class BaseProj : MonoBehaviour {
         if (hitSomething) {
             // TODO: Check PhotonView.ViewID
             hitObject = hit.transform.root.gameObject;
-            Hit(hitObject.GetComponent<BaseShip>());
-            return hitObject != owner.gameObject;
+            if (hitObject != owner.gameObject) {
+                Hit(hitObject.GetComponent<BaseShip>());
+            }
         }
-        return false;
+        return hitSomething;
     }
 
     /// <summary>

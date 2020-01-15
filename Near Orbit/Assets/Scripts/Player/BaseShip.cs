@@ -38,12 +38,12 @@ public class BaseShip : MonoBehaviour {
     private ModBox weapons;
     private ModBox specials;
 
-    void Start() {
+    void Awake() {
         LoadBaseShip();
     }
 
     void Update() {
-        invincible = false; // TODO: Check if in safe zone (invincible)
+        invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
         if (ProcessModActivation()) {
             energy += energyChargeRate * Time.deltaTime;
         }
@@ -110,7 +110,7 @@ public class BaseShip : MonoBehaviour {
         moveInput = new GestureInput(rollRate, yawRate, pitchRate, transform);
         movement = new Movement(transform);
         
-        // TODO: Load ModBox instances
+        // TODO: Load ModBox instances (CURRENTLY HARD CODED)
         weapons = new ModBox(weaponMounts, new Module[] {Module.LaserGun});
         specials = new ModBox(specialMounts, new Module[] {Module.Boost, Module.Shield});
     }
