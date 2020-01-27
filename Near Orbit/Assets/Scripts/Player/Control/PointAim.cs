@@ -8,38 +8,48 @@ using UnityEngine;
 public class PointAim : MonoBehaviour {
 
     [SerializeField]
-    private Transform headTrack;
-    [SerializeField]
-    private Transform reticle;
+    private Transform eyeTrack;
     [SerializeField]
     private Transform aimPoint;
 
-    private const float reticleDist = 3f;
-    private const float minPointDist = 4f;
-    private const float maxPointDist = 100f;
+    private const float intersectRadius = 4f;
+    private const float minPointDist = 2f;
+    private const float maxPointDist = 20f;
+
+    private float baseScale;
+
+    void Start() {
+        baseScale = aimPoint.localScale.x;
+    }
 
     void Update() {
         aimPoint.position = GetAimPoint();
+        float newScale = Vector3.Distance(transform.position, aimPoint.position) / maxPointDist;
+        aimPoint.localScale = Vector3.one * baseScale * newScale;
+        aimPoint.rotation = Quaternion.LookRotation(eyeTrack.position - aimPoint.position, aimPoint.transform.up);
     }
 
+    /// <summary>
+    /// Returns the Vector3 position of the aim point.
+    /// </summary>
     public Vector3 GetAimPoint() {
-        Vector3 vectorA = headTrack.position - transform.position;
+        Vector3 vectorA = eyeTrack.position - transform.position;
         Vector3 vectorP = transform.forward * int.MaxValue;
         float degXYW = Vector3.Angle(vectorA, vectorP);
 
         float lenXW = Mathf.Sin(degXYW * Mathf.Deg2Rad) * vectorA.magnitude;
-        float degZXW = Mathf.Acos(lenXW / reticleDist) * Mathf.Rad2Deg;
+        float degZXW = Mathf.Acos(lenXW / intersectRadius) * Mathf.Rad2Deg;
         float degZXY = degZXW + (90f - degXYW);
 
-        float lenYZ = LawOfCosines(vectorA.magnitude, reticleDist, degZXY * Mathf.Deg2Rad);
-        reticle.position = transform.position + (transform.forward * lenYZ);
+        float lenYZ = LawOfCosines(vectorA.magnitude, intersectRadius, degZXY * Mathf.Deg2Rad);
+        Vector3 intersectPosition = transform.position + (transform.forward * lenYZ);
 
-        Vector3 aimVector = (reticle.position - headTrack.position).normalized;
+        Vector3 aimVector = (intersectPosition - eyeTrack.position).normalized;
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(headTrack.position, aimVector, out hit, maxPointDist);
+        bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, maxPointDist);
 
         if (hitSomething) {
-            if (Vector3.Distance(headTrack.position, hit.point) < minPointDist) {
+            if (Vector3.Distance(eyeTrack.position, hit.point) < minPointDist) {
                 aimVector *= minPointDist;
             }
             else {
@@ -50,7 +60,7 @@ public class PointAim : MonoBehaviour {
             aimVector *= maxPointDist;
         }
 
-        return headTrack.position + aimVector;
+        return eyeTrack.position + aimVector;
     }
 
     /// <summary>

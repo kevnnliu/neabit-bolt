@@ -62,7 +62,7 @@ public class BaseWeapon : MonoBehaviour, IShipMod {
         }
     }
 
-    public bool ReadyToFire() {
+    public virtual bool ReadyToFire() {
         return delay <= 0f;
     }
 

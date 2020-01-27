@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 262ec08d9e2087e419357f2197fb9a86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projVelocity: 95
+  projVelocity: 105
   impactPrefab: {fileID: 3644481398292810958, guid: ea8965c72a5c07a498b5f5814aa1a84a,
     type: 3}
   range: 5

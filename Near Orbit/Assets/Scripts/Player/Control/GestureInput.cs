@@ -6,9 +6,6 @@ public class GestureInput : IMoveInput {
 
     private const float throttleMax = 1.2f;
     private const float pointerDistance = 5f;
-    private const float yawBorder = 20f;
-    private const float pitchBorder = 15f;
-    private const float rollBorder = 25f;
 
     private float rollCoeff;
     private float yawCoeff;
@@ -16,12 +13,16 @@ public class GestureInput : IMoveInput {
     private float thrustCoeff;
     private Transform shipTransform;
     private Vector2 pitchYaw;
+    private float pitchYawBorder;
+    private float rollBorder;
 
-    public GestureInput(float rCoeff, float yCoeff, float pCoeff, float thrust, Transform shipT) {
+    public GestureInput(float rCoeff, float yCoeff, float pCoeff, float thrust, Transform shipT, float pYB, float rB) {
         rollCoeff = rCoeff;
         yawCoeff = yCoeff;
         pitchCoeff = pCoeff;
         thrustCoeff = thrust;
+        pitchYawBorder = pYB;
+        rollBorder = rB;
         ProcessRawInput(shipT);
     }
 
@@ -54,11 +55,11 @@ public class GestureInput : IMoveInput {
     }
 
     private float GetYawInput() {
-        return Smooth(pitchYaw.x, yawCoeff, yawBorder);
+        return Smooth(pitchYaw.x, yawCoeff, pitchYawBorder);
     }
 
     private float GetPitchInput() {
-        return Smooth(pitchYaw.y, pitchCoeff, pitchBorder);
+        return Smooth(pitchYaw.y, pitchCoeff, pitchYawBorder);
     }
 
     /// <summary>
