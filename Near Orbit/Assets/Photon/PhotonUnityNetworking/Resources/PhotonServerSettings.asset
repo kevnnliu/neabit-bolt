@@ -16,9 +16,9 @@ MonoBehaviour:
     AppIdRealtime: 4cf225f5-b2b9-4600-8fe8-8800b42055cf
     AppIdChat: 
     AppIdVoice: 
-    AppVersion: 
+    AppVersion: 0.0.1
     UseNameServer: 1
-    FixedRegion: 
+    FixedRegion: usw
     Server: 
     Port: 0
     Protocol: 0
@@ -31,8 +31,5 @@ MonoBehaviour:
   RpcList:
   - ClickRpc
   - DestroyRpc
-  - DestroySpaceship
-  - Fire
-  - RespawnSpaceship
   DisableAutoOpenWizard: 1
-  ShowSettings: 0
+  ShowSettings: 1
