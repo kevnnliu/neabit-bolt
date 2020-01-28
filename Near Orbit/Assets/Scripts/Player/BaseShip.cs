@@ -103,15 +103,7 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        Vector3 aimPoint = pointAim.GetAimPoint();
-        Vector3 aimVector = aimPoint - transform.position;
-        float angle = Vector3.Angle(transform.forward, aimVector);
-        if (angle <= pitchYawBorder) {
-            return aimPoint;
-        }
-        Quaternion worldRot = Quaternion.LookRotation(aimVector, transform.up);
-        Quaternion heading = Quaternion.LookRotation(transform.forward, transform.up);
-        return Quaternion.Lerp(heading, worldRot, pitchYawBorder / angle) * transform.forward;
+        return pointAim.GetAimPoint();
     }
 
     /// <summary>
@@ -127,7 +119,7 @@ public class BaseShip : MonoBehaviour {
         health = baseHealth;
         energy = baseEnergy;
 
-        moveInput = new GestureInput(rollRate, yawRate, pitchRate, thrust, transform, pitchYawBorder, rollBorder);
+        moveInput = new GestureInput(rollRate, yawRate, pitchRate, thrust, transform);
         movement = new Movement(transform);
         
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)

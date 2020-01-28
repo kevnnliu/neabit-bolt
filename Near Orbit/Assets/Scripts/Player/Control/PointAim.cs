@@ -13,7 +13,7 @@ public class PointAim : MonoBehaviour {
     private Transform aimPoint;
 
     private const float intersectRadius = 4f;
-    private const float minPointDist = 2f;
+    private const float minPointDist = 3f;
     private const float maxPointDist = 20f;
 
     private float baseScale;

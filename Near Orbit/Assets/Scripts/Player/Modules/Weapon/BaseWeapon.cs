@@ -51,6 +51,8 @@ public class BaseWeapon : MonoBehaviour, IShipMod {
 
     #endregion
 
+    private const float firingArc = 18f;
+
     private float damageFactor = 1f;
     private float delayFactor = 1f;
     private float delay = 0f;
@@ -86,8 +88,15 @@ public class BaseWeapon : MonoBehaviour, IShipMod {
         float damage = baseDamage * damageFactor;
 
         GameObject proj = Instantiate(projPrefab, transform.position, transform.rotation);
-        proj.transform.LookAt(target, transform.up);
         proj.GetComponent<BaseProj>().Parametrize(damage, owner, 9999); // TODO: Change 9999 to PhotonView.ViewID
+        proj.transform.LookAt(target, transform.up);
+
+        Vector3 aimVector = target - transform.position;
+        Vector3 normal = Vector3.Cross(transform.forward, aimVector);
+        float angle = Vector3.SignedAngle(transform.forward, aimVector, normal);
+        if (Mathf.Abs(angle) > firingArc) {
+            proj.transform.rotation = Quaternion.AngleAxis(firingArc * Mathf.Sign(angle), normal);
+        }
 
         damageFactor = 1f;
         delayFactor = 1f;
