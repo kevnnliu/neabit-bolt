@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Oculus.Platform;
 using Oculus.Platform.Models;
-using Photon.Pun;
-using Photon.Realtime;
 
 public class Launcher : MonoBehaviour {
 
@@ -64,14 +62,14 @@ public class Launcher : MonoBehaviour {
     }
 
     private void ConnectToPhoton() {
-        PhotonNetwork.AuthValues = new AuthenticationValues();
-        PhotonNetwork.AuthValues.UserId = oculusID;
-        PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Oculus;
-        PhotonNetwork.AuthValues.AddAuthParameter("userid", oculusID);
-        PhotonNetwork.AuthValues.AddAuthParameter("nonce", oculusNonce);
-        PhotonNetwork.ConnectUsingSettings();
+        // PhotonNetwork.AuthValues = new AuthenticationValues();
+        // PhotonNetwork.AuthValues.UserId = oculusID;
+        // PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Oculus;
+        // PhotonNetwork.AuthValues.AddAuthParameter("userid", oculusID);
+        // PhotonNetwork.AuthValues.AddAuthParameter("nonce", oculusNonce);
+        // PhotonNetwork.ConnectUsingSettings();
 
-        PhotonNetwork.NickName = oculusNickname;
+        // PhotonNetwork.NickName = oculusNickname;
     }
 
 }

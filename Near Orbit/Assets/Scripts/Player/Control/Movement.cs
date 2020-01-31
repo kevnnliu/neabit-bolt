@@ -17,14 +17,14 @@ public class Movement {
     /// Computes new position and rotation from an IMoveInput instance and the current Transform.
     /// </summary>
     public void ComputeNewTransform(Transform shipT, IMoveInput moveInput) {
-        newRotation = shipT.rotation * moveInput.GetRotationInput();
-        newPosition = shipT.position;
+        newRotation = shipT.rotation * Quaternion.Slerp(Quaternion.identity, moveInput.GetRotationInput(), Time.deltaTime);
 
-        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput())) {
-            newPosition += (shipT.forward * moveInput.GetThrustInput());
+        Vector3 diff = Vector3.zero;
+
+        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput() * Time.deltaTime)) {
+            diff = shipT.forward * moveInput.GetThrustInput() * Time.deltaTime;
         }
 
-        Vector3 diff = newPosition - shipT.position;
         newPosition = shipT.position + (diff * speedFactor);
 
         speedFactor = 1f;

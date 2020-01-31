@@ -41,7 +41,7 @@ public class GestureInput : IMoveInput {
 
     public float GetThrustInput() {
         float throttle = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).y;
-        return Mathf.Clamp(0.7f + throttle, 0f, throttleMax) * thrustCoeff * Time.deltaTime;
+        return Mathf.Clamp(0.7f + throttle, 0f, throttleMax) * thrustCoeff;
     }
 
     private float GetRollInput() {
@@ -66,7 +66,7 @@ public class GestureInput : IMoveInput {
     private float Smooth(float amount, float coeff, float border) {
         float proportion = Mathf.Clamp(amount, -border, border) / border;
         float smoothed = Mathf.Sign(amount) * Mathf.Pow(proportion, 2f);
-        return smoothed * coeff * Time.deltaTime;
+        return smoothed * coeff;
     }
 
     /// <summary>

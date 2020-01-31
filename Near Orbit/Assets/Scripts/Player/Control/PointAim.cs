@@ -10,29 +10,32 @@ public class PointAim : MonoBehaviour {
     [SerializeField]
     private Transform eyeTrack;
     [SerializeField]
-    private Transform aimPoint;
+    private Transform reticlePoint;
 
     private const float intersectRadius = 4f;
     private const float minPointDist = 3f;
     private const float maxPointDist = 20f;
+    private const float maxFiringAngle = 18f;
 
     private float baseScale;
+    private BaseShip ship;
 
     void Start() {
-        baseScale = aimPoint.localScale.x;
+        baseScale = reticlePoint.localScale.x;
+        ship = transform.root.GetComponent<BaseShip>();
     }
 
     void Update() {
-        aimPoint.position = GetAimPoint();
-        float newScale = Vector3.Distance(transform.position, aimPoint.position) / maxPointDist;
-        aimPoint.localScale = Vector3.one * baseScale * newScale;
-        aimPoint.rotation = Quaternion.LookRotation(eyeTrack.position - aimPoint.position, aimPoint.transform.up);
+        reticlePoint.position = GetReticlePoint();
+        float newScale = Vector3.Distance(transform.position, reticlePoint.position) / maxPointDist;
+        reticlePoint.localScale = Vector3.one * baseScale * newScale;
+        reticlePoint.rotation = Quaternion.LookRotation(eyeTrack.position - reticlePoint.position, reticlePoint.transform.up);
     }
 
     /// <summary>
     /// Returns the Vector3 position of the aim point.
     /// </summary>
-    public Vector3 GetAimPoint() {
+    public Vector3 GetReticlePoint() {
         Vector3 vectorA = eyeTrack.position - transform.position;
         Vector3 vectorP = transform.forward * int.MaxValue;
         float degXYW = Vector3.Angle(vectorA, vectorP);
@@ -45,6 +48,14 @@ public class PointAim : MonoBehaviour {
         Vector3 intersectPosition = transform.position + (transform.forward * lenYZ);
 
         Vector3 aimVector = (intersectPosition - eyeTrack.position).normalized;
+
+        float angle = Vector3.Angle(aimVector, ship.transform.forward);
+        if (angle > maxFiringAngle) {
+            Quaternion arc = Quaternion.FromToRotation(ship.transform.forward, aimVector);
+            arc = Quaternion.Slerp(Quaternion.identity, arc, maxFiringAngle / angle);
+            aimVector = arc * ship.transform.forward;
+        }
+
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, maxPointDist);
 

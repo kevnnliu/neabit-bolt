@@ -268,12 +268,6 @@
  <Reference Include="UnityEditor.Android.Extensions">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.19f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll</HintPath>
  </Reference>
- <Reference Include="Photon3Unity3D">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Assets/Photon/PhotonLibs/Photon3Unity3D.dll</HintPath>
- </Reference>
- <Reference Include="websocket-sharp">
- <HintPath>C:/Projects/neabit-official/Near Orbit/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
- </Reference>
  <Reference Include="nunit.framework">
  <HintPath>C:/Projects/neabit-official/Near Orbit/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
  </Reference>
@@ -649,17 +643,21 @@
       <Project>{73a0bd79-a81c-e4cc-0940-500ee99998a7}</Project>
       <Name>Unity.Timeline.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.PhotonPlayer.Editor.csproj">
-      <Project>{347fcbcd-3ce9-ca05-fcee-c64eb0d8c8fb}</Project>
-      <Name>PhotonUnityNetworking.Utilities.PhotonPlayer.Editor</Name>
+    <ProjectReference Include="PlayFabTesting.csproj">
+      <Project>{d89b2529-e076-48f9-a3c1-fa4ba3635e16}</Project>
+      <Name>PlayFabTesting</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VSCode.Editor.csproj">
       <Project>{ad64ad0b-8059-b181-a223-283a5dad99b0}</Project>
       <Name>Unity.VSCode.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.csproj">
-      <Project>{a0f47e26-d648-23fe-05c9-7187245a4a49}</Project>
-      <Name>PhotonUnityNetworking.Utilities</Name>
+    <ProjectReference Include="PlayFab.csproj">
+      <Project>{bdd46ef2-05cf-5ca2-c808-aa9d8e8fc864}</Project>
+      <Name>PlayFab</Name>
+    </ProjectReference>
+    <ProjectReference Include="PlayFabEditorExtensions.csproj">
+      <Project>{6e6eab8d-f4ed-1074-3df4-b5c4b3ad3cb5}</Project>
+      <Name>PlayFabEditorExtensions</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
       <Project>{226d54db-8c88-d57d-ac47-ca5c88d87116}</Project>
@@ -673,25 +671,21 @@
       <Project>{d51a93ee-42c3-9d00-a445-d148eccc9c48}</Project>
       <Name>Unity.Timeline</Name>
     </ProjectReference>
-    <ProjectReference Include="PhotonWebSocket.csproj">
-      <Project>{3e2c0b7f-139a-ecff-cab4-10826cf0e17e}</Project>
-      <Name>PhotonWebSocket</Name>
+    <ProjectReference Include="PlayFabSDKEditor.csproj">
+      <Project>{b54ee5a0-b555-4cfc-31ed-e0621700f79e}</Project>
+      <Name>PlayFabSDKEditor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.CollabProxy.Editor.csproj">
       <Project>{5c290075-a1fd-33bd-1c05-a39691327dd3}</Project>
       <Name>Unity.CollabProxy.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="PhotonRealtime.csproj">
-      <Project>{89d0cb02-c939-8dfe-fcc5-863b82c7e1ce}</Project>
-      <Name>PhotonRealtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.csproj">
-      <Project>{06c58389-abfa-9c59-5f6f-0b96d4ba976f}</Project>
-      <Name>PhotonUnityNetworking</Name>
-    </ProjectReference>
     <ProjectReference Include="Oculus.VR.Editor.csproj">
       <Project>{bbdeec41-f553-d4f9-773d-2f8a5bebc6c4}</Project>
       <Name>Oculus.VR.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="PlayFabTestingEditor.csproj">
+      <Project>{c4ca176c-602b-4301-4d2f-6675f875f274}</Project>
+      <Name>PlayFabTestingEditor</Name>
     </ProjectReference>
     <ProjectReference Include="Oculus.VR.Scripts.Editor.csproj">
       <Project>{60262402-1d05-9c4a-785d-16587c7e54b2}</Project>
@@ -701,21 +695,9 @@
       <Project>{d75f5e4a-c4b6-7493-2893-b79c096a090f}</Project>
       <Name>Oculus.VR</Name>
     </ProjectReference>
-    <ProjectReference Include="PhotonChat.csproj">
-      <Project>{9aa674b5-d645-0d13-d9ba-e53e51e84eb3}</Project>
-      <Name>PhotonChat</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.csproj">
       <Project>{b202b21c-7acd-e817-c860-1500c8e2bacc}</Project>
       <Name>Unity.TextMeshPro</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Utilities.Culling.Editor.csproj">
-      <Project>{99e13174-71bc-00e9-3fd0-fe8b5ab2fca3}</Project>
-      <Name>PhotonUnityNetworking.Utilities.Culling.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="PhotonUnityNetworking.Editor.csproj">
-      <Project>{a7729f32-ec8a-2b02-1be8-4f4347b3e8be}</Project>
-      <Name>PhotonUnityNetworking.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.UI.csproj">
       <Project>{6a2e029f-b2cd-c267-c458-91743443b702}</Project>

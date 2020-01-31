@@ -61,6 +61,10 @@ public class BaseShip : MonoBehaviour {
         return movement;
     }
 
+    public IMoveInput GetMoveInput() {
+        return moveInput;
+    }
+
     public void SetInvincibility(bool enabled) {
         invincible = enabled;
     }
@@ -103,7 +107,7 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        return pointAim.GetAimPoint();
+        return pointAim.GetReticlePoint();
     }
 
     /// <summary>
