@@ -1,2 +1,2 @@
 # Near Orbit
-Made with Unity, uses the Oculus API and Photon Unity Networking
+Made with Unity, uses the Oculus SDK
