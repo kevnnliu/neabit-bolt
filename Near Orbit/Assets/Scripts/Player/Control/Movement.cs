@@ -8,7 +8,17 @@ public class Movement {
     private Quaternion newRotation;
     private float speedFactor = 1f;
 
-    public Movement(Transform shipT) {
+    private float rollCoeff;
+    private float yawCoeff;
+    private float pitchCoeff;
+    private float thrustCoeff;
+
+    public Movement(float rCoeff, float yCoeff, float pCoeff, float thrust, Transform shipT) {
+        rollCoeff = rCoeff;
+        yawCoeff = yCoeff;
+        pitchCoeff = pCoeff;
+        thrustCoeff = thrust;
+
         newPosition = shipT.position;
         newRotation = shipT.rotation;
     }
@@ -17,12 +27,15 @@ public class Movement {
     /// Computes new position and rotation from an IMoveInput instance and the current Transform.
     /// </summary>
     public void ComputeNewTransform(Transform shipT, IMoveInput moveInput) {
-        newRotation = shipT.rotation * Quaternion.Slerp(Quaternion.identity, moveInput.GetRotationInput(), Time.deltaTime);
+        Vector3 eulerRotation = Vector3.Scale(moveInput.GetRotationInput(), new Vector3(pitchCoeff, yawCoeff, rollCoeff));
+        Quaternion rotation = Quaternion.Euler(eulerRotation);
+        newRotation = shipT.rotation * Quaternion.Slerp(Quaternion.identity, rotation, Time.deltaTime);
 
         Vector3 diff = Vector3.zero;
+        float thrust = moveInput.GetThrustInput() * thrustCoeff * Time.deltaTime;
 
-        if (!Physics.Raycast(shipT.position, shipT.forward, moveInput.GetThrustInput() * Time.deltaTime)) {
-            diff = shipT.forward * moveInput.GetThrustInput() * Time.deltaTime;
+        if (!Physics.Raycast(shipT.position, shipT.forward, thrust)) {
+            diff = shipT.forward * thrust;
         }
 
         newPosition = shipT.position + (diff * speedFactor);

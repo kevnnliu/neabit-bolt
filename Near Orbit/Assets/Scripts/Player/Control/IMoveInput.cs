@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Base interface for movement inputs.
+/// 
+/// </summary>
 public interface IMoveInput {
 
     /// <summary>
@@ -11,8 +15,18 @@ public interface IMoveInput {
         get;
     }
 
-    Quaternion GetRotationInput();
+    /// <summary>
+    /// Local rotational velocity to be applied on the next frame.
+    /// All values should be between -1 and 1.
+    /// </summary>
+    /// <returns></returns>
+    Vector3 GetRotationInput();
 
+    /// <summary>
+    /// Forward thrust input to be applied on the next frame.
+    /// Value should be between 0 and 1.
+    /// </summary>
+    /// <returns></returns>
     float GetThrustInput();
 
     /// <summary>

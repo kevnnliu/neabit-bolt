@@ -9,18 +9,10 @@ public class GestureInput : IMoveInput {
     private const float pitchYawBorder = 15f;
     private const float rollBorder = 25f;
 
-    private float rollCoeff;
-    private float yawCoeff;
-    private float pitchCoeff;
-    private float thrustCoeff;
     private Transform shipTransform;
     private Vector2 pitchYaw;
 
-    public GestureInput(float rCoeff, float yCoeff, float pCoeff, float thrust, Transform shipT) {
-        rollCoeff = rCoeff;
-        yawCoeff = yCoeff;
-        pitchCoeff = pCoeff;
-        thrustCoeff = thrust;
+    public GestureInput(Transform shipT) {
         ProcessRawInput(shipT);
     }
 
@@ -35,13 +27,14 @@ public class GestureInput : IMoveInput {
         pitchYaw = ConvertFromRaw();
     }
 
-    public Quaternion GetRotationInput() {
-        return Quaternion.Euler(GetPitchInput(), GetYawInput(), GetRollInput());
+    public Vector3 GetRotationInput() {
+        return new Vector3(GetPitchInput(), GetYawInput(), GetRollInput());
     }
 
     public float GetThrustInput() {
+        // TODO: Change how throttle input works
         float throttle = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).y;
-        return Mathf.Clamp(0.7f + throttle, 0f, throttleMax) * thrustCoeff;
+        return Mathf.Clamp(0.7f + throttle, 0f, throttleMax);
     }
 
     private float GetRollInput() {
@@ -49,24 +42,24 @@ public class GestureInput : IMoveInput {
         if (inputReading > 180f) {
             inputReading -= 360f;
         }
-        return Smooth(inputReading, rollCoeff, rollBorder);
+        return Smooth(inputReading, rollBorder);
     }
 
     private float GetYawInput() {
-        return Smooth(pitchYaw.x, yawCoeff, pitchYawBorder);
+        return Smooth(pitchYaw.x, pitchYawBorder);
     }
 
     private float GetPitchInput() {
-        return Smooth(pitchYaw.y, pitchCoeff, pitchYawBorder);
+        return Smooth(pitchYaw.y, pitchYawBorder);
     }
 
     /// <summary>
     /// Smooths input along a polynomial function, multiplied by Time.deltaTime, retains sign.
     /// </summary>
-    private float Smooth(float amount, float coeff, float border) {
+    private float Smooth(float amount, float border) {
         float proportion = Mathf.Clamp(amount, -border, border) / border;
         float smoothed = Mathf.Sign(amount) * Mathf.Pow(proportion, 2f);
-        return smoothed * coeff;
+        return smoothed;
     }
 
     /// <summary>
