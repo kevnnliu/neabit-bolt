@@ -119,6 +119,9 @@ public class BaseShip : MonoBehaviour {
         return !didActivateWeapon && !didActivateSpecial;
     }
 
+    /// <summary>
+    /// Initializes control, movement, and module instances.
+    /// </summary>
     private void LoadBaseShip() {
         health = baseHealth;
         energy = baseEnergy;
