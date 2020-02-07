@@ -89,12 +89,10 @@ public class PointAim : MonoBehaviour {
         if (hitSomething) {
             if (Vector3.Distance(eyeTrack.position, hit.point) < minPointDist) {
                 aimVector *= minPointDist;
-            }
-            else {
+            } else {
                 return hit.point;
             }
-        }
-        else {
+        } else {
             aimVector *= maxDist;
         }
 

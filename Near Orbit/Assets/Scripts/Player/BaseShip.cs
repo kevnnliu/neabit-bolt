@@ -126,8 +126,9 @@ public class BaseShip : MonoBehaviour {
         health = baseHealth;
         energy = baseEnergy;
 
-        moveInput = new GestureInput(rollRate, yawRate, pitchRate, thrust, transform);
-        movement = new Movement(transform);
+        //moveInput = new GestureInput(transform);
+        moveInput = new KeyboardInput();
+        movement = new Movement(rollRate, yawRate, pitchRate, thrust, transform);
         
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
         weapons = new ModBox(weaponMounts, new Module[] {Module.LaserGun});
