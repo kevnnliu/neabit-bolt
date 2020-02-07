@@ -8,3 +8,7 @@ Near Orbit/Logs/
 Near Orbit/obj/Debug/
 
 Near Orbit/Temp/
+
+.DS_Store
+
+*.meta
