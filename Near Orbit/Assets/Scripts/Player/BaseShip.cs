@@ -107,7 +107,7 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        return pointAim.GetReticlePoint();
+        return pointAim.GetAimPoint();
     }
 
     /// <summary>
