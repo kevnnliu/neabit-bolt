@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class BaseShip : MonoBehaviour {
 
@@ -44,6 +45,7 @@ public class BaseShip : MonoBehaviour {
     private ModBox specials;
 
     void Awake() {
+        SetupCamera();
         LoadBaseShip();
     }
 
@@ -144,7 +146,7 @@ public class BaseShip : MonoBehaviour {
     /// </summary>
     private void ConvertInputs(IMoveInput moveInput) {
         if (moveInput.ReadInputs) {
-            moveInput.ProcessRawInput(transform);
+            moveInput.UpdateInput();
             movement.ComputeNewTransform(transform, moveInput);
         }
     }
@@ -156,6 +158,20 @@ public class BaseShip : MonoBehaviour {
         if (movement != null) {
             transform.position = movement.GetNewPosition();
             transform.rotation = movement.GetNewRotation();
+        }
+    }
+
+    /// </summary>
+    /// Detects whether or not there is a VR device connected and enables
+    /// the corresponding camera object.
+    /// </summary>
+    private void SetupCamera() {
+        if (XRSettings.isDeviceActive) {
+            transform.Find("OVRCameraRig").gameObject.SetActive(true);
+        }
+        else {
+            XRSettings.enabled = false;
+            transform.Find("Camera").gameObject.SetActive(true);
         }
     }
 

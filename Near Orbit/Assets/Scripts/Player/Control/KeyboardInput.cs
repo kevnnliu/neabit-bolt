@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KeyboardInput : IMoveInput
-{
+public class KeyboardInput : IMoveInput {
     private float mouseMoveSpeed = 0.01f;
     private Vector3 pitchYaw;
     private Vector3 lastPosition;
@@ -16,6 +15,18 @@ public class KeyboardInput : IMoveInput
         get {
             return true;
         }
+    }
+
+    public void UpdateInput() {
+        return;
+    }
+
+    public Vector3 GetReticlePoint() {
+        throw new System.NotImplementedException();
+    }
+
+    public Vector3 GetAimPoint() {
+        throw new System.NotImplementedException();
     }
 
     public Vector3 GetRotationInput() {
