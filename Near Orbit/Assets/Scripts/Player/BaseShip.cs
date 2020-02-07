@@ -128,8 +128,6 @@ public class BaseShip : MonoBehaviour {
         health = baseHealth;
         energy = baseEnergy;
 
-        //moveInput = new GestureInput(transform);
-        moveInput = new KeyboardInput();
         movement = new Movement(rollRate, yawRate, pitchRate, thrust, transform);
         
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
@@ -168,10 +166,12 @@ public class BaseShip : MonoBehaviour {
     private void SetupCamera() {
         if (XRSettings.isDeviceActive) {
             transform.Find("OVRCameraRig").gameObject.SetActive(true);
+            moveInput = new GestureInput(transform);
         }
         else {
             XRSettings.enabled = false;
             transform.Find("Camera").gameObject.SetActive(true);
+            moveInput = new KeyboardInput();
         }
     }
 
