@@ -13,3 +13,5 @@ Near Orbit/Temp/
 .DS_Store
 
 *.meta
+
+*.csproj
