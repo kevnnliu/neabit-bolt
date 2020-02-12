@@ -9,11 +9,16 @@ public class GestureInput : IMoveInput {
     private const float pitchYawBorder = 15f;
     private const float rollBorder = 25f;
 
+    private PointAim pointAim;
+    private Transform rightController;
     private Transform shipTransform;
     private Vector2 pitchYaw;
 
     public GestureInput(Transform shipT) {
-        ProcessRawInput(shipT);
+        shipTransform = shipT;
+        rightController = shipT.Find("OVRCameraRig").Find("TrackingSpace").Find("RightHandAnchor");
+        pointAim = new PointAim(shipT);
+        UpdateInput();
     }
 
     public bool ReadInputs {
@@ -22,9 +27,9 @@ public class GestureInput : IMoveInput {
         }
     }
 
-    public void ProcessRawInput(Transform shipT) {
-        shipTransform = shipT;
+    public void UpdateInput() {
         pitchYaw = ConvertFromRaw();
+        pointAim.UpdateAim();
     }
 
     public Vector3 GetRotationInput() {
@@ -37,8 +42,16 @@ public class GestureInput : IMoveInput {
         return Mathf.Clamp(0.7f + throttle, 0f, throttleMax);
     }
 
+    public Vector3 GetReticlePoint() {
+        return pointAim.GetReticlePoint();
+    }
+
+    public Vector3 GetAimPoint() {
+        return pointAim.GetAimPoint();
+    }
+
     private float GetRollInput() {
-        float inputReading = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch).eulerAngles.z;
+        float inputReading = rightController.localRotation.eulerAngles.z;
         if (inputReading > 180f) {
             inputReading -= 360f;
         }
@@ -66,13 +79,9 @@ public class GestureInput : IMoveInput {
     /// Takes the local Transform of RTouch and converts it to a pointer heading.
     /// </summary>
     private Vector2 ConvertFromRaw() {
-        // Get local controller position/rotation
-        Vector3 controllerPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
-        Quaternion controllerRot = OVRInput.GetLocalControllerRotation(OVRInput.Controller.RTouch);
-
-        // Convert to global
-        controllerPos = shipTransform.TransformPoint(controllerPos);
-        controllerRot = shipTransform.rotation * controllerRot;
+        // Get global controller position/rotation
+        Vector3 controllerPos = rightController.position;
+        Quaternion controllerRot = rightController.rotation;
 
         // Compute pointer vector
         Vector3 pointerDirection = controllerRot * Vector3.forward;

@@ -15,6 +15,16 @@ public interface IMoveInput {
         get;
     }
 
+    /// </summary>
+    /// Get the position of the reticle.
+    /// </summary>
+    Vector3 GetReticlePoint();
+
+    /// </summary>
+    /// Get the position of the aim point.
+    /// </summary>
+    Vector3 GetAimPoint();
+
     /// <summary>
     /// Local rotational velocity to be applied on the next frame.
     /// All values should be between -1 and 1.
@@ -30,8 +40,8 @@ public interface IMoveInput {
     float GetThrustInput();
 
     /// <summary>
-    /// Convert raw input to scaled values, relative to the ship transform if necessary.
+    /// Convert and update raw input to scaled values, to be called every frame.
     /// </summary>
-    void ProcessRawInput(Transform shipT);
+    void UpdateInput();
 
 }
