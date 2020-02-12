@@ -42,6 +42,28 @@ public class GestureInput : IMoveInput {
         return Mathf.Clamp(0.7f + throttle, 0f, throttleMax);
     }
 
+    public int WeaponActivated() {
+        if (OVRInput.Get(OVRInput.RawButton.RIndexTrigger, OVRInput.Controller.RTouch)) {
+            return 0;
+        } else if (OVRInput.Get(OVRInput.RawButton.A, OVRInput.Controller.RTouch)) {
+            return 1;
+        } else if (OVRInput.Get(OVRInput.RawButton.B, OVRInput.Controller.RTouch)) {
+            return 2;
+        }
+        return int.MaxValue;
+    }
+
+    public int SpecialActivated() {
+        if (OVRInput.Get(OVRInput.RawButton.LIndexTrigger, OVRInput.Controller.LTouch)) {
+            return 0;
+        } else if (OVRInput.Get(OVRInput.RawButton.X, OVRInput.Controller.LTouch)) {
+            return 1;
+        } else if (OVRInput.Get(OVRInput.RawButton.Y, OVRInput.Controller.LTouch)) {
+            return 2;
+        }
+        return int.MaxValue;
+    }
+
     public Vector3 GetReticlePoint() {
         return pointAim.GetReticlePoint();
     }

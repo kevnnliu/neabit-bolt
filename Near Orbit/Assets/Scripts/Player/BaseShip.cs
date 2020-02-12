@@ -109,15 +109,15 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        return pointAim.GetAimPoint();
+        return moveInput.GetAimPoint();
     }
 
     /// <summary>
     /// Process inputs and activate mods using the ModBox instances, returns true if no mods were activated.
     /// </summary>
     private bool ProcessModActivation() {
-        bool didActivateSpecial = specials.ActivateMod(this, ModActInput.SpecialActivated());
-        bool didActivateWeapon = weapons.ActivateMod(this, ModActInput.WeaponActivated());
+        bool didActivateSpecial = specials.ActivateMod(this, moveInput.SpecialActivated());
+        bool didActivateWeapon = weapons.ActivateMod(this, moveInput.WeaponActivated());
         return !didActivateWeapon && !didActivateSpecial;
     }
 
@@ -171,7 +171,7 @@ public class BaseShip : MonoBehaviour {
         else {
             XRSettings.enabled = false;
             transform.Find("Camera").gameObject.SetActive(true);
-            moveInput = new KeyboardInput();
+            moveInput = new KeyboardInput(transform);
         }
     }
 

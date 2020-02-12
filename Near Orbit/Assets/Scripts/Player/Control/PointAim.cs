@@ -7,12 +7,6 @@ using UnityEngine;
 /// </summary>
 public class PointAim {
 
-    private const float intersectRadius = 4f;
-    private const float minPointDist = 3f;
-    private const float maxReticleDist = 20f;
-    private const float maxPointDist = 100f;
-    private const float maxFiringAngle = 18f;
-
     private Transform eyeTrack;
     private Transform rightController;
     private Transform reticlePoint;
@@ -29,7 +23,7 @@ public class PointAim {
     }
     public void UpdateAim() {
         reticlePoint.position = GetReticlePoint();
-        float newScale = Vector3.Distance(rightController.position, reticlePoint.position) / maxReticleDist;
+        float newScale = Vector3.Distance(rightController.position, reticlePoint.position) / ReticleAimConstants.MaxReticleDist;
         reticlePoint.localScale = Vector3.one * baseScale * newScale;
         reticlePoint.rotation = Quaternion.LookRotation(eyeTrack.position - reticlePoint.position, reticlePoint.up);
     }
@@ -41,9 +35,9 @@ public class PointAim {
         Vector3 aimVector = (reticlePoint.position - eyeTrack.position).normalized;
 
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, maxPointDist);
+        bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, ReticleAimConstants.MaxPointDist);
 
-        return ClampRay(hitSomething, hit, aimVector, maxPointDist);
+        return ClampRay(hitSomething, hit, aimVector, ReticleAimConstants.MaxPointDist);
     }
 
     /// <summary>
@@ -55,23 +49,23 @@ public class PointAim {
         float degXYW = Vector3.Angle(vectorA, vectorP);
 
         float lenXW = Mathf.Sin(degXYW * Mathf.Deg2Rad) * vectorA.magnitude;
-        float degZXW = Mathf.Acos(lenXW / intersectRadius) * Mathf.Rad2Deg;
+        float degZXW = Mathf.Acos(lenXW / ReticleAimConstants.IntersectRadius) * Mathf.Rad2Deg;
         float degZXY = degZXW + (90f - degXYW);
 
-        float lenYZ = LawOfCosines(vectorA.magnitude, intersectRadius, degZXY * Mathf.Deg2Rad);
+        float lenYZ = LawOfCosines(vectorA.magnitude, ReticleAimConstants.IntersectRadius, degZXY * Mathf.Deg2Rad);
         Vector3 intersectPosition = rightController.position + (rightController.forward * lenYZ);
 
         Vector3 aimVector = (intersectPosition - eyeTrack.position).normalized;
 
         float angle = Vector3.Angle(aimVector, ship.transform.forward);
-        if (angle > maxFiringAngle) {
+        if (angle > ReticleAimConstants.MaxFiringAngle) {
             aimVector = ClampAimAngle(angle, aimVector);
         }
 
         RaycastHit hit;
-        bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, maxReticleDist);
+        bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, ReticleAimConstants.MaxReticleDist);
 
-        return ClampRay(hitSomething, hit, aimVector, maxReticleDist);
+        return ClampRay(hitSomething, hit, aimVector, ReticleAimConstants.MaxReticleDist);
     }
 
     /// <summary>
@@ -86,8 +80,8 @@ public class PointAim {
     /// </summary>
     private Vector3 ClampRay(bool hitSomething, RaycastHit hit, Vector3 aimVector, float maxDist) {
         if (hitSomething) {
-            if (Vector3.Distance(eyeTrack.position, hit.point) < minPointDist) {
-                aimVector *= minPointDist;
+            if (Vector3.Distance(eyeTrack.position, hit.point) < ReticleAimConstants.MinPointDist) {
+                aimVector *= ReticleAimConstants.MinPointDist;
             } else {
                 return hit.point;
             }
@@ -100,7 +94,7 @@ public class PointAim {
 
     private Vector3 ClampAimAngle(float angle, Vector3 aimVector) {
         Quaternion arc = Quaternion.FromToRotation(ship.transform.forward, aimVector);
-        arc = Quaternion.Slerp(Quaternion.identity, arc, maxFiringAngle / angle);
+        arc = Quaternion.Slerp(Quaternion.identity, arc, ReticleAimConstants.MaxFiringAngle / angle);
         return arc * ship.transform.forward;
     }
 

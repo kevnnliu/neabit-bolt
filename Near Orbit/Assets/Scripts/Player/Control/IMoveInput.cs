@@ -15,6 +15,10 @@ public interface IMoveInput {
         get;
     }
 
+    int WeaponActivated();
+
+    int SpecialActivated();
+
     /// </summary>
     /// Get the position of the reticle.
     /// </summary>
