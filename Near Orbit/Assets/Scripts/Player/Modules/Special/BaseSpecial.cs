@@ -2,51 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseSpecial: MonoBehaviour, IShipMod {
+public class BaseSpecial : IShipModule {
+    private float cooldown;
 
-    #region Serialized Fields
+    public ModuleType Type => ModuleType.Special;
 
-    [SerializeField]
-    private ModType _typeOfMod;
-    [SerializeField]
-    private float _energyCost;
-    [SerializeField]
-    private bool _isPassive;
-    [SerializeField]
-    private bool _isContinuous;
+    public bool IsActive => throw new System.NotImplementedException();
 
-    #endregion
-
-    #region Properties
-
-    public ModType TypeOfMod {
-        get {
-            return _typeOfMod;
-        }
-    }
-
-    public float EnergyCost {
-        get {
-            return _energyCost;
-        }
-    }
-
-    public bool IsPassive {
-        get {
-            return _isContinuous;
-        }
-    }
-
-    public bool IsContinuous {
-        get {
-            return _isPassive;
-        }
-    }
-
-    #endregion
-
-    public virtual void Activate(BaseShip properties) {
+    public void Activate() {
         throw new System.NotImplementedException();
     }
 
+    public void Deactivate() {
+        throw new System.NotImplementedException();
+    }
+
+    public void Update() {
+        throw new System.NotImplementedException();
+    }
 }

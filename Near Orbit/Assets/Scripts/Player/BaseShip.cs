@@ -6,23 +6,13 @@ using UnityEngine.XR;
 public class BaseShip : MonoBehaviour {
 
     #region Serialized Fields
-
-    [SerializeField]
-    private float thrust;
-    [SerializeField]
-    private float rollRate;
-    [SerializeField]
-    private float yawRate;
-    [SerializeField]
-    private float pitchRate;
+    
     [SerializeField]
     private int totalModCapacity;
     [SerializeField]
     private float baseHealth;
     [SerializeField]
-    private float baseEnergy;
-    [SerializeField]
-    private float energyChargeRate;
+    private ShipStats stats;
     [SerializeField]
     private Transform[] weaponMounts;
     [SerializeField]
@@ -36,13 +26,11 @@ public class BaseShip : MonoBehaviour {
     private const float rollBorder = 25f;
 
     private float health;
-    private float energy;
     private bool invincible;
 
-    private IMoveInput moveInput;
+    private IMoveInput input;
     private Movement movement;
-    private ModBox weapons;
-    private ModBox specials;
+    private ModuleGroup modules = new ModuleGroup();
 
     void Awake() {
         SetupCamera();
@@ -51,12 +39,14 @@ public class BaseShip : MonoBehaviour {
 
     void Update() {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
-        if (ProcessModActivation() && energy < baseEnergy) {
-            float charge = energyChargeRate * Time.deltaTime;
-            energy = energy + charge < baseEnergy ? energy + charge : baseEnergy;
+
+        //ConvertInputs(input);
+        if (input.ReadInputs) {
+            input.UpdateInput();
+            movement.ComputeNewTransform(transform, input);
         }
-        ConvertInputs(moveInput);
         ApplyMovement(movement);
+        modules.Update(input);
     }
 
     public Movement GetMovement() {
@@ -64,26 +54,11 @@ public class BaseShip : MonoBehaviour {
     }
 
     public IMoveInput GetMoveInput() {
-        return moveInput;
+        return input;
     }
 
     public void SetInvincibility(bool enabled) {
         invincible = enabled;
-    }
-
-    /// <summary>
-    /// Returns whether or not the ship can activate a mod, and if so subtracts the energy required.
-    /// </summary>
-    public bool SpendEnergy(IShipMod mod) {
-        if (mod.TypeOfMod == ModType.Weapon && !((BaseWeapon) mod).ReadyToFire()) {
-            return false;
-        }
-        float cost = mod.IsContinuous ? mod.EnergyCost * Time.deltaTime : mod.EnergyCost;
-        if (energy >= cost) {
-            energy -= cost;
-            return true;
-        }
-        return false;
     }
 
     /// <summary>
@@ -93,6 +68,7 @@ public class BaseShip : MonoBehaviour {
         if (!invincible) {
             health -= damage;
             if (health <= 0f) {
+                Debug.Log("I died :(");
                 Respawn();
             }
         }
@@ -109,16 +85,7 @@ public class BaseShip : MonoBehaviour {
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
     public Vector3 AimTarget() {
-        return moveInput.GetAimPoint();
-    }
-
-    /// <summary>
-    /// Process inputs and activate mods using the ModBox instances, returns true if no mods were activated.
-    /// </summary>
-    private bool ProcessModActivation() {
-        bool didActivateSpecial = specials.ActivateMod(this, moveInput.SpecialActivated());
-        bool didActivateWeapon = weapons.ActivateMod(this, moveInput.WeaponActivated());
-        return !didActivateWeapon && !didActivateSpecial;
+        return input.GetAimPoint();
     }
 
     /// <summary>
@@ -126,13 +93,11 @@ public class BaseShip : MonoBehaviour {
     /// </summary>
     private void LoadBaseShip() {
         health = baseHealth;
-        energy = baseEnergy;
 
-        movement = new Movement(rollRate, yawRate, pitchRate, thrust, transform);
-        
+        movement = new Movement(stats, transform);
+
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
-        weapons = new ModBox(weaponMounts, new Module[] {Module.LaserGun});
-        specials = new ModBox(specialMounts, new Module[] {Module.Boost, Module.Shield});
+        modules.AddModule(new LaserBlasterWeapon(this));
     }
 
     private void Respawn() {
@@ -166,12 +131,12 @@ public class BaseShip : MonoBehaviour {
     private void SetupCamera() {
         if (XRSettings.isDeviceActive) {
             transform.Find("OVRCameraRig").gameObject.SetActive(true);
-            moveInput = new GestureInput(transform);
+            input = new GestureInput(transform);
         }
         else {
             XRSettings.enabled = false;
             transform.Find("Camera").gameObject.SetActive(true);
-            moveInput = new KeyboardInput(transform);
+            input = new KeyboardInput(transform);
         }
     }
 

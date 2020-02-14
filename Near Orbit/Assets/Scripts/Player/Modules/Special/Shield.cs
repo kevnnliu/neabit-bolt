@@ -4,8 +4,4 @@ using UnityEngine;
 
 public class Shield : BaseSpecial {
 
-    public override void Activate(BaseShip properties) {
-        properties.SetInvincibility(true);
-    }
-
 }

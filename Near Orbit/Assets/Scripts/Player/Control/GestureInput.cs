@@ -14,6 +14,12 @@ public class GestureInput : IMoveInput {
     private Transform shipTransform;
     private Vector2 pitchYaw;
 
+    private struct Input {
+        public bool weaponActivation, weaponNext, weaponPrev;
+        public bool special0, special1, special2;
+    }
+    private Input prevInput, curInput;
+
     public GestureInput(Transform shipT) {
         shipTransform = shipT;
         rightController = shipT.Find("OVRCameraRig").Find("TrackingSpace").Find("RightHandAnchor");
@@ -30,6 +36,14 @@ public class GestureInput : IMoveInput {
     public void UpdateInput() {
         pitchYaw = ConvertFromRaw();
         pointAim.UpdateAim();
+
+        prevInput = curInput;
+        curInput.weaponActivation = OVRInput.Get(OVRInput.RawButton.RIndexTrigger, OVRInput.Controller.RTouch);
+        curInput.weaponNext = OVRInput.Get(OVRInput.RawButton.A, OVRInput.Controller.RTouch);
+        curInput.weaponPrev = OVRInput.Get(OVRInput.RawButton.B, OVRInput.Controller.RTouch);
+        curInput.special0 = OVRInput.Get(OVRInput.RawButton.LIndexTrigger, OVRInput.Controller.LTouch);
+        curInput.special1 = OVRInput.Get(OVRInput.RawButton.X, OVRInput.Controller.LTouch);
+        curInput.special2 = OVRInput.Get(OVRInput.RawButton.Y, OVRInput.Controller.LTouch);
     }
 
     public Vector3 GetRotationInput() {
@@ -43,25 +57,28 @@ public class GestureInput : IMoveInput {
     }
 
     public int WeaponActivated() {
-        if (OVRInput.Get(OVRInput.RawButton.RIndexTrigger, OVRInput.Controller.RTouch)) {
-            return 0;
-        } else if (OVRInput.Get(OVRInput.RawButton.A, OVRInput.Controller.RTouch)) {
-            return 1;
-        } else if (OVRInput.Get(OVRInput.RawButton.B, OVRInput.Controller.RTouch)) {
-            return 2;
-        }
-        return int.MaxValue;
+        return (curInput.weaponActivation ? 1 : 0) - (prevInput.weaponActivation ? 1 : 0);
+    }
+    
+    public bool WeaponNextPressed() {
+        return curInput.weaponNext && !prevInput.weaponNext;
     }
 
-    public int SpecialActivated() {
-        if (OVRInput.Get(OVRInput.RawButton.LIndexTrigger, OVRInput.Controller.LTouch)) {
-            return 0;
-        } else if (OVRInput.Get(OVRInput.RawButton.X, OVRInput.Controller.LTouch)) {
-            return 1;
-        } else if (OVRInput.Get(OVRInput.RawButton.Y, OVRInput.Controller.LTouch)) {
-            return 2;
+    public bool WeaponPrevPressed() {
+        return curInput.weaponPrev && !prevInput.weaponPrev;
+    }
+
+    public int SpecialActivated(int index) {
+        switch (index) {
+            case 0:
+                return (curInput.special0 ? 1 : 0) - (prevInput.special0 ? 1 : 0);
+            case 1:
+                return (curInput.special0 ? 1 : 0) - (prevInput.special0 ? 1 : 0);
+            case 2:
+                return (curInput.special0 ? 1 : 0) - (prevInput.special0 ? 1 : 0);
+            default:
+                return 0;
         }
-        return int.MaxValue;
     }
 
     public Vector3 GetReticlePoint() {

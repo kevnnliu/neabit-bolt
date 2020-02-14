@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964124, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641252, b: 0.5748167, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -556,6 +556,11 @@ MonoBehaviour:
   totalModCapacity: 3
   baseHealth: 100
   baseEnergy: 100
+  stats:
+    RollRate: 45
+    YawRate: 30
+    PitchRate: 35
+    ThrustRate: 12
   energyChargeRate: 8
   weaponMounts:
   - {fileID: 1689486514}
