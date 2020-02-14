@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR;
 
 public class BaseShip : MonoBehaviour {
@@ -10,9 +8,9 @@ public class BaseShip : MonoBehaviour {
     [SerializeField]
     private int totalModCapacity;
     [SerializeField]
-    private float baseHealth;
+    private float baseHealth = 100;
     [SerializeField]
-    private ShipStats stats;
+    private ShipStats stats = new ShipStats(45, 30, 35, 12);
     [SerializeField]
     private Transform[] weaponMounts;
     [SerializeField]
@@ -39,7 +37,7 @@ public class BaseShip : MonoBehaviour {
 
     void Update() {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
-
+        
         //ConvertInputs(input);
         if (input.ReadInputs) {
             input.UpdateInput();
@@ -49,17 +47,11 @@ public class BaseShip : MonoBehaviour {
         modules.Update(input);
     }
 
-    public Movement GetMovement() {
-        return movement;
-    }
-
-    public IMoveInput GetMoveInput() {
-        return input;
-    }
-
     public void SetInvincibility(bool enabled) {
         invincible = enabled;
     }
+
+    public Movement Movement => movement;
 
     /// <summary>
     /// Checks invincibility, subtracts from Health, and initiates respawn when necessary.
@@ -97,7 +89,8 @@ public class BaseShip : MonoBehaviour {
         movement = new Movement(stats, transform);
 
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
-        modules.AddModule(new LaserBlasterWeapon(this));
+        modules.AddModule(ModuleManager.CreateModule<BaseWeapon>("Weapons/LaserGun", this, weaponMounts[0]));
+        modules.AddModule(ModuleManager.CreateModule<BaseSpecial>("Specials/Boost", this, specialMounts[0]));
     }
 
     private void Respawn() {
@@ -134,7 +127,7 @@ public class BaseShip : MonoBehaviour {
             input = new GestureInput(transform);
         }
         else {
-            XRSettings.enabled = false;
+            // XRSettings.enabled = false;
             transform.Find("Camera").gameObject.SetActive(true);
             input = new KeyboardInput(transform);
         }

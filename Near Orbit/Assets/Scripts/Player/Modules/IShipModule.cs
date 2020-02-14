@@ -17,6 +17,8 @@ public interface IShipModule {
     /// </summary>
     bool IsActive { get; }
 
+    void Init(BaseShip owner);
+
     void Activate();
     void Update();
     void Deactivate();

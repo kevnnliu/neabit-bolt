@@ -1,22 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public abstract class BaseWeapon : IShipModule {
-    private readonly float firingDelay;
+public abstract class BaseWeapon : MonoBehaviour, IShipModule {
+    private float firingDelay;
     private float delay = 0;
     private bool firing = false;
 
     protected BaseShip owner;
 
-    protected BaseWeapon(BaseShip owner, float firingDelay) {
-        this.owner = owner;
-        this.firingDelay = firingDelay;
-    }
-
     public ModuleType Type => ModuleType.Weapon;
 
     public bool IsActive => firing || delay > 0;
+
+    public abstract void Init(BaseShip owner);
+
+    protected void Init(BaseShip owner, float firingDelay) {
+        this.owner = owner;
+        this.firingDelay = firingDelay;
+    }
 
     public void Activate() {
         firing = true;

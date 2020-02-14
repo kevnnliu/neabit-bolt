@@ -36,8 +36,7 @@
 //                slots[inputIndex].Activate(properties);
 //            }
 //            return true;
-//        }
-//        else {
+//        } else {
 //            switch (inputIndex) {
 //                case 0:
 //                    if (properties.SpendEnergy(slots[equippedIndex])) {
