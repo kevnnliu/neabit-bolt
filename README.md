@@ -1,2 +1,2 @@
 # Near Orbit
-Made with Unity, uses the Oculus SDK and Photon BOLT.
+Made with Unity, uses the Oculus SDK and Photon Bolt.
