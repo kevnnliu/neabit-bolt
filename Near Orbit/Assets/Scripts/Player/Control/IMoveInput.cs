@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
-/// Base interface for movement inputs.
+/// Base interface for player inputs.
 /// 
 /// </summary>
 public interface IMoveInput {
@@ -16,8 +14,10 @@ public interface IMoveInput {
     }
 
     int WeaponActivated();
+    bool WeaponNextPressed();
+    bool WeaponPrevPressed();
 
-    int SpecialActivated();
+    int SpecialActivated(int index);
 
     /// </summary>
     /// Get the position of the reticle.
@@ -47,5 +47,4 @@ public interface IMoveInput {
     /// Convert and update raw input to scaled values, to be called every frame.
     /// </summary>
     void UpdateInput();
-
 }

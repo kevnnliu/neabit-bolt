@@ -2,51 +2,55 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseSpecial: MonoBehaviour, IShipMod {
+public abstract class BaseSpecial : MonoBehaviour, IShipModule {
+    private float duration;
+    private float cooldown;
+    private bool whilePressed;
+    private float timer;
 
-    #region Serialized Fields
+    private bool effectActive;
 
-    [SerializeField]
-    private ModType _typeOfMod;
-    [SerializeField]
-    private float _energyCost;
-    [SerializeField]
-    private bool _isPassive;
-    [SerializeField]
-    private bool _isContinuous;
+    protected BaseShip owner;
 
-    #endregion
+    public ModuleType Type => ModuleType.Special;
 
-    #region Properties
+    public bool IsActive => timer > 0;
 
-    public ModType TypeOfMod {
-        get {
-            return _typeOfMod;
+    public abstract void Init(BaseShip owner);
+
+    protected void Init(BaseShip owner, float duration, float cooldown, bool whilePressed) {
+        this.owner = owner;
+        this.duration = duration;
+        this.cooldown = cooldown;
+        this.whilePressed = whilePressed;
+    }
+
+    public void Activate() {
+        if (timer == 0 && !effectActive) {
+            timer = duration;
+            effectActive = true;
         }
     }
 
-    public float EnergyCost {
-        get {
-            return _energyCost;
+    public void Deactivate() {
+        if (whilePressed && effectActive) {
+            // TODO: Maybe replace with this?
+            // timer = cooldown - timer;
+            timer = cooldown;
+            effectActive = false;
         }
     }
 
-    public bool IsPassive {
-        get {
-            return _isContinuous;
+    public void Update() {
+        timer = Mathf.Max(timer - Time.deltaTime, 0);
+        if (timer == 0 && effectActive) {
+            timer = cooldown;
+            effectActive = false;
+        }
+        if (effectActive) {
+            ApplyEffect();
         }
     }
 
-    public bool IsContinuous {
-        get {
-            return _isPassive;
-        }
-    }
-
-    #endregion
-
-    public virtual void Activate(BaseShip properties) {
-        throw new System.NotImplementedException();
-    }
-
+    protected abstract void ApplyEffect();
 }

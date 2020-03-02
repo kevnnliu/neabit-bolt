@@ -31,6 +31,10 @@ public class BaseProj : MonoBehaviour {
         networkViewID = netID;
     }
 
+    public void SetOwner(BaseShip owner) {
+        this.owner = owner;
+    }
+
     /// <summary>
     /// To be called by derived classes at the beginning of every frame.
     /// </summary>

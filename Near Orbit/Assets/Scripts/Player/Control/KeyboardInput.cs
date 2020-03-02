@@ -17,14 +17,11 @@ public class KeyboardInput : IMoveInput {
         camera = shipTransform.Find("Camera");
         reticlePoint = shipT.Find("MainReticle");
         baseScale = reticlePoint.localScale.x;
-        float TODO = camera.GetComponent<Camera>().fieldOfView;
         lastPosition = new Vector3(Screen.width/2, Screen.height/2);
         UpdateInput();
     }
 
-    public bool ReadInputs {
-        get => true;
-    }
+    public bool ReadInputs => true;
 
     public void UpdateInput() {
         //pitchYaw += mouseMoveSpeed * (Input.mousePosition - lastPosition);
@@ -94,25 +91,36 @@ public class KeyboardInput : IMoveInput {
     }
 
     public int WeaponActivated() {
-        if (Input.GetMouseButton(0)) {
-            return 0;
-        } else if (Input.GetMouseButton(1)) {
-            return 1;
-        } else if (Input.GetKey(KeyCode.E)) {
-            return 2;
-        }
-        return int.MaxValue;
+        return Input.GetMouseButtonUp(0) ? -1
+            : Input.GetMouseButtonDown(0) ? 1
+            : 0;
     }
 
-    public int SpecialActivated() {
-        if (Input.GetKey(KeyCode.LeftShift)) {
-            return 0;
-        } else if (Input.GetKeyDown(KeyCode.Q)) {
-            return 1;
-        } else if (Input.GetKey(KeyCode.W)) {
-            return 2;
+    public bool WeaponNextPressed() {
+        return Input.GetKeyDown(KeyCode.E);
+    }
+
+    public bool WeaponPrevPressed() {
+        return Input.GetKeyDown(KeyCode.Q);
+    }
+
+    public int SpecialActivated(int index) {
+        switch (index) {
+            case 0:
+                return Input.GetMouseButtonUp(1) ? -1
+                    : Input.GetMouseButtonDown(1) ? 1
+                    : 0;
+            case 1:
+                return Input.GetKeyDown(KeyCode.LeftShift) ? -1
+                    : Input.GetKeyUp(KeyCode.LeftShift) ? 1
+                    : 0;
+            case 2:
+                return Input.GetKeyDown(KeyCode.E) ? -1
+                    : Input.GetKeyUp(KeyCode.E) ? 1
+                    : 0;
+            default:
+                return 0;
         }
-        return int.MaxValue;
     }
 
     public void ProcessRawInput(Transform shipT) { }
