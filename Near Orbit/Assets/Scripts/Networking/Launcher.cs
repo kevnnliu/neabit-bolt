@@ -1,75 +1,185 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Oculus.Platform;
-using Oculus.Platform.Models;
+﻿using UnityEngine;
+using System;
+using UdpKit;
+using UnityEngine.SceneManagement;
+using Bolt;
+using Bolt.Matchmaking;
+using Bolt.Photon;
+using UdpKit.Platform.Photon;
 
-public class Launcher : MonoBehaviour {
-
-    private string oculusID;
-    private string oculusNickname;
-    private string oculusNonce;
-
-    private void Start() {
-        Core.AsyncInitialize().OnComplete(OnInitializationCallback);
+public class Launcher : Bolt.GlobalEventListener
+{
+    enum State
+    {
+        SelectMode,
+        SelectMap,
+        SelectRoom,
+        StartServer,
+        StartClient,
+        Started,
     }
 
-    private void OnInitializationCallback(Message<PlatformInitialize> msg) {
-        if (msg.IsError) {
-            Debug.LogErrorFormat("Oculus: Error during initialization. Error Message: {0}", msg.GetError().Message);
+    Rect labelRoom = new Rect(0, 0, 140, 75);
+    GUIStyle labelRoomStyle;
+
+    State state;
+    string map;
+
+    void Awake()
+    {
+        Application.targetFrameRate = 60;
+
+        labelRoomStyle = new GUIStyle()
+        {
+            fontSize = 20,
+            fontStyle = FontStyle.Bold,
+            normal =
+            {
+                textColor = Color.white
+            }
+        };
+    }
+
+    void OnGUI()
+    {
+        Rect tex = new Rect(10, 10, 140, 75);
+        Rect area = new Rect(10, 90, Screen.width - 20, Screen.height - 100);
+
+        GUI.Box(tex, Resources.Load("BoltLogo") as Texture2D);
+
+        if (BoltNetwork.IsRunning)
+        {
+            tex = new Rect(160, 10, 140, 75);
+            GUILayout.BeginArea(tex);
+            if (GUILayout.Button("Shutdown", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)))
+            {
+                BoltNetwork.Shutdown();
+            }
+            GUILayout.EndArea();
         }
-        else {
-            Entitlements.IsUserEntitledToApplication().OnComplete(OnIsEntitledCallback);
+
+        GUILayout.BeginArea(area);
+
+        switch (state)
+        {
+            case State.SelectMode: State_SelectMode(); break;
+            case State.SelectMap: State_SelectMap(); break;
+            case State.SelectRoom: State_SelectRoom(); break;
+            case State.StartClient: State_StartClient(); break;
+            case State.StartServer: State_StartServer(); break;
+        }
+
+        GUILayout.EndArea();
+    }
+
+    void State_SelectRoom()
+    {
+        GUI.Label(labelRoom, "Looking for rooms:", labelRoomStyle);
+
+        if (BoltNetwork.SessionList.Count > 0)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.Space(30);
+
+            foreach (var session in BoltNetwork.SessionList)
+            {
+                var photonSession = session.Value as PhotonSession;
+
+                if (photonSession.Source == UdpSessionSource.Photon)
+                {
+                    var matchName = photonSession.HostName;
+                    var label = string.Format("Join: {0} | {1}/{2}", matchName, photonSession.ConnectionsCurrent, photonSession.ConnectionsMax);
+
+                    if (ExpandButton(label))
+                    {
+                        BoltNetwork.Connect(photonSession);
+                        state = State.Started;
+                    }
+                }
+            }
+
+            GUILayout.EndVertical();
         }
     }
 
-    private void OnIsEntitledCallback(Message msg) {
-        if (msg.IsError) {
-            Debug.LogErrorFormat("Oculus: Error verifying the user is entitled to the application. Error Message: {0}", msg.GetError().Message);
+    void State_SelectMode()
+    {
+        if (ExpandButton("Server"))
+        {
+            state = State.SelectMap;
         }
-        else {
-            GetLoggedInUser();
-        }
-    }
-
-    private void GetLoggedInUser() {
-        Users.GetLoggedInUser().OnComplete(OnLoggedInUserCallback);
-    }
-
-    private void OnLoggedInUserCallback(Message<User> msg) {
-        if (msg.IsError) {
-            Debug.LogErrorFormat("Oculus: Error getting logged in user. Error Message: {0}", msg.GetError().Message);
-        }
-        else {
-            oculusID = msg.Data.ID.ToString(); // do not use msg.Data.OculusID;
-            oculusNickname = msg.Data.OculusID.ToString();
-            GetUserProof();
+        if (ExpandButton("Client"))
+        {
+            state = State.StartClient;
         }
     }
 
-    private void GetUserProof() {
-        Users.GetUserProof().OnComplete(OnUserProofCallback);
-    }
+    void State_SelectMap()
+    {
+        GUILayout.BeginVertical();
 
-    private void OnUserProofCallback(Message<UserProof> msg) {
-        if (msg.IsError) {
-            Debug.LogErrorFormat("Oculus: Error getting user proof. Error Message: {0}", msg.GetError().Message);
+        foreach (string value in BoltScenes.AllScenes)
+        {
+            if (SceneManager.GetActiveScene().name != value)
+            {
+                if (ExpandButton(value))
+                {
+                    map = value;
+                    state = State.StartServer;
+                }
+            }
         }
-        else{
-            oculusNonce = msg.Data.Value;
-            ConnectToPhoton();
+
+        GUILayout.EndVertical();
+    }
+
+    void State_StartServer()
+    {
+        BoltLauncher.StartServer();
+        state = State.Started;
+    }
+
+    void State_StartClient()
+    {
+        BoltLauncher.StartClient();
+        state = State.SelectRoom;
+    }
+
+    public override void BoltStartBegin()
+    {
+        // Register any Protocol Token that are you using
+        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+    }
+
+    public override void BoltStartDone()
+    {
+        if (BoltNetwork.IsServer)
+        {
+            var id = Guid.NewGuid().ToString().Split('-')[0];
+            var matchName = string.Format("{0} - {1}", id, map);
+
+            BoltMatchmaking.CreateSession(
+                sessionID: matchName,
+                sceneToLoad: map
+            );
         }
     }
 
-    private void ConnectToPhoton() {
-        // PhotonNetwork.AuthValues = new AuthenticationValues();
-        // PhotonNetwork.AuthValues.UserId = oculusID;
-        // PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Oculus;
-        // PhotonNetwork.AuthValues.AddAuthParameter("userid", oculusID);
-        // PhotonNetwork.AuthValues.AddAuthParameter("nonce", oculusNonce);
-        // PhotonNetwork.ConnectUsingSettings();
-
-        // PhotonNetwork.NickName = oculusNickname;
+    public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)
+    {
+        registerDoneCallback(() =>
+        {
+            state = State.SelectMode;
+        });
     }
 
+    bool ExpandButton(string text)
+    {
+        return GUILayout.Button(text, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+    }
+
+    public override void SessionListUpdated(Map<Guid, UdpSession> sessionList)
+    {
+        BoltLog.Info("New session list");
+    }
 }

@@ -165,12 +165,10 @@ public class BaseShip : MonoBehaviour {
     /// </summary>
     private void SetupCamera() {
         if (XRSettings.isDeviceActive) {
-            transform.Find("OVRCameraRig").gameObject.SetActive(true);
             moveInput = new GestureInput(transform);
         }
         else {
             XRSettings.enabled = false;
-            transform.Find("Camera").gameObject.SetActive(true);
             moveInput = new KeyboardInput(transform);
         }
     }
