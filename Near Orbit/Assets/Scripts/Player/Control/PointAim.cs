@@ -30,6 +30,7 @@ public class PointAim {
 
     /// <summary>
     /// Returns the Vector3 position of the aim point.
+    /// NEEDS TO BE MOVED TO SERVER-SIDE
     /// </summary>
     public Vector3 GetAimPoint() {
         Vector3 aimVector = (reticlePoint.position - eyeTrack.position).normalized;

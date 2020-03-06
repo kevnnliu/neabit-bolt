@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.XR;
+using Bolt;
 
-public class BaseShip : MonoBehaviour {
+public class BaseShip : EntityBehaviour<IShipState> {
 
     #region Serialized Fields
     
@@ -30,8 +31,16 @@ public class BaseShip : MonoBehaviour {
     private Movement movement;
     private ModuleGroup modules = new ModuleGroup();
 
+    #region Bolt Functions
+
+    public override void Attached() {
+        state.SetTransforms(state.Transform, transform);
+    }
+
+    #endregion
+
     void Awake() {
-        SetupCamera();
+        SetupControl();
         LoadBaseShip();
     }
 
@@ -119,15 +128,16 @@ public class BaseShip : MonoBehaviour {
 
     /// </summary>
     /// Detects whether or not there is a VR device connected and enables
-    /// the corresponding camera object.
+    /// the corresponding control scheme.
     /// </summary>
-    private void SetupCamera() {
+    private void SetupControl() {
         if (XRSettings.isDeviceActive) {
-            moveInput = new GestureInput(transform);
+            input = new GestureInput(transform);
+            Debug.Log("Gesture input enabled");
         }
         else {
-            XRSettings.enabled = false;
-            moveInput = new KeyboardInput(transform);
+            input = new KeyboardInput(transform);
+            Debug.Log("Keyboard input enabled");
         }
     }
 
