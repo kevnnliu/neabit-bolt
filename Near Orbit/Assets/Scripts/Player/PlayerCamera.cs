@@ -9,4 +9,8 @@ public class PlayerCamera : BoltSingletonPrefab<PlayerCamera> {
         transform.parent = entity.transform;
     }
 
+    public Transform GetTrackingSpace() {
+        return transform.Find("TrackingSpace");
+    }
+
 }

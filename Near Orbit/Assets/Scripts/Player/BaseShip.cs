@@ -35,6 +35,44 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
     public override void Attached() {
         state.SetTransforms(state.Transform, transform);
+        Debug.Log("Attached");
+    }
+
+    public override void SimulateController() {
+        if (input.ReadInputs) {
+            input.UpdateInput();
+            IShipMoveCommandInput moveCommandInput = ShipMoveCommand.Create();
+
+            moveCommandInput.Thrust = input.GetThrustInput();
+            moveCommandInput.Rotation = input.GetRotationInput();
+            moveCommandInput.ReticlePoint = input.GetReticlePoint();
+
+            entity.QueueInput(moveCommandInput);
+            Debug.Log("Inputs queued over network");
+        }
+    }
+
+    public override void ExecuteCommand(Command command, bool resetState) {
+        ShipMoveCommand moveCommand = (ShipMoveCommand) command;
+
+        if (resetState) {
+            movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
+            ApplyMovement();
+
+            input.SetAimPoint(moveCommand.Result.AimPoint);
+            Debug.Log("Reset state");
+        } 
+        else {
+            movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
+            ApplyMovement();
+
+            input.ComputeAimPoint(moveCommand.Input.ReticlePoint);
+
+            moveCommand.Result.Position = movement.GetNewPosition();
+            moveCommand.Result.Rotation = movement.GetNewRotation();
+            moveCommand.Result.AimPoint = input.GetAimPoint();
+            Debug.Log("Processed inputs");
+        }
     }
 
     #endregion
@@ -47,12 +85,9 @@ public class BaseShip : EntityBehaviour<IShipState> {
     void Update() {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
         
-        //ConvertInputs(input);
-        if (input.ReadInputs) {
-            input.UpdateInput();
-            movement.ComputeNewTransform(transform, input);
-        }
-        ApplyMovement(movement);
+        // ConvertInputs(input);
+        // ApplyMovement(movement);
+        input.UpdateInput();
         modules.Update(input);
     }
 
@@ -69,7 +104,6 @@ public class BaseShip : EntityBehaviour<IShipState> {
         if (!invincible) {
             health -= damage;
             if (health <= 0f) {
-                Debug.Log("I died :(");
                 Respawn();
             }
         }
@@ -109,17 +143,17 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// <summary>
     /// Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
-    private void ConvertInputs(IMoveInput moveInput) {
-        if (moveInput.ReadInputs) {
-            moveInput.UpdateInput();
-            movement.ComputeNewTransform(transform, moveInput);
+    private void ConvertInputs() {
+        if (input.ReadInputs) {
+            input.UpdateInput();
+            movement.ComputeNewTransform(transform, input.GetRotationInput(), input.GetThrustInput());
         }
     }
 
     /// <summary>
     /// Applies the Movement instance by updating the ship's Transform component.
     /// </summary>
-    private void ApplyMovement(Movement movement) {
+    private void ApplyMovement() {
         if (movement != null) {
             transform.position = movement.GetNewPosition();
             transform.rotation = movement.GetNewRotation();

@@ -11,10 +11,11 @@ public class KeyboardInput : IMoveInput {
     private Transform shipTransform;
     private Transform camera, reticlePoint;
     private float baseScale;
+    private Vector3 aimPoint = Vector3.zero;
 
     public KeyboardInput(Transform shipT) {
         shipTransform = shipT;
-        camera = shipTransform.Find("Camera");
+        camera = PlayerCamera.instance.GetTrackingSpace().Find("CenterEyeAnchor");
         reticlePoint = shipT.Find("MainReticle");
         baseScale = reticlePoint.localScale.x;
         lastPosition = new Vector3(Screen.width/2, Screen.height/2);
@@ -64,8 +65,8 @@ public class KeyboardInput : IMoveInput {
         return camera.position + aimVector;
     }
 
-    public Vector3 GetAimPoint() {
-        Vector3 aimVector = (reticlePoint.position - camera.position).normalized;
+    public void ComputeAimPoint(Vector3 reticlePosition) {
+        Vector3 aimVector = (reticlePosition - camera.position).normalized;
 
         bool hitSomething = Physics.Raycast(camera.position, aimVector, out RaycastHit hit, ReticleAimConstants.MaxPointDist);
 
@@ -73,13 +74,22 @@ public class KeyboardInput : IMoveInput {
             if (Vector3.Distance(camera.position, hit.point) < ReticleAimConstants.MinPointDist) {
                 aimVector *= ReticleAimConstants.MinPointDist;
             } else {
-                return hit.point;
+                aimPoint = hit.point;
+                return;
             }
         } else {
             aimVector *= ReticleAimConstants.MaxPointDist;
         }
 
-        return camera.position + aimVector;
+        aimPoint = camera.position + aimVector;
+    }
+
+    public Vector3 GetAimPoint() {
+        return aimPoint;
+    }
+
+    public void SetAimPoint(Vector3 aimPosition) {
+        aimPoint = aimPosition;
     }
 
     public Vector3 GetRotationInput() {

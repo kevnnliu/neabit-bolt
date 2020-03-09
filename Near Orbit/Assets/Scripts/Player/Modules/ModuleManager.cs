@@ -8,7 +8,7 @@ public class ModuleManager {
 
     public static T CreateModule<T>(string id, BaseShip ship, Transform mount) where T : MonoBehaviour, IShipModule {
         if (validModules.Contains(id)) {
-            GameObject prefab = Resources.Load<GameObject>("Prefabs/" + id);
+            GameObject prefab = Resources.Load<GameObject>(id);
             GameObject gameObject = Object.Instantiate(prefab, mount);
             T shipModule = gameObject.GetComponent<T>();
             shipModule.Init(ship);

@@ -19,15 +19,25 @@ public interface IMoveInput {
 
     int SpecialActivated(int index);
 
-    /// </summary>
+    /// <summary>
     /// Get the position of the reticle.
     /// </summary>
     Vector3 GetReticlePoint();
 
-    /// </summary>
+    /// <summary>
     /// Get the position of the aim point.
     /// </summary>
     Vector3 GetAimPoint();
+
+    /// <summary>
+    /// Compute the position of the aim point.
+    /// </summary>
+    void ComputeAimPoint(Vector3 reticlePosition);
+
+    /// <summary>
+    /// Set the position of the aim point.
+    /// </summary>
+    void SetAimPoint(Vector3 aimPosition);
 
     /// <summary>
     /// Local rotational velocity to be applied on the next frame.

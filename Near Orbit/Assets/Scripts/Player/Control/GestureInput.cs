@@ -13,6 +13,7 @@ public class GestureInput : IMoveInput {
     private Transform rightController;
     private Transform shipTransform;
     private Vector2 pitchYaw;
+    private Vector3 aimPoint;
 
     private struct Input {
         public bool weaponActivation, weaponNext, weaponPrev;
@@ -22,7 +23,7 @@ public class GestureInput : IMoveInput {
 
     public GestureInput(Transform shipT) {
         shipTransform = shipT;
-        rightController = shipT.Find("OVRCameraRig").Find("TrackingSpace").Find("RightHandAnchor");
+        rightController = PlayerCamera.instance.GetTrackingSpace().Find("RightHandAnchor");
         pointAim = new PointAim(shipT);
         UpdateInput();
     }
@@ -85,8 +86,16 @@ public class GestureInput : IMoveInput {
         return pointAim.GetReticlePoint();
     }
 
+    public void ComputeAimPoint(Vector3 reticlePosition) {
+        aimPoint = pointAim.GetAimPoint(reticlePosition);
+    }
+
     public Vector3 GetAimPoint() {
-        return pointAim.GetAimPoint();
+        return aimPoint;
+    }
+
+    public void SetAimPoint(Vector3 aimPosition) {
+        aimPoint = aimPosition;
     }
 
     private float GetRollInput() {

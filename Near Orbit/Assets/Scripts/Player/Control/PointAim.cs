@@ -14,7 +14,7 @@ public class PointAim {
     private BaseShip ship;
 
     public PointAim(Transform shipT) {
-        Transform trackSpace = shipT.Find("OVRCameraRig").Find("TrackingSpace");
+        Transform trackSpace = PlayerCamera.instance.GetTrackingSpace();
         eyeTrack = trackSpace.Find("CenterEyeAnchor");
         rightController = trackSpace.Find("RightHandAnchor");
         reticlePoint = shipT.Find("MainReticle");
@@ -30,10 +30,9 @@ public class PointAim {
 
     /// <summary>
     /// Returns the Vector3 position of the aim point.
-    /// NEEDS TO BE MOVED TO SERVER-SIDE
     /// </summary>
-    public Vector3 GetAimPoint() {
-        Vector3 aimVector = (reticlePoint.position - eyeTrack.position).normalized;
+    public Vector3 GetAimPoint(Vector3 reticlePosition) {
+        Vector3 aimVector = (reticlePosition - eyeTrack.position).normalized;
 
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(eyeTrack.position, aimVector, out hit, ReticleAimConstants.MaxPointDist);
