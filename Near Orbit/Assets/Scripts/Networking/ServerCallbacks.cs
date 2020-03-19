@@ -10,7 +10,9 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
     
     public override void SceneLoadRemoteDone(BoltConnection connection) {
-        PlayerObjectRegistry.GetPlayer(connection).Spawn();
+        PlayerObject player = PlayerObjectRegistry.GetPlayer(connection);
+        player.Spawn();
+        player.LoadWeapon(BoltPrefabs.LaserGun);
     }
 
 }

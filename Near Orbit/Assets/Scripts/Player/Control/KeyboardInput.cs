@@ -100,10 +100,8 @@ public class KeyboardInput : IMoveInput {
         return Input.GetButton("Thrust") ? 1 : 0;
     }
 
-    public int WeaponActivated() {
-        return Input.GetMouseButtonUp(0) ? -1
-            : Input.GetMouseButtonDown(0) ? 1
-            : 0;
+    public bool WeaponActivated() {
+        return Input.GetMouseButton(0);
     }
 
     public bool WeaponNextPressed() {

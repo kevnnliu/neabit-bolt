@@ -57,8 +57,8 @@ public class GestureInput : IMoveInput {
         return Mathf.Clamp(0.7f + throttle, 0f, throttleMax);
     }
 
-    public int WeaponActivated() {
-        return (curInput.weaponActivation ? 1 : 0) - (prevInput.weaponActivation ? 1 : 0);
+    public bool WeaponActivated() {
+        return curInput.weaponActivation;
     }
     
     public bool WeaponNextPressed() {

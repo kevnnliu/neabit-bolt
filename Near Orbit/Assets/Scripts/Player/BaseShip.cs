@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.XR;
 using Bolt;
 
@@ -6,8 +7,6 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
     #region Serialized Fields
     
-    [SerializeField]
-    private int totalModCapacity;
     [SerializeField]
     private float baseHealth = 100;
     [SerializeField]
@@ -19,6 +18,8 @@ public class BaseShip : EntityBehaviour<IShipState> {
     [SerializeField]
     private PointAim pointAim;
 
+    private List<Weapon> weapons = new List<Weapon>();
+
     #endregion
 
     private const float pitchYawBorder = 18f;
@@ -29,12 +30,14 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
     private IMoveInput input;
     private Movement movement;
-    private ModuleGroup modules = new ModuleGroup();
+    //private ModuleGroup modules = new ModuleGroup();
 
     #region Bolt Functions
 
     public override void Attached() {
         state.SetTransforms(state.Transform, transform);
+        state.EquippedWeapon = 0;
+
         Debug.Log("Attached");
     }
 
@@ -47,20 +50,26 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommandInput.Rotation = input.GetRotationInput();
             moveCommandInput.ReticlePoint = input.GetReticlePoint();
 
+            moveCommandInput.Fire = input.WeaponActivated();
+
             entity.QueueInput(moveCommandInput);
-            Debug.Log("Inputs queued over network");
+            //Debug.Log("Inputs queued over network");
         }
     }
 
     public override void ExecuteCommand(Command command, bool resetState) {
-        ShipMoveCommand moveCommand = (ShipMoveCommand) command;
+        ShipMoveCommand moveCommand = (ShipMoveCommand)command;
 
         if (resetState) {
             movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
             ApplyMovement();
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
-            Debug.Log("Reset state");
+
+            if (state.EquippedWeapon < weapons.Count) {
+                weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
+            }
+            //Debug.Log("Reset state");
         } 
         else {
             movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
@@ -71,7 +80,9 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommand.Result.Position = movement.GetNewPosition();
             moveCommand.Result.Rotation = movement.GetNewRotation();
             moveCommand.Result.AimPoint = input.GetAimPoint();
-            Debug.Log("Processed inputs");
+
+            moveCommand.Result.Firing = moveCommand.Input.Fire;
+            //Debug.Log("Processed inputs");
         }
     }
 
@@ -88,7 +99,12 @@ public class BaseShip : EntityBehaviour<IShipState> {
         // ConvertInputs(input);
         // ApplyMovement(movement);
         input.UpdateInput();
-        modules.Update(input);
+        //modules.Update(input);
+    }
+
+    public void AddWeapon(BoltEntity weapon) {
+        weapon.transform.SetParent(weaponMounts[weapons.Count]);
+        weapons.Add(weapon.GetComponent<Weapon>());
     }
 
     public void SetInvincibility(bool enabled) {
@@ -132,8 +148,8 @@ public class BaseShip : EntityBehaviour<IShipState> {
         movement = new Movement(stats, transform);
 
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
-        modules.AddModule(ModuleManager.CreateModule<BaseWeapon>("Weapons/LaserGun", this, weaponMounts[0]));
-        modules.AddModule(ModuleManager.CreateModule<BaseSpecial>("Specials/Boost", this, specialMounts[0]));
+        //modules.AddModule(ModuleManager.CreateModule<BaseWeapon>("Weapons/LaserGun", this, weaponMounts[0]));
+        //modules.AddModule(ModuleManager.CreateModule<BaseSpecial>("Specials/Boost", this, specialMounts[0]));
     }
 
     private void Respawn() {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 /// <summary>
-/// Contains all of the modules installed in a ship.
+/// OBSOLETE. Contains all of the modules installed in a ship.
 /// Weapons can only be fired if they are selected, while
 /// specials can be used directly from their slot.
 /// </summary>
@@ -21,17 +21,17 @@ public class ModuleGroup {
 
     public void Update(IMoveInput input) {
         // Process weapon inputs
-        if (input.WeaponNextPressed()) {
-            deactivateWeapons();
-            equipped = (equipped + 1) % weapons.Count;
-        } else if (input.WeaponPrevPressed()) {
-            deactivateWeapons();
-            equipped = (equipped - 1) % weapons.Count;
-        } else if (input.WeaponActivated() > 0) {
-            weapons[equipped].Activate();
-        } else if (input.WeaponActivated() < 0) {
-            deactivateWeapons();
-        }
+        //if (input.WeaponNextPressed()) {
+        //    deactivateWeapons();
+        //    equipped = (equipped + 1) % weapons.Count;
+        //} else if (input.WeaponPrevPressed()) {
+        //    deactivateWeapons();
+        //    equipped = (equipped - 1) % weapons.Count;
+        //} else if (input.WeaponActivated() > 0) {
+        //    weapons[equipped].Activate();
+        //} else if (input.WeaponActivated() < 0) {
+        //    deactivateWeapons();
+        //}
         // Process special inputs
         for (int i = 0; i < specials.Count; i++) {
             if (input.SpecialActivated(i) > 0) {

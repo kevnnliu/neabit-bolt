@@ -241,7 +241,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d16531ab10c654888144ee90f48b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalModCapacity: 3
   baseHealth: 100
   stats:
     RollRate: 45

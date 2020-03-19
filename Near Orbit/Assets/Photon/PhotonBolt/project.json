@@ -83,6 +83,23 @@
             "ExtrapolationMaxFrames": 9,
             "SnapMagnitude": 10.0
           }
+        },
+        {
+          "Name": "EquippedWeapon",
+          "Enabled": true,
+          "Expanded": true,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
         }
       ],
       "PacketMaxBits": 512,
@@ -162,6 +179,7 @@
         {
           "Name": "Thrust",
           "Enabled": true,
+          "Expanded": true,
           "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
@@ -183,6 +201,7 @@
         {
           "Name": "Rotation",
           "Enabled": true,
+          "Expanded": true,
           "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
@@ -225,6 +244,7 @@
         {
           "Name": "ReticlePoint",
           "Enabled": true,
+          "Expanded": true,
           "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
@@ -259,6 +279,19 @@
                 "BitsRequired": 18
               }
             ]
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
+          }
+        },
+        {
+          "Name": "Fire",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
           },
           "AssetSettings": {
             "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
@@ -395,11 +428,153 @@
           "AssetSettings": {
             "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
           }
+        },
+        {
+          "Name": "Firing",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
+          }
         }
       ],
       "Properties": [],
       "Name": "ShipMoveCommand",
       "Guid": "8a9aa497-f92c-41d7-aeea-ff650d4a40c4",
+      "Groups": []
+    },
+    {
+      "$type": "Bolt.Compiler.StateDefinition, bolt.compiler",
+      "Properties": [
+        {
+          "Name": "Clip",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 3,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
+        },
+        {
+          "Name": "LastFired",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 3,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
+        },
+        {
+          "Name": "LastReloaded",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 3,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
+        }
+      ],
+      "PacketMaxBits": 512,
+      "PacketMaxProperties": 16,
+      "InitialPositionCompression": {
+        "Compression": [
+          {
+            "MinValue": -1024,
+            "MaxValue": 1024,
+            "Accuracy": 0.01,
+            "Pack": 100.0,
+            "Read": 0.01,
+            "Shift": 1024.0,
+            "BitsRequired": 18
+          },
+          {
+            "MinValue": -1024,
+            "MaxValue": 1024,
+            "Accuracy": 0.01,
+            "Pack": 100.0,
+            "Read": 0.01,
+            "Shift": 1024.0,
+            "BitsRequired": 18
+          },
+          {
+            "MinValue": -1024,
+            "MaxValue": 1024,
+            "Accuracy": 0.01,
+            "Pack": 100.0,
+            "Read": 0.01,
+            "Shift": 1024.0,
+            "BitsRequired": 18
+          }
+        ]
+      },
+      "InitialRotationCompression": {
+        "EulerCompression": [
+          {
+            "MaxValue": 360,
+            "Accuracy": 1.0,
+            "Pack": 1.0,
+            "Read": 1.0,
+            "BitsRequired": 9
+          },
+          {
+            "MaxValue": 360,
+            "Accuracy": 1.0,
+            "Pack": 1.0,
+            "Read": 1.0,
+            "BitsRequired": 9
+          },
+          {
+            "MaxValue": 360,
+            "Accuracy": 1.0,
+            "Pack": 1.0,
+            "Read": 1.0,
+            "BitsRequired": 9
+          }
+        ],
+        "QuaternionCompression": {
+          "MinValue": -1,
+          "MaxValue": 1,
+          "Accuracy": 0.01,
+          "Pack": 100.0,
+          "Read": 0.01,
+          "Shift": 1.0,
+          "BitsRequired": 8
+        }
+      },
+      "Name": "WeaponState",
+      "Guid": "7396a8fe-5ec5-4110-bd6f-0c506ca33c80",
       "Groups": []
     }
   ],

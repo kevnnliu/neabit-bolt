@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 public class ProjectileManager {
@@ -31,4 +30,9 @@ public class ProjectileManager {
             gameObject.GetComponent<BaseProj>().SetOwner(owner);
         }
     }
+}
+
+public enum ProjectileType {
+    MachineGunBullet,
+    Laser
 }

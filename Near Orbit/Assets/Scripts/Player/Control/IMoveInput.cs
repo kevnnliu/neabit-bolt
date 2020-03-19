@@ -13,7 +13,7 @@ public interface IMoveInput {
         get;
     }
 
-    int WeaponActivated();
+    bool WeaponActivated();
     bool WeaponNextPressed();
     bool WeaponPrevPressed();
 
