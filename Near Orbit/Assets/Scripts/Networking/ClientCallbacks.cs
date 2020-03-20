@@ -10,10 +10,6 @@ public class ClientCallbacks : Bolt.GlobalEventListener {
     }
 
     public override void ControlOfEntityGained(BoltEntity entity) {
-        // Temporary fix
-        if (entity.PrefabId == BoltPrefabs.ViperShip) {
-            PlayerCamera.instance.SetTarget(entity);
-        }
+        PlayerCamera.instance.SetTarget(entity);
     }
-
 }

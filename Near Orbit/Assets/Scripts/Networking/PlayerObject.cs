@@ -24,17 +24,4 @@ public class PlayerObject {
 
         character.transform.position = MapInfo.SpawnLocations[0];
     }
-
-    // IDK
-    public void LoadWeapon(PrefabId id) {
-        BoltEntity weapon = BoltNetwork.Instantiate(id);
-        if (IsServer) {
-            weapon.TakeControl();
-        } else {
-            weapon.AssignControl(connection);
-        }
-        weapon.SetParent(character);
-        BaseShip ship = character.GetComponent<BaseShip>();
-        ship.AddWeapon(weapon);
-    }
 }

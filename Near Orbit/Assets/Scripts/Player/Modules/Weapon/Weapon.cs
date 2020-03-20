@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using Bolt;
 
-public class Weapon : EntityBehaviour<IWeaponState> {
+public class Weapon : MonoBehaviour {
     [SerializeField]
-    private ProjectileType projectileType;
+    private PrefabId projectileType;
     [SerializeField]
     private int rpm;
     [SerializeField]
@@ -18,20 +18,32 @@ public class Weapon : EntityBehaviour<IWeaponState> {
 
     public bool Firing;
 
+    private int lastFired;
+    private int lastReloaded;
+    private int clip;
+
     public void Update() {
-        int lastFired = BoltNetwork.ServerFrame - state.LastFired;
-        int lastReloaded = BoltNetwork.ServerFrame - state.LastReloaded;
-        if (Firing && state.Clip > 0) {
-            if (lastFired >= FireInterval) {
-                state.LastFired = BoltNetwork.ServerFrame;
-                state.Clip--;
+        int fireDelay = BoltNetwork.ServerFrame - lastFired;
+        int reloadDelay = BoltNetwork.ServerFrame - lastReloaded;
+        if (Firing && clip > 0) {
+            if (fireDelay >= FireInterval) {
+                lastFired = BoltNetwork.ServerFrame;
+                clip--;
                 // Fire code
+                if (BoltNetwork.IsServer) {
+                    FireProjectile evt = FireProjectile.Create();
+                    evt.ProjectileType = projectileType;
+                    evt.Origin = transform.position;
+                    evt.Rotation = transform.rotation;
+                    evt.Frame = BoltNetwork.ServerFrame;
+                    evt.Send();
+                }
                 Debug.Log("Firing: " + BoltNetwork.ServerTime);
             }
-        } else if (lastFired >= cooldownDelay * BoltNetwork.FramesPerSecond &&
-                lastReloaded >= ReloadInterval) {
-            state.LastReloaded = BoltNetwork.ServerFrame;
-            state.Clip++;
+        } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
+                reloadDelay >= ReloadInterval) {
+            lastReloaded = BoltNetwork.ServerFrame;
+            clip++;
         }
     }
 }

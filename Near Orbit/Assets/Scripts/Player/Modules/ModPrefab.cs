@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// OBSOLETE.
+/// </summary>
 public class ModPrefab {
 
     public static Dictionary<ModuleName, string> Path = new Dictionary<ModuleName, string> {

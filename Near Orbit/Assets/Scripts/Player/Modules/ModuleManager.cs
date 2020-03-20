@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// OBSOLETE.
+/// </summary>
 public class ModuleManager {
     private static readonly List<string> validModules = new List<string>() {
         "Weapons/LaserGun", "Specials/Boost"

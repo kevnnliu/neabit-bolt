@@ -66,9 +66,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
 
-            if (state.EquippedWeapon < weapons.Count) {
-                weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
-            }
+            weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
             //Debug.Log("Reset state");
         } 
         else {
@@ -102,8 +100,9 @@ public class BaseShip : EntityBehaviour<IShipState> {
         //modules.Update(input);
     }
 
-    public void AddWeapon(BoltEntity weapon) {
-        weapon.transform.SetParent(weaponMounts[weapons.Count]);
+    public void AddWeapon(string prefabID) {
+        GameObject prefab = Resources.Load<GameObject>(prefabID);
+        GameObject weapon = Instantiate(prefab, weaponMounts[weapons.Count]);
         weapons.Add(weapon.GetComponent<Weapon>());
     }
 
@@ -146,6 +145,8 @@ public class BaseShip : EntityBehaviour<IShipState> {
         health = baseHealth;
 
         movement = new Movement(stats, transform);
+
+        AddWeapon("Weapons/LaserGun");
 
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)
         //modules.AddModule(ModuleManager.CreateModule<BaseWeapon>("Weapons/LaserGun", this, weaponMounts[0]));

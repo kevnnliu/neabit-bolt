@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// OBSOLETE.
+/// </summary>
 public interface IShipModule {
     /// <summary>
     /// Type of module, either Weapon or Special.
