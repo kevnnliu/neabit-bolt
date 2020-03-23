@@ -1,5 +1,4 @@
 using UnityEngine;
-using Bolt;
 
 public class PlayerObject {
 
@@ -11,7 +10,9 @@ public class PlayerObject {
     public bool IsClient => connection != null;
 
     public void Spawn() {
+
         if (!character) {
+            BoltLog.Warn("Spawning ship from " + (IsServer ? "server" : "client"));
             character = BoltNetwork.Instantiate(BoltPrefabs.ViperShip, MapInfo.SpawnLocations[0], Quaternion.identity);
 
             if (IsServer) {

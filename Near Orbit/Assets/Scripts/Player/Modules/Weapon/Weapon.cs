@@ -2,8 +2,9 @@
 using Bolt;
 
 public class Weapon : MonoBehaviour {
-    [SerializeField]
     private PrefabId projectileType;
+    [SerializeField]
+    private GameObject projectile;
     [SerializeField]
     private int rpm;
     [SerializeField]
@@ -16,11 +17,16 @@ public class Weapon : MonoBehaviour {
     public int FireInterval => BoltNetwork.FramesPerSecond * 60 / rpm;
     public int ReloadInterval => BoltNetwork.FramesPerSecond * 60 / cooldownRate;
 
+    public BaseShip Owner;
     public bool Firing;
 
     private int lastFired;
     private int lastReloaded;
     private int clip;
+
+    public void Start() {
+        projectileType = projectile.GetComponent<BoltEntity>().PrefabId;
+    }
 
     public void Update() {
         int fireDelay = BoltNetwork.ServerFrame - lastFired;
@@ -37,8 +43,13 @@ public class Weapon : MonoBehaviour {
                     evt.Rotation = transform.rotation;
                     evt.Frame = BoltNetwork.ServerFrame;
                     evt.Send();
+                    BoltLog.Warn("Sent fire event");
+                    // Other option?
+                    BoltNetwork.Instantiate(projectileType, transform.position, transform.rotation)
+                        .GetComponent<Projectile>()
+                        .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());
                 }
-                Debug.Log("Firing: " + BoltNetwork.ServerTime);
+                BoltLog.Warn("Firing: " + BoltNetwork.ServerTime);
             }
         } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
                 reloadDelay >= ReloadInterval) {

@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a91d2f65fbb4064eb10e41c12bec723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Map: 
+  Map: NetworkTest
   GameType: 
   RoomID: 
 --- !u!4 &2100840174

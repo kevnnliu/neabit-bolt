@@ -19,7 +19,7 @@ MonoBehaviour:
     maxEntityPriority: 65536
     maxPropertyPriority: 2048
     scopeMode: 0
-    logTargets: 3
+    logTargets: 11
     disableDejitterBuffer: 0
     clientSendRate: 3
     clientDejitterDelay: 6
@@ -46,8 +46,8 @@ MonoBehaviour:
     EnableIPv6: 0
   debugClientCount: 2
   debugStartPort: 50538
-  debugStartMapName: Game
-  debugPlayAsServer: 1
+  debugStartMapName: Server
+  debugPlayAsServer: 0
   showDebugInfo: 1
   overrideTimeScale: 1
   logUncaughtExceptions: 0

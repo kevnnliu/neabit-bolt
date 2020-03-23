@@ -79,6 +79,36 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &717709327912655724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4509946399306283169}
+  m_Layer: 0
+  m_Name: WeaponMount Center
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4509946399306283169
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 717709327912655724}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.02, z: 4.03}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7057254767550981509}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4724426203593099292
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,7 +141,8 @@ Transform:
   m_Children:
   - {fileID: 1755775929737130353}
   - {fileID: 4206062204300312130}
-  - {fileID: 8096408772665241412}
+  - {fileID: 3829902668001231881}
+  - {fileID: 4509946399306283169}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -134,7 +165,8 @@ MonoBehaviour:
     PitchRate: 35
     ThrustRate: 12
   weaponMounts:
-  - {fileID: 1862164049612696791}
+  - {fileID: 4509946399306283169}
+  - {fileID: 0}
   - {fileID: 0}
   specialMounts:
   - {fileID: 0}
@@ -344,15 +376,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c842f490265ea74c980ff781ac92df4, type: 3}
---- !u!4 &8096408772665241412 stripped
+--- !u!4 &3829902668001231881 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 0c842f490265ea74c980ff781ac92df4,
-    type: 3}
-  m_PrefabInstance: {fileID: 3829902668001231966}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1862164049612696791 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -5984949133278828407, guid: 0c842f490265ea74c980ff781ac92df4,
     type: 3}
   m_PrefabInstance: {fileID: 3829902668001231966}
   m_PrefabAsset: {fileID: 0}

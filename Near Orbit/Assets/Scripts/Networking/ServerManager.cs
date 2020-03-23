@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class ServerManager : Bolt.GlobalEventListener {
 
-    public string Map = "";
+    public string Map = "NetworkTest";
     public string GameType = "";
     public string RoomID = "";
 

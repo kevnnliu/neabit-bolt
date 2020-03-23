@@ -10,6 +10,7 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
     
     public override void SceneLoadRemoteDone(BoltConnection connection) {
+        BoltLog.Warn("Spawning player");
         PlayerObjectRegistry.GetPlayer(connection).Spawn();
     }
 

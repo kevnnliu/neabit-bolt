@@ -29,7 +29,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     private bool invincible;
 
     private IMoveInput input;
-    private Movement movement;
+
     //private ModuleGroup modules = new ModuleGroup();
 
     #region Bolt Functions
@@ -61,7 +61,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
         ShipMoveCommand moveCommand = (ShipMoveCommand)command;
 
         if (resetState) {
-            movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
+            Movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
             ApplyMovement();
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
@@ -70,16 +70,17 @@ public class BaseShip : EntityBehaviour<IShipState> {
             //Debug.Log("Reset state");
         } 
         else {
-            movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
+            Movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
             ApplyMovement();
 
             input.ComputeAimPoint(moveCommand.Input.ReticlePoint);
 
-            moveCommand.Result.Position = movement.GetNewPosition();
-            moveCommand.Result.Rotation = movement.GetNewRotation();
+            moveCommand.Result.Position = Movement.GetNewPosition();
+            moveCommand.Result.Rotation = Movement.GetNewRotation();
             moveCommand.Result.AimPoint = input.GetAimPoint();
 
             moveCommand.Result.Firing = moveCommand.Input.Fire;
+            weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
             //Debug.Log("Processed inputs");
         }
     }
@@ -101,16 +102,18 @@ public class BaseShip : EntityBehaviour<IShipState> {
     }
 
     public void AddWeapon(string prefabID) {
-        GameObject prefab = Resources.Load<GameObject>(prefabID);
-        GameObject weapon = Instantiate(prefab, weaponMounts[weapons.Count]);
-        weapons.Add(weapon.GetComponent<Weapon>());
+        var prefab = Resources.Load<GameObject>(prefabID);
+        Weapon weapon = Instantiate(prefab, weaponMounts[weapons.Count].position, weaponMounts[weapons.Count].rotation, transform)
+            .GetComponent<Weapon>();
+        weapon.Owner = this;
+        weapons.Add(weapon);
     }
 
     public void SetInvincibility(bool enabled) {
         invincible = enabled;
     }
 
-    public Movement Movement => movement;
+    public Movement Movement { get; private set; }
 
     /// <summary>
     /// Checks invincibility, subtracts from Health, and initiates respawn when necessary.
@@ -144,7 +147,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     private void LoadBaseShip() {
         health = baseHealth;
 
-        movement = new Movement(stats, transform);
+        Movement = new Movement(stats, transform);
 
         AddWeapon("Weapons/LaserGun");
 
@@ -163,7 +166,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     private void ConvertInputs() {
         if (input.ReadInputs) {
             input.UpdateInput();
-            movement.ComputeNewTransform(transform, input.GetRotationInput(), input.GetThrustInput());
+            Movement.ComputeNewTransform(transform, input.GetRotationInput(), input.GetThrustInput());
         }
     }
 
@@ -171,9 +174,9 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// Applies the Movement instance by updating the ship's Transform component.
     /// </summary>
     private void ApplyMovement() {
-        if (movement != null) {
-            transform.position = movement.GetNewPosition();
-            transform.rotation = movement.GetNewRotation();
+        if (Movement != null) {
+            transform.position = Movement.GetNewPosition();
+            transform.rotation = Movement.GetNewRotation();
         }
     }
 
