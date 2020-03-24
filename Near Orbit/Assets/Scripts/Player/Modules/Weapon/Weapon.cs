@@ -37,14 +37,14 @@ public class Weapon : MonoBehaviour {
                 clip--;
                 // Fire code
                 if (BoltNetwork.IsServer) {
-                    FireProjectile evt = FireProjectile.Create();
-                    evt.ProjectileType = projectileType;
-                    evt.Origin = transform.position;
-                    evt.Rotation = transform.rotation;
-                    evt.Frame = BoltNetwork.ServerFrame;
-                    evt.Send();
-                    BoltLog.Warn("Sent fire event");
-                    // Other option?
+                    // TODO: Maybe for client-predicted shooting?
+                    //FireProjectile evt = FireProjectile.Create();
+                    //evt.ProjectileType = projectileType;
+                    //evt.Origin = transform.position;
+                    //evt.Rotation = transform.rotation;
+                    //evt.Frame = BoltNetwork.ServerFrame;
+                    //evt.Send();
+                    //BoltLog.Warn("Sent fire event");
                     BoltNetwork.Instantiate(projectileType, transform.position, transform.rotation)
                         .GetComponent<Projectile>()
                         .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());

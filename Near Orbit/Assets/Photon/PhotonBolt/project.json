@@ -444,7 +444,7 @@
         }
       ],
       "Properties": [],
-      "Name": "ShipMoveCommand",
+      "Name": "ShipCommand",
       "Guid": "8a9aa497-f92c-41d7-aeea-ff650d4a40c4",
       "Groups": []
     },

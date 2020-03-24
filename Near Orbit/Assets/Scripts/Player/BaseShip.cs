@@ -44,7 +44,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     public override void SimulateController() {
         if (input.ReadInputs) {
             input.UpdateInput();
-            IShipMoveCommandInput moveCommandInput = ShipMoveCommand.Create();
+            IShipCommandInput moveCommandInput = ShipCommand.Create();
 
             moveCommandInput.Thrust = input.GetThrustInput();
             moveCommandInput.Rotation = input.GetRotationInput();
@@ -58,7 +58,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     }
 
     public override void ExecuteCommand(Command command, bool resetState) {
-        ShipMoveCommand moveCommand = (ShipMoveCommand)command;
+        ShipCommand moveCommand = (ShipCommand)command;
 
         if (resetState) {
             Movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
