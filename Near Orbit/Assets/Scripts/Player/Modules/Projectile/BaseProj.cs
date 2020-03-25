@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// OBSOLETE. Use for reference code.
+/// </summary>
 public class BaseProj : MonoBehaviour {
 
     #region Serialized Fields

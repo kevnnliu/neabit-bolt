@@ -49,7 +49,9 @@ public class Weapon : MonoBehaviour {
                         .GetComponent<Projectile>()
                         .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());
                 }
-                BoltLog.Warn("Firing: " + BoltNetwork.ServerTime);
+                //BoltLog.Warn("Firing: " + BoltNetwork.ServerTime);
+                BoltLog.Warn("Firing angle: " +
+                    Vector3.Angle(Owner.transform.forward, Owner.AimTarget() - Owner.transform.position));
             }
         } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
                 reloadDelay >= ReloadInterval) {
