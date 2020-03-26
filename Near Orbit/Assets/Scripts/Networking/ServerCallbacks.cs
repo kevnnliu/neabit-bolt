@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-[BoltGlobalBehaviour(BoltNetworkModes.Server, "NetworkTest")]
+﻿[BoltGlobalBehaviour(BoltNetworkModes.Server, "NetworkTest")]
 public class ServerCallbacks : Bolt.GlobalEventListener {
 
     public override void Connected(BoltConnection connection) {
@@ -15,8 +11,9 @@ public class ServerCallbacks : Bolt.GlobalEventListener {
     }
 
     public override void OnEvent(FireProjectile evnt) {
-        // Fire now
+        // TODO: Maximum lag frames and ammo check
         var token = new ProjectileToken {
+            Owner = evnt.Owner,
             SpawnFrame = evnt.Frame
         };
         BoltNetwork.Instantiate(evnt.ProjectileType, token, evnt.Origin, evnt.Rotation);

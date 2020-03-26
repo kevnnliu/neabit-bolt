@@ -46,6 +46,7 @@ public class Weapon : MonoBehaviour {
                 // New code: Client sends information, server instantiates projectile
                 if (BoltNetwork.IsClient) {
                     var evnt = FireProjectile.Create();
+                    evnt.Owner = Owner.entity.NetworkId;
                     evnt.Frame = BoltNetwork.ServerFrame;
                     evnt.ProjectileType = projectileType;
                     evnt.Origin = transform.position;

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-[BoltGlobalBehaviour]
+﻿[BoltGlobalBehaviour]
 public class GlobalCallbacks : Bolt.GlobalEventListener {
 
     public override void BoltStartBegin() {

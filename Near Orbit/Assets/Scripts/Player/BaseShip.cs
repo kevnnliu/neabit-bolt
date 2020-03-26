@@ -8,7 +8,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     #region Serialized Fields
     
     [SerializeField]
-    private float baseHealth = 100;
+    private int baseHealth = 400;
     [SerializeField]
     private ShipStats stats = new ShipStats(45, 30, 35, 12);
     [SerializeField]
@@ -25,16 +25,16 @@ public class BaseShip : EntityBehaviour<IShipState> {
     private const float pitchYawBorder = 18f;
     private const float rollBorder = 25f;
 
-    private float health;
     private bool invincible;
 
     private IMoveInput input;
 
-    //private ModuleGroup modules = new ModuleGroup();
+    public Movement Movement { get; private set; }
 
     #region Bolt Functions
 
     public override void Attached() {
+        state.Health = baseHealth;
         state.SetTransforms(state.Transform, transform);
         state.EquippedWeapon = 0;
 
@@ -50,6 +50,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommandInput.Rotation = input.GetRotationInput();
             moveCommandInput.ReticlePoint = input.GetReticlePoint();
 
+            moveCommandInput.SwapWeapon = (input.WeaponNextPressed() ? 1 : 0) - (input.WeaponPrevPressed() ? 1 : 0);
             moveCommandInput.Fire = input.WeaponActivated();
 
             entity.QueueInput(moveCommandInput);
@@ -66,6 +67,10 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
 
+            state.EquippedWeapon = moveCommand.Result.EquippedWeapon;
+            foreach (var weapon in weapons) {
+                weapon.Firing = false;
+            }
             weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
             //Debug.Log("Reset state");
         } 
@@ -78,8 +83,18 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommand.Result.Position = Movement.GetNewPosition();
             moveCommand.Result.Rotation = Movement.GetNewRotation();
             moveCommand.Result.AimPoint = input.GetAimPoint();
-
+            
+            if (command.IsFirstExecution) {
+                if (moveCommand.Input.SwapWeapon != 0) BoltLog.Warn("Switched weapon");
+                moveCommand.Result.EquippedWeapon = (moveCommand.Result.EquippedWeapon + moveCommand.Input.SwapWeapon + weapons.Count) % weapons.Count;
+            }
+            
             moveCommand.Result.Firing = moveCommand.Input.Fire;
+
+            state.EquippedWeapon = moveCommand.Result.EquippedWeapon;
+            foreach (var weapon in weapons) {
+                weapon.Firing = false;
+            }
             weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
             //Debug.Log("Processed inputs");
         }
@@ -113,15 +128,13 @@ public class BaseShip : EntityBehaviour<IShipState> {
         invincible = enabled;
     }
 
-    public Movement Movement { get; private set; }
-
     /// <summary>
     /// Checks invincibility, subtracts from Health, and initiates respawn when necessary.
     /// </summary>
-    public void TakeDamage(float damage) {
+    public void TakeDamage(int damage) {
         if (!invincible) {
-            health -= damage;
-            if (health <= 0f) {
+            state.Health -= damage;
+            if (state.Health <= 0f) {
                 Respawn();
             }
         }
@@ -145,7 +158,6 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// Initializes control, movement, and module instances.
     /// </summary>
     private void LoadBaseShip() {
-        health = baseHealth;
 
         Movement = new Movement(stats, transform);
 

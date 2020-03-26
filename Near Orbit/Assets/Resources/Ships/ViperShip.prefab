@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1755775929737130353}
   - component: {fileID: 7400977039754985811}
   - component: {fileID: 2587210120972534481}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4509946399306283169}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: WeaponMount Center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2606715448333036206}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: WeaponMountRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -151,7 +151,8 @@ GameObject:
   - component: {fileID: 3521656535551813594}
   - component: {fileID: 8260141988039788747}
   - component: {fileID: 7532242163402188661}
-  m_Layer: 0
+  - component: {fileID: -284959916352915736}
+  m_Layer: 2
   m_Name: ViperShip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d16531ab10c654888144ee90f48b8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseHealth: 100
+  baseHealth: 400
   stats:
     RollRate: 45
     YawRate: 30
@@ -245,6 +246,20 @@ MonoBehaviour:
   _entityBehaviourQueryOption: 0
   _entityPriorityCalculatorQueryOption: 0
   _entityReplicationFilterQueryOption: 0
+--- !u!114 &-284959916352915736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4724426203593099292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1510134700, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _proximity: {fileID: 0}
+  _hitboxes: []
 --- !u!1 &7541493681483698587
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,7 +271,7 @@ GameObject:
   - component: {fileID: 4206062204300312130}
   - component: {fileID: 7504728182040338067}
   - component: {fileID: 6884041385479521463}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: MainReticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,7 +348,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 145643363944282389}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: WeaponMountLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -361,6 +376,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7057254767550981509}
     m_Modifications:
+    - target: {fileID: -7533779177259746070, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 0c842f490265ea74c980ff781ac92df4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -431,10 +451,65 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: -3569533560555146140, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -2432628212526336908, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1944963258548554569, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 0c842f490265ea74c980ff781ac92df4,
         type: 3}
       propertyPath: m_Name
       value: ship02
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 941644072219088000, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1844624372878212914, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2030905033761731463, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4966985888864361598, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5653379217557197973, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7743737937941846788, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7935622027262686581, guid: 0c842f490265ea74c980ff781ac92df4,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c842f490265ea74c980ff781ac92df4, type: 3}

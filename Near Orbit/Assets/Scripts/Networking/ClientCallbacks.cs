@@ -1,5 +1,3 @@
-using UnityEngine;
-
 [BoltGlobalBehaviour("NetworkTest")]
 public class ClientCallbacks : Bolt.GlobalEventListener {
 
