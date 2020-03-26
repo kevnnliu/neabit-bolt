@@ -12,12 +12,14 @@ public class Weapon : MonoBehaviour {
     [SerializeField]
     private int cooldownRate;
     [SerializeField]
-    private int cooldownDelay;
+    private float cooldownDelay;
 
     public int FireInterval => BoltNetwork.FramesPerSecond * 60 / rpm;
     public int ReloadInterval => BoltNetwork.FramesPerSecond * 60 / cooldownRate;
 
+    [System.NonSerialized]
     public BaseShip Owner;
+    [System.NonSerialized]
     public bool Firing;
 
     private int lastFired;
@@ -35,23 +37,25 @@ public class Weapon : MonoBehaviour {
             if (fireDelay >= FireInterval) {
                 lastFired = BoltNetwork.ServerFrame;
                 clip--;
-                // Fire code
-                if (BoltNetwork.IsServer) {
-                    // TODO: Maybe for client-predicted shooting?
-                    //FireProjectile evt = FireProjectile.Create();
-                    //evt.ProjectileType = projectileType;
-                    //evt.Origin = transform.position;
-                    //evt.Rotation = transform.rotation;
-                    //evt.Frame = BoltNetwork.ServerFrame;
-                    //evt.Send();
-                    //BoltLog.Warn("Sent fire event");
-                    BoltNetwork.Instantiate(projectileType, transform.position, transform.rotation)
-                        .GetComponent<Projectile>()
-                        .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());
+                // Old code: Server instantiates projectile
+                //if (BoltNetwork.IsServer) {
+                //    BoltNetwork.Instantiate(projectileType, transform.position, transform.rotation)
+                //        .GetComponent<Projectile>()
+                //        .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());
+                //}
+                // New code: Client sends information, server instantiates projectile
+                if (BoltNetwork.IsClient) {
+                    var evnt = FireProjectile.Create();
+                    evnt.Frame = BoltNetwork.ServerFrame;
+                    evnt.ProjectileType = projectileType;
+                    evnt.Origin = transform.position;
+                    evnt.Rotation = Quaternion.LookRotation(Owner.AimTarget() - transform.position);
+                    evnt.Send();
                 }
-                //BoltLog.Warn("Firing: " + BoltNetwork.ServerTime);
-                BoltLog.Warn("Firing angle: " +
-                    Vector3.Angle(Owner.transform.forward, Owner.AimTarget() - Owner.transform.position));
+                if (BoltNetwork.IsServer) {
+
+                }
+                BoltLog.Warn("Firing at time: " + BoltNetwork.ServerTime);
             }
         } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
                 reloadDelay >= ReloadInterval) {

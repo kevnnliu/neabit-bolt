@@ -149,6 +149,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
         Movement = new Movement(stats, transform);
 
+        AddWeapon("Weapons/MachineGun");
         AddWeapon("Weapons/LaserGun");
 
         // TODO: Load ModBox instances (CURRENTLY HARD CODED)

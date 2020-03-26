@@ -10,19 +10,17 @@ public class Projectile : EntityBehaviour<IProjectileState> {
     [SerializeField]
     private int lifetime;
 
-    public bool Hitscan => velocity == 0;
-
-    public void Init(int frame, Vector3 position, Vector3 target) {
-        state.SpawnFrame = frame;
-        state.Origin = position;
-
-        transform.LookAt(target);
+    public override void Attached() {
+        var token = (ProjectileToken)entity.AttachToken;
+        state.SpawnFrame = token.SpawnFrame;
+        state.Origin = transform.position;
+        transform.rotation = transform.rotation;
         Update();
     }
 
     void FixedUpdate() {
-        if (state.SpawnFrame + lifetime < ServerFrame) {
-            gameObject.SetActive(false);
+        if (IsServer && state.SpawnFrame + lifetime < ServerFrame) {
+            BoltNetwork.Destroy(gameObject);
         }
 
         // TODO: Resolve collisions
