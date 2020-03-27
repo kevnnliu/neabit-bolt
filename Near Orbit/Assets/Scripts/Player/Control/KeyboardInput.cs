@@ -5,11 +5,12 @@ public class KeyboardInput : IMoveInput {
     private float mouseMoveSpeed = 0.005f;
     private Vector3 pitchYaw;
     private Vector3 lastPosition;
+    private bool read;
 
     private Transform shipTransform;
     private Transform camera, reticlePoint;
     private float baseScale;
-    private Vector3 aimPoint = Vector3.zero;
+    private Vector3 aimPoint;
 
     public KeyboardInput(Transform shipT) {
         shipTransform = shipT;
@@ -23,6 +24,7 @@ public class KeyboardInput : IMoveInput {
     public bool ReadInputs => true;
 
     public void UpdateInput() {
+        read = false;
         //pitchYaw += mouseMoveSpeed * (Input.mousePosition - lastPosition);
         //lastPosition = Input.mousePosition;
         pitchYaw = mouseMoveSpeed * (Input.mousePosition - lastPosition);
@@ -94,21 +96,13 @@ public class KeyboardInput : IMoveInput {
         return new Vector3(GetPitchInput(), GetYawInput(), GetRollInput());
     }
 
-    public float GetThrustInput() {
-        return Input.GetButton("Thrust") ? 1 : 0;
-    }
+    public float GetThrustInput() => Input.GetButton("Thrust") ? 1 : 0;
 
-    public bool WeaponActivated() {
-        return Input.GetMouseButton(0);
-    }
+    public bool WeaponActivated() => Input.GetMouseButton(0);
 
-    public bool WeaponNextPressed() {
-        return Input.GetKeyDown(KeyCode.E);
-    }
+    public bool WeaponNextPressed() => Input.GetKeyDown(KeyCode.E) && !read;
 
-    public bool WeaponPrevPressed() {
-        return Input.GetKeyDown(KeyCode.Q);
-    }
+    public bool WeaponPrevPressed() => Input.GetKeyDown(KeyCode.Q) && !read;
 
     public int SpecialActivated(int index) {
         switch (index) {
@@ -128,6 +122,8 @@ public class KeyboardInput : IMoveInput {
                 return 0;
         }
     }
+
+    public void MarkAsRead() => read = true;
 
     public void ProcessRawInput(Transform shipT) { }
 

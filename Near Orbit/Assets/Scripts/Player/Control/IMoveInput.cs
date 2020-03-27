@@ -57,4 +57,9 @@ public interface IMoveInput {
     /// Convert and update raw input to scaled values, to be called every frame.
     /// </summary>
     void UpdateInput();
+
+    /// <summary>
+    /// Mark one-time inputs (such as weapon switching) as read (set to false).
+    /// </summary>
+    void MarkAsRead();
 }

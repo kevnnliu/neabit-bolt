@@ -57,17 +57,11 @@ public class GestureInput : IMoveInput {
         return Mathf.Clamp(0.7f + throttle, 0f, throttleMax);
     }
 
-    public bool WeaponActivated() {
-        return curInput.weaponActivation;
-    }
-    
-    public bool WeaponNextPressed() {
-        return curInput.weaponNext && !prevInput.weaponNext;
-    }
+    public bool WeaponActivated() => curInput.weaponActivation;
 
-    public bool WeaponPrevPressed() {
-        return curInput.weaponPrev && !prevInput.weaponPrev;
-    }
+    public bool WeaponNextPressed() => curInput.weaponNext && !prevInput.weaponNext;
+
+    public bool WeaponPrevPressed() => curInput.weaponPrev && !prevInput.weaponPrev;
 
     public int SpecialActivated(int index) {
         switch (index) {
@@ -80,6 +74,11 @@ public class GestureInput : IMoveInput {
             default:
                 return 0;
         }
+    }
+
+    public void MarkAsRead() {
+        prevInput.weaponNext = true;
+        prevInput.weaponPrev = true;
     }
 
     public Vector3 GetReticlePoint() {

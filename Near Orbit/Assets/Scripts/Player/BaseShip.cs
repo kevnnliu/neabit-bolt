@@ -26,6 +26,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     private const float rollBorder = 25f;
 
     private bool invincible;
+    private int equipped;
 
     private IMoveInput input;
 
@@ -34,24 +35,28 @@ public class BaseShip : EntityBehaviour<IShipState> {
     #region Bolt Functions
 
     public override void Attached() {
-        state.Health = baseHealth;
         state.SetTransforms(state.Transform, transform);
-        state.EquippedWeapon = 0;
+        
+        if (entity.IsOwner) {
+            state.Health = baseHealth;
+            state.EquippedWeapon = 0;
+        }
 
         Debug.Log("Attached");
     }
 
     public override void SimulateController() {
         if (input.ReadInputs) {
-            input.UpdateInput();
             IShipCommandInput moveCommandInput = ShipCommand.Create();
 
             moveCommandInput.Thrust = input.GetThrustInput();
             moveCommandInput.Rotation = input.GetRotationInput();
             moveCommandInput.ReticlePoint = input.GetReticlePoint();
 
-            moveCommandInput.SwapWeapon = (input.WeaponNextPressed() ? 1 : 0) - (input.WeaponPrevPressed() ? 1 : 0);
             moveCommandInput.Fire = input.WeaponActivated();
+
+            moveCommandInput.SwapWeapon = input.WeaponNextPressed() ? 1 : input.WeaponPrevPressed() ? -1 : 0;
+            input.MarkAsRead();
 
             entity.QueueInput(moveCommandInput);
             //Debug.Log("Inputs queued over network");
@@ -67,14 +72,13 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
 
-            state.EquippedWeapon = moveCommand.Result.EquippedWeapon;
+            equipped = moveCommand.Result.EquippedWeapon;
             foreach (var weapon in weapons) {
                 weapon.Firing = false;
             }
-            weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
+            weapons[equipped].Firing = moveCommand.Result.Firing;
             //Debug.Log("Reset state");
-        } 
-        else {
+        } else {
             Movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
             ApplyMovement();
 
@@ -84,18 +88,23 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommand.Result.Rotation = Movement.GetNewRotation();
             moveCommand.Result.AimPoint = input.GetAimPoint();
             
-            if (command.IsFirstExecution) {
-                if (moveCommand.Input.SwapWeapon != 0) BoltLog.Warn("Switched weapon");
-                moveCommand.Result.EquippedWeapon = (moveCommand.Result.EquippedWeapon + moveCommand.Input.SwapWeapon + weapons.Count) % weapons.Count;
-            }
-            
             moveCommand.Result.Firing = moveCommand.Input.Fire;
 
-            state.EquippedWeapon = moveCommand.Result.EquippedWeapon;
+            if (moveCommand.IsFirstExecution) {
+                moveCommand.Result.EquippedWeapon = (equipped + moveCommand.Input.SwapWeapon + weapons.Count) % weapons.Count;
+                if (moveCommand.Input.SwapWeapon != 0) {
+                    BoltLog.Warn("Swapping to " + moveCommand.Result.EquippedWeapon);
+                }
+            }
+
+            equipped = moveCommand.Result.EquippedWeapon;
+            if (entity.IsOwner) {
+                state.EquippedWeapon = moveCommand.Result.EquippedWeapon;
+            }
             foreach (var weapon in weapons) {
                 weapon.Firing = false;
             }
-            weapons[state.EquippedWeapon].Firing = moveCommand.Result.Firing;
+            weapons[equipped].Firing = moveCommand.Result.Firing;
             //Debug.Log("Processed inputs");
         }
     }
@@ -110,10 +119,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     void Update() {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
         
-        // ConvertInputs(input);
-        // ApplyMovement(movement);
         input.UpdateInput();
-        //modules.Update(input);
     }
 
     public void AddWeapon(string prefabID) {
@@ -133,6 +139,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// </summary>
     public void TakeDamage(int damage) {
         if (!invincible) {
+            BoltLog.Warn("Ouch! Took " + damage + " damage");
             state.Health -= damage;
             if (state.Health <= 0f) {
                 Respawn();
@@ -163,10 +170,9 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
         AddWeapon("Weapons/MachineGun");
         AddWeapon("Weapons/LaserGun");
+        AddWeapon("Weapons/LaserGun");
 
-        // TODO: Load ModBox instances (CURRENTLY HARD CODED)
-        //modules.AddModule(ModuleManager.CreateModule<BaseWeapon>("Weapons/LaserGun", this, weaponMounts[0]));
-        //modules.AddModule(ModuleManager.CreateModule<BaseSpecial>("Specials/Boost", this, specialMounts[0]));
+        equipped = 0;
     }
 
     private void Respawn() {
@@ -174,7 +180,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
     }
 
     /// <summary>
-    /// Processes an IMoveInput instance and updates the ship's Movement instance.
+    /// OBSOLETE. Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
     private void ConvertInputs() {
         if (input.ReadInputs) {

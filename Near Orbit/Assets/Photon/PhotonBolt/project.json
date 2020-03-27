@@ -88,10 +88,12 @@
           "Name": "EquippedWeapon",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 255
+            "MaxValue": 255,
+            "CompressionEnabled": true
           },
           "AssetSettings": {
             "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -323,8 +325,8 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MinValue": -1,
-            "MaxValue": 1,
+            "MinValue": -128,
+            "MaxValue": 127,
             "CompressionEnabled": true
           },
           "AssetSettings": {
@@ -484,7 +486,7 @@
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
-            "MaxValue": 3,
+            "MaxValue": 255,
             "CompressionEnabled": true
           },
           "AssetSettings": {

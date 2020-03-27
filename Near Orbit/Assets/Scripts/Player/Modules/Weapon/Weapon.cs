@@ -52,6 +52,7 @@ public class Weapon : MonoBehaviour {
                     evnt.Origin = transform.position;
                     evnt.Rotation = Quaternion.LookRotation(Owner.AimTarget() - transform.position);
                     evnt.Send();
+                    Debug.Log("Ammo: " + clip + "/" + clipSize);
                 }
                 if (BoltNetwork.IsServer) {
 
@@ -59,7 +60,7 @@ public class Weapon : MonoBehaviour {
                 BoltLog.Warn("Firing at time: " + BoltNetwork.ServerTime);
             }
         } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
-                reloadDelay >= ReloadInterval) {
+                reloadDelay >= ReloadInterval && clip < clipSize) {
             lastReloaded = BoltNetwork.ServerFrame;
             clip++;
         }

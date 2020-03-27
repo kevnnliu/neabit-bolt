@@ -54,8 +54,9 @@ public class Projectile : EntityBehaviour<IProjectileState> {
     /// Resolves projectile collisions with static geometry and players.
     /// Returns true if the projectile is to be destroyed.
     /// </summary>
-    private bool ResolveCollisions(int frame) {
+    protected bool ResolveCollisions(int frame) {
         float distance = DistanceAtFrame(frame);
+        float nextDistance = Mathf.Min(DistanceAtFrame(frame + 1), maxDistance, range);
         // Static impact
         if (distance >= maxDistance) {
             // TODO: Spawn impact entity
@@ -73,14 +74,14 @@ public class Projectile : EntityBehaviour<IProjectileState> {
                 }
             }
             // Deal damage if collision occurs on this frame
-            if (min != -1 && hits[min].distance + distance < DistanceAtFrame(frame + 1)) {
+            if (min != -1 && hits[min].distance + distance < nextDistance) {
                 hits[min].body.GetComponent<BaseShip>().TakeDamage(damage);
                 // TODO: Spawn impact entity
                 return true;
             }
         }
         // Despawn at max range
-        return distance > range;
+        return distance >= range;
     }
 
     private float DistanceAtFrame(int frame) {

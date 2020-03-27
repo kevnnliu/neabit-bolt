@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 8260141988039788747}
   - component: {fileID: 7532242163402188661}
   - component: {fileID: -284959916352915736}
+  - component: {fileID: 3495390933539449689}
   m_Layer: 2
   m_Name: ViperShip
   m_TagString: Untagged
@@ -259,7 +260,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _proximity: {fileID: 0}
-  _hitboxes: []
+  _hitboxes:
+  - {fileID: 3495390933539449689}
+--- !u!114 &3495390933539449689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4724426203593099292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1301758009, guid: 5b00bf8b25851d440940a40ec23344f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shape: 0
+  _type: 0
+  _center: {x: 0, y: -0.75, z: 2}
+  _boxSize: {x: 4.5, y: 1.25, z: 4.7}
+  _sphereRadius: 0.25
 --- !u!1 &7541493681483698587
 GameObject:
   m_ObjectHideFlags: 0
