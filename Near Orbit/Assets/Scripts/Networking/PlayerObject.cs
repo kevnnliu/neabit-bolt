@@ -13,7 +13,7 @@ public class PlayerObject {
 
         if (!character) {
             BoltLog.Warn("Spawning ship from " + (IsServer ? "server" : "client"));
-            character = BoltNetwork.Instantiate(BoltPrefabs.ViperShip, MapInfo.SpawnLocations[0], Quaternion.identity);
+            character = BoltNetwork.Instantiate(BoltPrefabs.ViperPrefab, MapInfo.SpawnLocations[0], Quaternion.identity);
 
             if (IsServer) {
                 character.TakeControl();

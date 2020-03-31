@@ -13,6 +13,8 @@ public class Weapon : MonoBehaviour {
     private int cooldownRate;
     [SerializeField]
     private float cooldownDelay;
+    [SerializeField]
+    private Transform origin;
 
     public int FireInterval => BoltNetwork.FramesPerSecond * 60 / rpm;
     public int ReloadInterval => BoltNetwork.FramesPerSecond * 60 / cooldownRate;
@@ -49,8 +51,8 @@ public class Weapon : MonoBehaviour {
                     evnt.Owner = Owner.entity.NetworkId;
                     evnt.Frame = BoltNetwork.ServerFrame;
                     evnt.ProjectileType = projectileType;
-                    evnt.Origin = transform.position;
-                    evnt.Rotation = Quaternion.LookRotation(Owner.AimTarget() - transform.position);
+                    evnt.Origin = origin.position;
+                    evnt.Rotation = Quaternion.LookRotation(Owner.AimTarget() - origin.position);
                     evnt.Send();
                     Debug.Log("Ammo: " + clip + "/" + clipSize);
                 }

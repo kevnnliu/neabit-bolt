@@ -42,7 +42,12 @@ public class Projectile : EntityBehaviour<IProjectileState> {
         if (!IsServer) return;
 
         if (ResolveCollisions(ServerFrame)) {
-            BoltNetwork.Destroy(gameObject);
+            if (IsServer) {
+                BoltNetwork.Destroy(gameObject);
+            } else {
+                // Hides object?
+                transform.localScale = Vector3.zero;
+            }
         }
     }
 
