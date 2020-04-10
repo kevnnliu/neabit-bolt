@@ -12,26 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd7bb81df5b74b34dadbf531f381a26b, type: 3}
   m_Name: OVRPlatformToolSettings
   m_EditorClassIdentifier: 
-  appIDs:
-  - 
-  - 
-  - 
-  releaseNotes:
-  - 
-  - 
-  - 
-  releaseChannels:
-  - Alpha
-  - Alpha
-  - Alpha
-  riftBuildDiretory: 
-  riftBuildVersion: 
-  riftLaunchFile: 
-  riftLaunchParams: 
-  rift2DLaunchFile: 
-  rift2DLaunchParams: 
-  riftFirewallException: 0
-  riftGamepadEmulation: 0
   riftRedistPackages:
   - include: 0
     name: ' .NET Framework 3.5'
@@ -100,18 +80,6 @@ MonoBehaviour:
     name: ' Vulkan Runtime 1.1.73.0'
     id: ' 1941020095932382   '
   languagePackDirectory: 
-  apkBuildPaths:
-  - 
-  - 
-  - 
-  obbFilePaths:
-  - 
-  - 
-  - 
-  assetsDirectorys:
-  - 
-  - 
-  - 
   assetConfigs:
   - configList: []
   - configList: []
