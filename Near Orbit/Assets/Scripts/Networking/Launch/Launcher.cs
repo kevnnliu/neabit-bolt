@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using System;
 using UdpKit;
 using UnityEngine.SceneManagement;
@@ -92,7 +93,7 @@ public class Launcher : Bolt.GlobalEventListener
 
                     if (ExpandButton(label))
                     {
-                        BoltNetwork.Connect(photonSession);
+                        BoltMatchmaking.JoinSession(photonSession);
                         state = State.Started;
                     }
                 }
@@ -153,6 +154,38 @@ public class Launcher : Bolt.GlobalEventListener
 
     public override void BoltStartDone()
     {
+        var meta = BoltMatchmaking.CurrentMetadata;
+
+        // Read all custom data sent from your auth server
+        object customData;
+        if (meta.TryGetValue("Data", out customData))
+        {
+            var text = "";
+
+            foreach (var item in (Dictionary<string, object>) customData)
+            {
+                text += string.Format("{0} : {1}\n", item.Key, item.Value);
+            }
+
+            BoltLog.Info(text);
+        }
+
+        // Read the UserId of the local player
+        object userID;
+        if (meta.TryGetValue("UserId", out userID))
+        {
+            BoltLog.Info("UserID: {0}", (string) userID);
+        }
+
+        // Read the Nickname of the local player
+        object nickName;
+        if (meta.TryGetValue("Nickname", out nickName))
+        {
+            BoltLog.Info("Nickname: {0}", (string) nickName);
+        }
+
+        // Your usual BoltStartDone behaviour: setup game server or join a session
+
         if (BoltNetwork.IsServer)
         {
             var id = Guid.NewGuid().ToString().Split('-')[0];
@@ -163,6 +196,11 @@ public class Launcher : Bolt.GlobalEventListener
                 sceneToLoad: map
             );
         }
+    }
+
+    public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
+    {
+        Debug.LogErrorFormat("BoltStartFailed. Reason: {0}", disconnectReason);
     }
 
     public override void BoltShutdownBegin(AddCallback registerDoneCallback, UdpConnectionDisconnectReason disconnectReason)

@@ -497,16 +497,64 @@
         <member name="P:ExitGames.Client.Photon.PhotonPeer.ClientVersion">
             <summary>Version of this library as string.</summary>
         </member>
+        <member name="P:ExitGames.Client.Photon.PhotonPeer.NativeSocketLibAvailable">
+             <summary>Checks if a native library for network sockets (PhotonSocketPlugin.dll) is available. To use it, see remarks.</summary>
+             <remarks>
+             When the native socket library is available, the SocketNative class may be used as socket implementation.
+            
+             If the SocketImplementationConfig is null, the SocketNative class is assigned for UDP, TCP and WebSocket.
+            
+             Alternatively the type SocketNative (or other) can be assigend in the SocketImplementationConfig.
+            
+             The SocketNative class in this assembly is compiled for dynamic linking.
+             A class "SocketNativeSource" can be made available for you to compile it along with your source for
+             platforms that use static linking (e.g. for iOS and some consoles).
+            
+             Note: Native libraries must match the execution platform.
+             Even if the native plugin is found it may fail to execute.
+             </remarks>
+        </member>
+        <member name="P:ExitGames.Client.Photon.PhotonPeer.NativePayloadEncryptionLibAvailable">
+             <summary>Checks if native library for Payload Encryption (PhotonCryptoPlugin.dll) is available. Used automatically.</summary>
+             <remarks>
+             While the encryptor Type for Datagram Encryption can be defined, Payload Encryption
+             will always use built-in types as encryptor.
+            
+             Note: Native libraries must match the execution platform.
+             Even if the native plugin is found it may fail to execute.
+             </remarks>
+        </member>
+        <member name="P:ExitGames.Client.Photon.PhotonPeer.NativeDatagramEncryptionLibAvailable">
+             <summary>Checks if a native library for Datagram Encryption is available. To use it, see remarks.</summary>
+             <remarks>
+             If the PhotonPeer.EncryptorType is set, this type is used as implementation for Datagram Encryption.
+             If it's not set, a native plugin is used if available. As fallback, a managed implementation is being used.
+            
+             Note: The native plugin is performing much better than the managed alternatives.
+             This is why we make the plugin available for various platforms.
+            
+             Note: Native libraries must match the execution platform.
+             Even if the native plugin is found it may fail to execute.
+             </remarks>
+        </member>
+        <member name="M:ExitGames.Client.Photon.PhotonPeer.CheckNativeLibsAvailability">
+            <summary>
+            Checks availability and completeness of native libs and sets respective "available" values.
+            </summary>
+        </member>
         <member name="P:ExitGames.Client.Photon.PhotonPeer.SerializationProtocolType">
             <summary>Enables selection of a (Photon-)serialization protocol. Used in Connect methods.</summary>
             <remarks>Defaults to SerializationProtocol.GpBinaryV16;</remarks>
         </member>
         <member name="F:ExitGames.Client.Photon.PhotonPeer.SocketImplementationConfig">
-             <summary>Defines which IPhotonSocket class to use per ConnectionProtocol.</summary>
+             <summary>Optional definition of IPhotonSocket type per ConnectionProtocol.</summary>
              <remarks>
              Several platforms have special Socket implementations and slightly different APIs.
              To accomodate this, switching the socket implementation for a network protocol was made available.
              By default, UDP and TCP have socket implementations assigned.
+            
+             If a native socket plugin is available (see: PhotonPeer.NativeSocketLibAvailable), the SocketNative
+             class is used by default (with dynamic linking).
             
              You only need to set the SocketImplementationConfig once, after creating a PhotonPeer
              and before connecting. If you switch the TransportProtocol, the correct implementation is being used.
@@ -957,7 +1005,10 @@
         </member>
         <member name="P:ExitGames.Client.Photon.PhotonPeer.EncryptorType">
             <summary>Setter for the Datagram Encryptor instance. Used at next connect.</summary>
-            <remarks>If null, the PhotonPeer will create a default encryptor instance.</remarks>
+            <remarks>
+            If null, the PhotonPeer will create a default encryptor instance, which may be native or managed.
+            See also: PhotonPeer.NativeDatagramEncryptionLibAvailable.
+            </remarks>
         </member>
         <member name="F:ExitGames.Client.Photon.PhotonPeer.Encryptor">
             <summary>The datagram encryptor used for the current connection. Applied internally in InitDatagramEncryption.</summary>
@@ -1091,7 +1142,7 @@
         </member>
         <member name="M:ExitGames.Client.Photon.PhotonPeer.InitDatagramEncryption(System.Byte[],System.Byte[],System.Boolean)">
             <summary>
-            Initializes Datagram Encryption.
+            Initializes Datagram Encryption. Optionally, the EncryptorType is being used, if set.
             </summary>
             <param name="encryptionSecret">secret used to chipher udp packets</param>
             <param name="hmacSecret">secret used for authentication of udp packets</param>

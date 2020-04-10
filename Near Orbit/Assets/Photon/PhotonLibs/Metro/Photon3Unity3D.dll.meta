@@ -40,7 +40,7 @@ PluginImporter:
       settings:
         CPU: AnyCPU
         DontProcess: False
-        PlaceholderPath: Assets/Plugins/Photon3Unity3D.dll
+        PlaceholderPath: Assets/Photon/PhotonLibs/Photon3Unity3D.dll
         SDK: AnySDK
         ScriptingBackend: DotNet
     Win:
@@ -56,7 +56,7 @@ PluginImporter:
       settings:
         CPU: AnyCPU
         DontProcess: False
-        PlaceholderPath: Assets/Plugins/Photon3Unity3D.dll
+        PlaceholderPath: Assets/Photon/PhotonLibs/Photon3Unity3D.dll
         SDK: AnySDK
         ScriptingBackend: DotNet
     iOS:

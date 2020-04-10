@@ -4,6 +4,17 @@ Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
 
+Version 4.1.2.20
+    Added: New callback IErrorInfoCallback.OnErrorInfo when the client receives an ErrorInfo event from the server.
+	Changed: RegionPinger use a singleton MonoBehaviourEmpty for coroutine ping in WebGL in Unity.
+	Added: LoadBalancingClient.SerializationProtocol property to get or set the binary protocol version. Use this always instead of setting it via LoadBalancingPeer.SerializationProtocolType.
+    Added: LoadBalancingClient.ConnectUsingSettings(AppSettings appSettings). This allows Best Region connect, setting a custom name server and much more.
+    Changed: Connect() is now ConnectToMasterServer(). Unlike ConnectUsingSettings(), this requires some settings to be done on the client.
+    Added: Return parameter for all methods that set properties on the server.
+    Changed: Failed Authentication will no longer call the OnDisconnected callback twice. This should better align with expectations.
+    Internal: Pinging regions via coroutine (when Threads are unavailable) now uses only one GameObject for all pinging.
+
+
 Version 4.1.2.19 (12. November 2019 - rev5266)
     Fixed: The ExpectedProtocol is now also set for Authmode "AuthOnce" for ConnectToNameServer and ConnectToRegionMaster.
     Changed: Player.ToString() to show ActorNumber and NickName. The PlayerProperties are included in ToStringFull().
@@ -14,7 +25,6 @@ Version 4.1.2.19 (12. November 2019 - rev5266)
     Changed: Logging of SupportLogger.
     Added: LoadBalancingClient.OpJoinRandomOrCreateRoom. This can be used to create a room, should random matchmaking fail. This helps avoid race conditons where players can't find one another.
     Added: Extra null-check in handling of event leave.
-
 
 Version 4.1.2.17 (9. August 2019 - rev5188)
     Changed: SupportLogger. Traffic stats are enabled by default. The PhotonHandler no longer has to enable this.

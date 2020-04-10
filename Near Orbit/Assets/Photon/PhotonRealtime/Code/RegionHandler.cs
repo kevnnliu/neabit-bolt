@@ -106,19 +106,6 @@ namespace Photon.Realtime
             }
         }
 
-        #if PING_VIA_COROUTINE
-        private ConnectionHandler connectionHandler;
-        
-        public RegionHandler()
-        {
-            this.connectionHandler = UnityEngine.Object.FindObjectOfType<ConnectionHandler>();
-            if (!connectionHandler)
-            {
-                Debug.LogError("ConnectionHandler component not found. It is required to start regions ping coroutine.");
-            }
-        }
-        #endif
-
         public string GetResults()
         {
             StringBuilder sb = new StringBuilder();
@@ -243,11 +230,7 @@ namespace Photon.Realtime
 
             Region preferred = this.EnabledRegions.Find(r => r.Code.Equals(prevBestRegionCode));
             RegionPinger singlePinger = new RegionPinger(preferred, this.OnPreferredRegionPinged);
-            #if PING_VIA_COROUTINE
-            singlePinger.Start(this.connectionHandler);
-            #else
             singlePinger.Start();
-            #endif
             return true;
         }
 
@@ -261,6 +244,9 @@ namespace Photon.Realtime
             {
                 this.IsPinging = false;
                 this.onCompleteCall(this);
+                #if PING_VIA_COROUTINE
+                MonoBehaviourEmpty.SelfDestroy();
+                #endif
             }
         }
 
@@ -279,11 +265,7 @@ namespace Photon.Realtime
             {
                 RegionPinger rp = new RegionPinger(region, this.OnRegionDone);
                 this.pingerList.Add(rp);
-                #if PING_VIA_COROUTINE
-                rp.Start(this.connectionHandler); // TODO: check return value
-                #else
                 rp.Start(); // TODO: check return value
-                #endif
             }
 
             return true;
@@ -302,6 +284,9 @@ namespace Photon.Realtime
 
             this.IsPinging = false;
             this.onCompleteCall(this);
+            #if PING_VIA_COROUTINE
+            MonoBehaviourEmpty.SelfDestroy();
+            #endif
         }
     }
 
@@ -362,11 +347,7 @@ namespace Photon.Realtime
             return ping;
         }
 
-        #if PING_VIA_COROUTINE
-        public bool Start(ConnectionHandler connectionHandler)
-        #else
         public bool Start()
-        #endif
         {
             // all addresses for Photon region servers will contain a :port ending. this needs to be removed first.
             // PhotonPing.StartPing() requires a plain (IP) address without port or protocol-prefix (on all but Windows 8.1 and WebGL platforms).
@@ -387,14 +368,7 @@ namespace Photon.Realtime
             this.rttResults = new List<int>(Attempts);
 
             #if PING_VIA_COROUTINE
-            if (connectionHandler)
-            {
-                connectionHandler.StartCoroutine(this.RegionPingCoroutine());
-            }
-            else
-            {
-                Debug.LogError("ConnectionHandler component is null or destroyed. It is required to start regions ping coroutine.");
-            }
+            MonoBehaviourEmpty.Instance.StartCoroutine(this.RegionPingCoroutine());
             #elif UNITY_SWITCH
             SupportClass.StartBackgroundCalls(this.RegionPingThreaded, 0);
             #else
@@ -533,9 +507,11 @@ namespace Photon.Realtime
                 yield return new WaitForSeconds(0.1f);
             }
 
+
             //Debug.Log("Done: "+ this.region.Code);
             this.Done = true;
-			this.ping.Dispose();
+            this.ping.Dispose();
+
             this.onDoneCall(this.region);
             yield return null;
         }
@@ -608,4 +584,38 @@ namespace Photon.Realtime
             return ipv4Address;
         }
     }
+
+    #if PING_VIA_COROUTINE
+    internal class MonoBehaviourEmpty : MonoBehaviour
+    {
+        private static bool instanceSet; // to avoid instance null check which may be incorrect
+        private static MonoBehaviourEmpty instance;
+
+        public static MonoBehaviourEmpty Instance
+        {
+            get
+            {
+                if (instanceSet)
+                {
+                    return instance;
+                }
+                GameObject go = new GameObject();
+                DontDestroyOnLoad(go);
+                go.name = "RegionPinger";
+                instance = go.AddComponent<MonoBehaviourEmpty>();
+                instanceSet = true;
+                return instance;
+            }
+        }
+
+        public static void SelfDestroy()
+        {
+            if (instanceSet)
+            {
+                instanceSet = false;
+                Destroy(instance.gameObject);
+            }
+        }
+    }
+    #endif
 }

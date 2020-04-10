@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Bolt.Editor;
+using Bolt.Editor.Utils;
 
 public partial class BoltWizardWindow
 {

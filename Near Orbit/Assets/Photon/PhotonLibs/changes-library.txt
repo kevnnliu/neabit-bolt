@@ -4,6 +4,15 @@ Exit Games GmbH - www.photonengine.com - forum.photonengine.com
 
 
 
+Version 4.1.2.20 (12. December 2019 - rev5296)
+    Changed: DiffieHellmanCryptoProviderNative is now always compiled into the assembly using dynamic linking. If the payload encryption native library is present, it will be used automatically.
+    Changed: Extern methods with the DllImport attribute are now public. This allows a PrelinkAll() check if the dll is available and can be loaded.
+    Internal: EncryptorNative will no longer use native extern methods in static fields. This causes execptions in unexpected context.
+    Added: PhotonPeer NativePayloadEncryptionLibAvailable, NativeDatagramEncryptionLibAvailable and NativeSocketLibAvailable values.
+    Changed: SocketNative is autmatically used if the native socket lib is available, based on the checks above.
+    Changed: The wrappers for the native libraries (sockets and datagram encryption) will now setup a debug logging callback with debug level. This requires new native libraries.
+
+
 Version 4.1.2.19 (13. November 2019 - rev5271)
     Internal: Handling for DllNotFoundException in the SocketNative.DnsAndConnect().
     Internal: Added support for setting the serialization protocol when using native websocket.
@@ -11,7 +20,7 @@ Version 4.1.2.19 (13. November 2019 - rev5271)
     Internal: Changed the access level of PeerBase.debugOut from 'internal' to 'public'.
     Changed: UDP socket classes now trigger a disconnect in the send methods, should the lower-level socket be disconnected. This gives us a quicker "disconnected" state in some error cases. So far, only reading-errors triggered disconnects in UDP.
     Changed: Logging in case of send errors.
-	Added: Exception handling to deserialization. This adds a safety layer for receiving messages, which can be skipped. Important: It will be unknown, what message got discarded and if it's important or if it was fake / surplus.
+    Added: Exception handling to deserialization. This adds a safety layer for receiving messages, which can be skipped. Important: It will be unknown, what message got discarded and if it's important or if it was fake / surplus.
     Fixed: Internal class EncryptorNet, which was not thread safe, so DatagramEncryption was failing sooner or later. This affected only v4.1.2.18, which was an internal release.
 
 Version 4.1.2.18 (1. October 2019 - rev5229)

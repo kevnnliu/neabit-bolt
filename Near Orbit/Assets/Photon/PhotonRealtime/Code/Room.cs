@@ -393,7 +393,7 @@ namespace Photon.Realtime
         /// Limit the amount of properties sent to users in the lobby to improve speed and stability.
         /// </remarks>
         /// <param name="propertiesListedInLobby">An array of custom room property names to forward to the lobby.</param>
-        public void SetPropertiesListedInLobby(string[] propertiesListedInLobby)
+        public bool SetPropertiesListedInLobby(string[] propertiesListedInLobby)
         {
             Hashtable customProps = new Hashtable();
             customProps[GamePropertyKey.PropsListedInLobby] = propertiesListedInLobby;
@@ -404,6 +404,8 @@ namespace Photon.Realtime
             {
                 this.propertiesListedInLobby = propertiesListedInLobby;
             }
+
+            return sent;
         }
 
 

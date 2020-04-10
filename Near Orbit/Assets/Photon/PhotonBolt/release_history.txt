@@ -1,3 +1,30 @@
+1.2.12
+
+Added: Option to pass an IProtocolToken when connecting to a "localhost" Game Server. This is useful when using the "Debug Start" utility to pass a token when connecting.
+Added: "StreamDataStarted" callback to Reliable Stream System. The callback fires when a new data stream started to be received.
+Added: "StreamDataProgress" callback to Reliable Stream System. The callback fires when a new piece of data from an incoming stream has been received.
+Added: "StreamDataAborted" callback to Reliable Stream System. The callback fires when an incoming stream of data has been aborted. This can happen because the remote peer was disconnected or the hash check fails.
+Added: Button in the "Debug Start" to run the Build in Single Player mode.
+Added: Support for Custom Authentication. Now you will be able to pass Authentication Values before starting Bolt, and then check the credentials of your players using your own auth service.
+Added: Photon Platform metadata now includes more properties: "UserId", "Nickname" and "Data". All information is related to the Custom Authentication support.
+Added: "BoltStartFailed" callback with a "UdpConnectionDisconnectReason" as argument, signaling the fail reason. This callback will replace the normal callback without the argument on future versions.
+Added: "SessionConnectFailed" callback with a "UdpSessionError" to signal errors when trying to join a new Game Session. This callback will replace the normal callback without the argument on future versions.
+Added: "SessionCreationFailed" callback with a "UdpSessionError" to signal errors when trying to create a new Game Session. This callback will replace the normal callback without the argument on future versions.
+
+Changed: Deprecated "BoltShutdownBegin" callback without "UdpConnectionDisconnectReason" as argument.
+Changed: Deprecated "SceneLoad" callbacks without "IProtocolToken" as an argument. This change aims to follow the Bolt pattern of using callbacks with the "IProtocolToken".
+Changed: Update version of Photon Realtime to 4.1.2.20.
+Changed: Package Overflow check. It warns the user when trying to package a ProtocolToken that exceeds the maximum package size.
+Changed: Warning when Photon Application ID is not set.
+Changed: Update Console integrations with the latest Bolt SDK.
+Changed: Photon Platform metadata key for the current Region: from "region" to "Region". The lowercase version still exists but will be removed on future versions.
+
+Fixed: Timeout connection in the background. The application will continue to ping the Game Server in the background, maintaining the connection.
+Fixed: Data Stream in Reliable Mode. The major issue was a Memory Leak after finishing the transmission.
+Fixed: Source Provider MissingMethodException that may occur on some versions of the Unity Editor.
+Fixed: Bolt Compiler does not work in Release Mode.
+Fixed: Bolt cannot be started if invoking ShutdownImmediate before BoltStartDone.
+
 1.2.11
 
 Added: GlobalEventListener callback documentation.

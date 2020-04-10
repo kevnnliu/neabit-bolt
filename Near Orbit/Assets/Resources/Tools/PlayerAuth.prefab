@@ -43,3 +43,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0813d7859df1da34e8285056a31a8e8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  oculusAuth: {fileID: 2002367145255775488, guid: e7981f3727c365545b5a8409c331bbe2,
+    type: 3}

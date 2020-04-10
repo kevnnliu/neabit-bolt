@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using Bolt.Editor;
+using Bolt.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,6 +9,9 @@ namespace Bolt.Utils
 {
 	public static class MenuUtililies
 	{
+		private const string DLL_SUFIX_DEBUG = ".debug";
+		private const string DLL_SUFIX_RELEASE = ".release";
+
 		// ======= PUBLIC METHODS =====================================================================================
 
 		[MenuItem("Bolt/Utils/Find Missing Scripts", priority = 25)]
@@ -31,7 +32,7 @@ namespace Bolt.Utils
 
 			var msg = string.Format("Bolt is in {0} mode, want to change to {1}?", current, target);
 
-			if (EditorUtility.DisplayDialog("Change Bolt DLL Mode", msg, "Yes", "Cancel"))
+			if (UnityEditor.EditorUtility.DisplayDialog("Change Bolt DLL Mode", msg, "Yes", "Cancel"))
 			{
 				if (ChangeDllMode())
 				{
@@ -48,7 +49,7 @@ namespace Bolt.Utils
 		{
 			return SwitchDebugReleaseMode(BoltNetwork.IsDebugMode);
 		}
-		
+
 		// ======= PRIVATE METHODS =====================================================================================
 
 		public static int FindMissingComponents()
@@ -56,12 +57,12 @@ namespace Bolt.Utils
 			int missingScriptsCount = 0;
 			List<Component> components = new List<Component>();
 
-            var folders = new string[] { "Assets" };
+			var folders = new string[] { "Assets" };
 			var iter = AssetDatabase.FindAssets("t:Prefab", folders).GetEnumerator();
 
 			while (iter.MoveNext())
 			{
-				var guid = (string) iter.Current;
+				var guid = (string)iter.Current;
 				var path = AssetDatabase.GUIDToAssetPath(guid);
 				var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
 
@@ -87,8 +88,8 @@ namespace Bolt.Utils
 
 		private static bool SwitchDebugReleaseMode(bool debug)
 		{
-			var from = debug ? ".debug" : ".release";
-			var to = debug ? ".release" : ".debug";
+			var from = debug ? DLL_SUFIX_DEBUG : DLL_SUFIX_RELEASE;
+			var to = debug ? DLL_SUFIX_RELEASE : DLL_SUFIX_DEBUG;
 
 			var paths = new string[]
 			{
@@ -109,14 +110,33 @@ namespace Bolt.Utils
 					backup = FileUtils.BackupFile(path);
 					FileUtils.ExchangeFile(path, from, to);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					FileUtils.BackupFile(path, true);
+					Debug.LogError("Aborting...");
+					Debug.LogException(ex);
 					abort = true;
+
+					try
+					{
+						FileUtils.BackupFile(path, true);
+					}
+					catch (Exception ex2)
+					{
+						Debug.LogException(ex2);
+					}
 				}
 				finally
 				{
-					FileUtils.DeleteFile(backup);
+					try
+					{
+						FileUtils.DeleteFile(backup);
+					}
+					catch (Exception ex)
+					{
+						Debug.LogException(ex);
+					}
+
+					backup = "";
 				}
 			}
 
@@ -140,20 +160,27 @@ namespace Bolt.Utils
 			{
 				if (File.Exists(to)) { return; }
 
-				UnityEngine.Debug.LogFormat("Moving file from {0} to {1}", from, to);
+				if (from.EndsWith(DLL_SUFIX_DEBUG) || from.EndsWith(DLL_SUFIX_RELEASE))
+				{
+					DeleteFile(string.Format("{0}.meta", from));
+				}
+
+				Debug.LogFormat("Moving file from {0} to {1}", from, to);
 				File.Move(from, to);
 			}
 
 			public static string BackupFile(string path, bool restore = false)
 			{
-				var backup = path + ".backup";
+				var backup = string.Format("{0}.backup", path);
 
 				if (restore)
 				{
+					Debug.LogFormat("Restore backup from file {0}", backup);
 					File.Copy(backup, path, true);
 				}
 				else
 				{
+					Debug.LogFormat("Creating backup from file {0}", path);
 					File.Copy(path, backup, true);
 				}
 
@@ -163,6 +190,7 @@ namespace Bolt.Utils
 			public static void DeleteFile(string path)
 			{
 				if (string.IsNullOrEmpty(path) || File.Exists(path) == false) { return; }
+				Debug.LogFormat("Removing file {0}", path);
 				File.Delete(path);
 			}
 		}

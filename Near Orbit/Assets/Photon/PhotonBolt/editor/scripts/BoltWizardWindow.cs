@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Bolt.Editor.Utils;
 using Bolt.Utils;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using EditorUtility = UnityEditor.EditorUtility;
 
 [InitializeOnLoad]
 public partial class BoltWizardWindow : EditorWindow
@@ -624,7 +626,7 @@ public partial class BoltWizardWindow : EditorWindow
                 {
                     try
                     {
-                        EditorUtility.DisplayProgressBar(BoltWizardText.CONNECTION_TITLE,
+						EditorUtility.DisplayProgressBar(BoltWizardText.CONNECTION_TITLE,
                             BoltWizardText.CONNECTION_INFO, 0.5f);
                         BoltLog.Info("Starting request");
 
@@ -651,13 +653,13 @@ public partial class BoltWizardWindow : EditorWindow
                                 }
 
                                 requestingAppId = false;
-                                EditorUtility.ClearProgressBar();
+								EditorUtility.ClearProgressBar();
                             }, (err) =>
                             {
                                 BoltLog.Error(err);
 
                                 requestingAppId = false;
-                                EditorUtility.ClearProgressBar();
+								EditorUtility.ClearProgressBar();
                             });
 
                         if (requestingAppId)
@@ -668,12 +670,12 @@ public partial class BoltWizardWindow : EditorWindow
                         {
                             BoltLog.Warn(
                                 "It was not possible to process your request, please go to the Photon Cloud Dashboard.");
-                            EditorUtility.ClearProgressBar();
+							EditorUtility.ClearProgressBar();
                         }
                     }
                     catch (Exception ex)
                     {
-                        EditorUtility.DisplayDialog("Error", ex.Message, "ok");
+						EditorUtility.DisplayDialog("Error", ex.Message, "ok");
                     }
                 }
                 else if (IsAppId(AppIdOrEmail))

@@ -1,4 +1,5 @@
-﻿using UdpKit;
+﻿using Bolt;
+using UdpKit;
 using UnityEngine;
 using Process = System.Diagnostics.Process;
 
@@ -10,8 +11,7 @@ public partial class BoltDebugStart : BoltInternal.GlobalEventListenerBase
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
-
-		Application.targetFrameRate = 60;
+        Application.targetFrameRate = 60;
     }
 
     void Start()
@@ -50,6 +50,10 @@ end tell'";
             {
                 BoltLauncher.StartClient(_clientEndPoint, cfg);
             }
+            else if (BoltDebugStartSettings.DebugStartIsSinglePlayer)
+            {
+                BoltLauncher.StartSinglePlayer(cfg);
+            }
 
             BoltDebugStartSettings.PositionWindow();
         }
@@ -59,24 +63,24 @@ end tell'";
         }
     }
 
-    public override void BoltStartFailed()
+    public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
     {
         BoltLog.Error("Failed to start debug mode");
     }
 
     public override void BoltStartDone()
     {
-        if (BoltNetwork.IsServer)
+        if (BoltNetwork.IsServer || BoltNetwork.IsSinglePlayer)
         {
             BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
         }
-        else
+        else if (BoltNetwork.IsClient)
         {
             BoltNetwork.Connect((ushort)BoltRuntimeSettings.instance.debugStartPort);
         }
     }
 
-    public override void SceneLoadLocalDone(string map)
+    public override void SceneLoadLocalDone(string scene, IProtocolToken token)
     {
         Destroy(gameObject);
     }

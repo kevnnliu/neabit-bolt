@@ -25,6 +25,7 @@ public class OculusAuth : MonoBehaviour
         }
         else
         {
+            Debug.Log("Oculus: Initialization successful.");
             Entitlements.IsUserEntitledToApplication().OnComplete(OnIsEntitledCallback);
         }
     }
@@ -38,6 +39,7 @@ public class OculusAuth : MonoBehaviour
         }
         else
         {
+            Debug.LogFormat("Oculus: Verified the user is entitled to the application.");
             GetLoggedInUser();
         }
     }
@@ -57,6 +59,7 @@ public class OculusAuth : MonoBehaviour
         else
         {
             oculusId = msg.Data.ID.ToString(); // do not use msg.Data.OculusID;
+            Debug.LogFormat("Oculus: Got user with ID: {0}", oculusId);
             GetUserProof();
         }
     }
@@ -76,6 +79,7 @@ public class OculusAuth : MonoBehaviour
         else
         {
             string oculusNonce = msg.Data.Value;
+            Debug.Log("Oculus: Got user proof.");
             // Photon Authentication can be done here
             var auth = new AuthenticationValues();
 
@@ -94,6 +98,8 @@ public class OculusAuth : MonoBehaviour
 
             // do not set loadBalancingClient.AuthValues.Token or authentication will fail
             // connect
+            Instantiate(launcher);
+            Destroy(this.gameObject);
         }
     }
 }

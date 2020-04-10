@@ -668,11 +668,11 @@ namespace Photon.Realtime
         }
 
 
-        protected void OpSetPropertyOfRoom(byte propCode, object value)
+        protected bool OpSetPropertyOfRoom(byte propCode, object value)
         {
             Hashtable properties = new Hashtable();
             properties[propCode] = value;
-            this.OpSetPropertiesOfRoom(properties);
+            return this.OpSetPropertiesOfRoom(properties);
         }
 
         public bool OpSetCustomPropertiesOfRoom(Hashtable gameProperties)
@@ -1030,26 +1030,47 @@ namespace Photon.Realtime
     }
 
 
-
+    /// <summary>
+    /// Parameters for the matchmaking of JoinRandomRoom and JoinRandomOrCreateRoom.
+    /// </summary>
+    /// <remarks>
+    /// More about matchmaking: <see cref="https://doc.photonengine.com/en-us/pun/current/manuals-and-demos/matchmaking-and-lobby"/>.
+    /// </remarks>
     public class OpJoinRandomRoomParams
     {
+        /// <summary>The custom room properties a room must have to fit. All key-values must be present to match. In SQL Lobby, use SqlLobbyFilter instead.</summary>
         public Hashtable ExpectedCustomRoomProperties;
+        /// <summary>Filters by the MaxPlayers value of rooms.</summary>
         public byte ExpectedMaxPlayers;
+        /// <summary>The MatchmakingMode affects how rooms get filled. By default, the server fills rooms.</summary>
         public MatchmakingMode MatchingType;
+        /// <summary>The lobby in which to match. The type affects how filters are applied.</summary>
         public TypedLobby TypedLobby;
+        /// <summary>SQL query to filter room matches. For default-typed lobbies, use ExpectedCustomRoomProperties instead.</summary>
         public string SqlLobbyFilter;
+        /// <summary>The expected users list blocks player slots for your friends or team mates to join the room, too.</summary>
+        /// <remarks>See: https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby#matchmaking_slot_reservation </remarks>
         public string[] ExpectedUsers;
     }
-
+    
+    /// <summary>Parameters for creating rooms.</summary>
     public class EnterRoomParams
     {
+        /// <summary>The name of the room to create. If null, the server generates a unique name. If not null, it must be unique and new or will cause an error.</summary>
         public string RoomName;
+        /// <summary>The RoomOptions define the optional behaviour of rooms.</summary>
         public RoomOptions RoomOptions;
+        /// <summary>A lobby to attach the new room to. If set, this overrides a joined lobby (if any).</summary>
         public TypedLobby Lobby;
+        /// <summary>The custom player properties that describe this client / user. Keys must be strings.</summary>
         public Hashtable PlayerProperties;
+        /// <summary>Internally used value to skip some values when the operation is sent to the Master Server.</summary>
         protected internal bool OnGameServer = true; // defaults to true! better send more parameter than too few (GS needs all)
+        /// <summary>Matchmaking can optionally create a room if it is not existing. Also useful, when joining a room with a team: It does not matter who is first.</summary>
         public bool CreateIfNotExists;
+        /// <summary>Signals, if the user attempts to return to a room or joins one. Set by the methods that call an operation.</summary>
         public bool RejoinOnly;
+        /// <summary>A list of users who are expected to join the room along with this client. Reserves slots for rooms with MaxPlayers value.</summary>
         public string[] ExpectedUsers;
     }
 
@@ -1323,10 +1344,10 @@ namespace Photon.Realtime
         [Obsolete("Use PropertiesChanged now.")]
         public const byte SetProperties = (byte)253;
 
-        /// <summary>(252) When player left game unexpected and the room has a playerTtl != 0, this event is fired to let everyone know about the timeout.</summary>
+        /// (252) When player left game unexpected and the room has a playerTtl != 0, this event is fired to let everyone know about the timeout.
         /// Obsolete. Replaced by Leave. public const byte Disconnect = LiteEventCode.Disconnect;
 
-        /// <summary>(251) Sent by Photon Cloud when a plugin-call or webhook-call failed. Usually, the execution on the server continues, despite the issue. Contains: ParameterCode.Info.</summary>
+        /// <summary>(251) Sent by Photon Cloud when a plugin-call or webhook-call failed or events cache limit exceeded. Usually, the execution on the server continues, despite the issue. Contains: ParameterCode.Info.</summary>
         /// <seealso cref="https://doc.photonengine.com/en-us/realtime/current/reference/webhooks#options"/>
         public const byte ErrorInfo = 251;
 

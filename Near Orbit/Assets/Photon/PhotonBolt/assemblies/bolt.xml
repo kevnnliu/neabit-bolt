@@ -4,6 +4,13 @@
         <name>bolt</name>
     </assembly>
     <members>
+        <member name="M:Bolt.ControlBehaviour.FinishPendingCommands">
+            <summary>
+            Use this function to finish any pending Control Command in the queue.
+            Usefull if when Bolt needs to be shutdown while a control command still running.
+            All command in the queue are marked as Finished.
+            </summary>
+        </member>
         <member name="T:Bolt.IEventFilter">
             <summary>
             Interface that can be implemented to create custom event filtering rules
@@ -53,6 +60,18 @@
             } 
             </code>
             </example>
+        </member>
+        <member name="P:Bolt.IEventListener.InvokeIfDisabled">
+            <summary>
+            Signal to Bolt if this EventListener must receive events even if it's disabled.
+            Return true to receive events.
+            </summary>
+        </member>
+        <member name="P:Bolt.IEventListener.InvokeIfGameObjectIsInactive">
+            <summary>
+            Signal to Bolt if this EventListener must receive events even if the GameObject is disabled.
+            Return true to receive events.
+            </summary>
         </member>
         <member name="T:Bolt.IProtocolToken">
             <summary>
@@ -407,6 +426,15 @@
             </code>
             </example>
         </member>
+        <member name="M:Bolt.EntityBehaviour.LocalAndRemoteResultEqual(Bolt.Command)">
+            <summary>
+            Utility callback used to signal to the user that this entity is about to be reset by a Command Result.
+            Using this method, you are able to signal Bolt that the Result of the Command is equaled the current state of your
+            entity, skipping all the recomputation needed when a Reset command arrives.
+            </summary>
+            <param name="command">The Command with ResetState flag as true for ExecuteCommand callback</param>
+            <returns>True if you want to not recompute everything when local and remote Result match. False otherwise (default always recompute)</returns>
+        </member>
         <member name="T:Bolt.EntityBehaviour`1">
             <summary>
             Base class for unity behaviours that want to access Bolt methods with the state available also
@@ -467,6 +495,19 @@
             Interface for unity behaviours that want to access Bolt methods
             </summary>
             <typeparam name="TState">Bolt state of the entity</typeparam>
+        </member>
+        <member name="T:Bolt.IEntityReplicationFilter">
+            <summary>
+            Interface for unity behaviours that want to control for each connection an Entity can be replicated to.
+            </summary>
+        </member>
+        <member name="M:Bolt.IEntityReplicationFilter.AllowReplicationTo(BoltConnection)">
+            <summary>
+            Based on the BoltConnection, signal if this particular Entity must be replicated to it or not.
+            By default, all entities are replicated to all connections.
+            </summary>
+            <param name="connection">Target BoltConnection to where the entity will be replicated</param>
+            <returns>True to replicate the Entity for this connection, false otherwise</returns>
         </member>
         <member name="T:Bolt.IPriorityCalculator">
             <summary>
@@ -1063,149 +1104,6 @@
             <returns><c>true</c>, if room property was removed, <c>false</c> otherwise.</returns>
             <param name="key">Property Key.</param>
         </member>
-        <member name="P:Bolt.zeuz.Zeuz.ServiceID">
-            <summary>
-            Service ID of this instance (server only)
-            </summary>
-        </member>
-        <member name="P:Bolt.zeuz.Zeuz.IP">
-            <summary>
-            IP address on which this game server should listen
-            </summary>
-        </member>
-        <member name="P:Bolt.zeuz.Zeuz.GamePort">
-            <summary>
-            Port on which this game server should listen
-            </summary>
-        </member>
-        <member name="P:Bolt.zeuz.Zeuz.GroupID">
-            <summary>
-            Server Group ID of this instance
-            </summary>
-        </member>
-        <member name="P:Bolt.zeuz.Zeuz.ProfileID">
-            <summary>
-            Game Profile ID of this instance
-            </summary>
-        </member>
-        <member name="M:Bolt.zeuz.Zeuz.SetServerOverrides(System.String,System.Int32,System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Override settings for game server
-            </summary>
-            <param name="ip">IP address of the server</param>
-            <param name="gamePort">Port on which the server listen</param>
-            <param name="queryPort">Port for A2S queries</param>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-        </member>
-        <member name="M:Bolt.zeuz.Zeuz.Initialize(System.Boolean)">
-            <summary>
-            Initialize zeuz - loads properties from command line arguments, setup query port and unreserve service (optional). We recommend to call this in Awake.
-            </summary>
-            <param name="unreserve">Set if you want to call Unreserve on zeuz API (with Service ID received as command line argument)</param>
-        </member>
-        <member name="M:Bolt.zeuz.Zeuz.Deinitialize(System.Boolean)">
-            <summary>
-            Deinitialize zeuz and unreserve service (optional). We recommend to call this when the game is over and all clients already left the server.
-            </summary>
-            <param name="unreserve">Set if you want to call Unreserve on zeuz API (with Service ID received as command line argument)</param>
-        </member>
-        <member name="E:Bolt.zeuz.ZeuzClient.OnServerInfoReceived">
-            <summary>
-            Called when the game server instance is successfully reserved and returns IP address and port
-            </summary>
-        </member>
-        <member name="E:Bolt.zeuz.ZeuzClient.OnServerNotAvailable">
-            <summary>
-            Called when the game server instance reservation failed
-            </summary>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomOptions(System.Int32,System.Int32)">
-            <summary>
-            Get room options with Server Group ID and Game Profile ID properties. Both properties set as visible for lobby.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <returns>New instance of RoomOptions, filled with Server Group ID and Game Profile ID</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomOptions(System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Get room options with Server Group ID, Game Profile ID and minimum players needed for server reservation. Server Group ID and Game Profile ID set as visible for lobby.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="minPlayers">Minimum players needed for server reservation</param>
-            <returns>New instance of RoomOptions, filled with Server Group ID, Game Profile ID and minimum players needed for server reservation</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomOptions(System.Int32,System.Int32,System.String,System.Int32)">
-            <summary>
-            Get room options with Server Group ID, Game Profile ID, custom server IP and Port properties. Server Group ID and Game Profile ID set as visible for lobby.
-            Use this if you want to bypass zeuz.io Reserve API call and send all clients in the room to a specific server instance.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="customServerIP">IP address of custom server</param>
-            <param name="customServerPort">Port on which custom server listen</param>
-            <returns>New instance of RoomOptions, filled with Server Group ID, Game Profile ID, custom server IP address and Port properties</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomOptions(System.Int32,System.Int32,System.Int32,System.String,System.Int32)">
-            <summary>
-            Get room options with Server Group ID, Game Profile ID, custom server IP, Port and minimum players needed for server reservation. Server Group ID and Game Profile ID set as visible for lobby.
-            Use this if you want to bypass zeuz.io Reserve API call and send all clients in the room to a specific server instance.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="minPlayers">Minimum players needed for server reservation</param>
-            <param name="customServerIP">IP address of custom server</param>
-            <param name="customServerPort">Port on which custom server listen</param>
-            <returns>New instance of RoomOptions, filled with Server Group ID, Game Profile ID, custom server IP address and Port properties</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomProperties(System.Int32,System.Int32)">
-            <summary>
-            Get room properties with Server Group ID, Game Profile ID
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <returns>Hashtable filled with Server Group ID and Game Profile ID</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomProperties(System.Int32,System.Int32,System.Int32)">
-            <summary>
-            Get room properties with Server Group ID, Game Profile ID and minimum players needed for server reservation.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="minPlayers">Minimum players needed for server reservation</param>
-            <returns>Hashtable filled with Server Group ID and Game Profile ID</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomProperties(System.Int32,System.Int32,System.String,System.Int32)">
-            <summary>
-            Get room properties with Server Group ID, Game Profile ID, custom server IP and Port.
-            Use this if you want to bypass zeuz.io Reserve API call and send all clients in the room to a specific server instance.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="customServerIP">IP address of custom server</param>
-            <param name="customServerPort">Port on which custom server listen</param>
-            <returns>Hashtable filled with Server Group ID, Game Profile ID, custom server IP address and Port</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomProperties(System.Int32,System.Int32,System.Int32,System.String,System.Int32)">
-            <summary>
-            Get room properties with Server Group ID, Game Profile ID, custom server IP, Port and minimum players needed for server reservation.
-            Use this if you want to bypass zeuz.io Reserve API call and send all clients in the room to a specific server instance.
-            </summary>
-            <param name="groupID">Zeuz Server Group ID</param>
-            <param name="profileID">Zeuz Game Profile ID</param>
-            <param name="minPlayers">Minimum players needed for server reservation</param>
-            <param name="customServerIP">IP address of custom server</param>
-            <param name="customServerPort">Port on which custom server listen</param>
-            <returns>Hashtable filled with Server Group ID, Game Profile ID, custom server IP address and Port</returns>
-        </member>
-        <member name="M:Bolt.zeuz.ZeuzClient.GetRoomPropertiesForLobby">
-            <summary>
-            Get room property names related to zeuz to expose them in lobby.
-            </summary>
-            <returns>Array of property names for zeuz Server Group ID and Game Profile ID</returns>
-        </member>
         <member name="T:Bolt.Exceptions.BoltException">
             <summary>
             Generic Bolt exception.
@@ -1428,6 +1326,41 @@
              </code>
              </example>
         </member>
+        <member name="M:Bolt.Matchmaking.BoltMatchmaking.ConfigureServer(System.String,System.Boolean,Bolt.IProtocolToken,System.String)">
+            <summary>
+            Internal method to configure a new game session.
+            This will follow to the UdpPlatform the necessary information to create a session
+            </summary>
+            <param name="sessionID">Session Unique ID</param>
+            <param name="dedicated">If session will be created from a dedicated server</param>
+            <param name="token">Protocol Token used to create the Session</param>
+            <param name="sceneToLoad">Scene to be loaded when the Session is ready</param>
+        </member>
+        <member name="M:BoltInternal.BoltCore.ShutdownProcedure(BoltNetworkModes,UdpKit.UdpConnectionDisconnectReason,Bolt.AddCallback,System.Threading.ManualResetEvent,System.Boolean)">
+            <summary>
+            Runs the Bolt Shutdown procedure, cleaning and resetting all necessary values in order to get Bolt ready
+            for a new startup process.
+            </summary>
+            <param name="setMode">NetworkMode when shutting down</param>
+            <param name="disconnectReason"></param>
+            <param name="shutdownAction"></param>
+            <param name="resetEvent"></param>
+            <param name="allowImmediateShutdown"></param>
+        </member>
+        <member name="M:BoltInternal.BoltCore.Quit">
+            <summary>
+            Invoked when the Application is about to Quit
+            </summary>
+        </member>
+        <member name="M:BoltInternal.BoltCore.UpdateActiveGlobalBehaviours(System.Int32)">
+            <summary>
+            Update all BoltGlobalBahaviours active in the scene.
+            This method will check accross all registered GlobalBehaviours classes which ones need to be
+            created or destroyed.
+            </summary>
+            <param name="sceneIndex">Scene index to lookup for associated GlobalBehaviours.
+            Passing -1 will load only behaviours with no associated scene.</param>
+        </member>
         <member name="F:BoltInternal.BoltCore._freezeProxyTempList">
             <summary>
             Temporary re-used list for holding current proxies that need to be frozen.
@@ -1458,7 +1391,7 @@
             
             <code>
             public override void BoltStartBegin() {
-              BoltLog.Debug("Warning: Bolt is Starting...");
+              BoltLog.Info("Warning: Bolt is Starting...");
             }
             </code>
             </example>
@@ -1472,7 +1405,7 @@
             
             <code>
             public override void BoltStartDone() {
-              BoltLog.Debug("Warning: Bolt started...");
+              BoltLog.Info("Warning: Bolt started...");
             }
             </code>
             </example>
@@ -1486,7 +1419,21 @@
             
             <code>
             public override void BoltStartFailed() {
-              BoltLog.Debug("Warning: Bolt failed to start.");
+              BoltLog.Info("Warning: Bolt failed to start.");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.BoltStartFailed(UdpKit.UdpConnectionDisconnectReason)">
+            <summary>
+            Callback triggered when Bolt was not able to initialize completely.
+            </summary>
+            <example>
+            *Example:* Logging a message in the console when Bolt failed to start.
+            
+            <code>
+            public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason) {
+              BoltLog.Info("Warning: Bolt failed to start. Reason: {0}", disconnectReason);
             }
             </code>
             </example>
@@ -1917,6 +1864,22 @@
             </code>
             </example>
         </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.SessionCreationFailed(UdpKit.UdpSession,UdpKit.UdpSessionError)">
+            <summary>
+            Callback triggered when the requested session creation has failed.
+            </summary>
+            <param name="session">The failed session</param>
+            <example>
+            *Example:* Loggging 
+            
+            <code>
+            public override void SessionCreationFailed(UdpSession session, UdpSessionError errorReason)
+            {
+              BoltLog.Info("UdpSession {0} of type {1} has failed to create", session.HostName, session.Source);
+            }
+            </code>
+            </example>
+        </member>
         <member name="M:BoltInternal.GlobalEventListenerBase.SessionConnected(UdpKit.UdpSession,Bolt.IProtocolToken)">
             <summary>
             Callback triggered when connecting to a session has successful.
@@ -1951,6 +1914,40 @@
             </code>
             </example>
         </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.SessionConnectFailed(UdpKit.UdpSession,Bolt.IProtocolToken,UdpKit.UdpSessionError)">
+            <summary>
+            Callback triggered when connecting to a session has failed.
+            </summary>
+            <param name="session">The session the client was trying to connect to</param>
+            <param name="token">Connection token</param>
+            <example>
+            *Example:* Loggging 
+            
+            <code>
+            public override void SessionConnectFailed(UdpSession session, IProtocolToken token, UdpSessionError errorReason)
+            {
+              BoltLog.Error("Failed to connect to session {0} with token {1}", session, token);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.StreamDataStarted(BoltConnection,UdpKit.UdpChannelName,System.UInt64)">
+            <summary>
+            Callback triggered when a new binary stream data is being transferred.
+            </summary>
+            <param name="connection">The sender connection</param>
+            <param name="channel">Stream Channel where the data will be sent</param>
+            <param name="streamID">Stream Unique ID</param>
+            <example>
+            *Example:* Receiving data from BoltConnection.
+            
+            <code>
+            public override void StreamDataStarted(BoltConnection connnection, UdpChannelName channel, ulong streamID) { 
+              BoltLog.Info("Connection {0} is transfering data on channel {1}...", connection, channel);
+            }
+            </code>
+            </example>
+        </member>
         <member name="M:BoltInternal.GlobalEventListenerBase.StreamDataReceived(BoltConnection,UdpKit.UdpStreamData)">
             <summary>
             Callback triggered when binary stream data is received.
@@ -1967,6 +1964,41 @@
               
               PlayerData playerData = (PlayerData)connection.userToken;
               playerData.SetIcon(icon);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.StreamDataProgress(BoltConnection,UdpKit.UdpChannelName,System.UInt64,System.Single)">
+            <summary>
+            Callback triggered when a new binary stream data is being transferred.
+            </summary>
+            <param name="connection">The sender connection</param>
+            <param name="channel">Stream Channel where the data is being sent</param>
+            <param name="streamID">Stream Unique ID</param>
+            <param name="progress">Stream transfer progress from 0 to 0.99</param>
+            <example>
+            *Example:* Receiving data from BoltConnection.
+            
+            <code>
+            public override void StreamDataProgress(BoltConnection connnection, UdpChannelName channel, ulong streamID, float progress) { 
+              BoltLog.Info("Connection {0} is transfering data on channel {1} :: Transfer {2} on {3}%...", connection, channel, streamID, progress * 100);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:BoltInternal.GlobalEventListenerBase.StreamDataAborted(BoltConnection,UdpKit.UdpChannelName,System.UInt64)">
+            <summary>
+            Callback triggered when a binary stream data has been aborted.
+            </summary>
+            <param name="connection">The sender connection</param>
+            <param name="channel">Stream Channel where the data was being sent</param>
+            <param name="streamID">Stream Unique ID</param>
+            <example>
+            *Example:* Receiving data from BoltConnection.
+            
+            <code>
+            public override void StreamDataAborted(BoltConnection connnection, UdpChannelName channel, ulong streamID) { 
+              BoltLog.Info("Stream {0} on channel {1} from connection {2} has been aborted.", streamID, channel, connection);
             }
             </code>
             </example>
@@ -2135,6 +2167,47 @@
             Whether dejitter delay buffering is disabled or not
             </summary>
         </member>
+        <member name="F:BoltConfig.clientSendRate">
+            <summary>
+            Client Update Send Rate.
+            Default is every 3 frames
+            </summary>
+        </member>
+        <member name="F:BoltConfig.clientDejitterDelay">
+            <summary>
+            Interpolation delay on client
+            </summary>
+        </member>
+        <member name="F:BoltConfig.clientDejitterDelayMin">
+            <summary>
+            Min interpolation delay on client
+            </summary>
+        </member>
+        <member name="F:BoltConfig.clientDejitterDelayMax">
+            <summary>
+            Max interpolation delay on client
+            </summary>
+        </member>
+        <member name="F:BoltConfig.serverSendRate">
+            <summary>
+            Server Update Send Rate.
+            </summary>
+        </member>
+        <member name="F:BoltConfig.serverDejitterDelay">
+            <summary>
+            Interpolation delay on server
+            </summary>
+        </member>
+        <member name="F:BoltConfig.serverDejitterDelayMin">
+            <summary>
+            Min interpolation delay on server
+            </summary>
+        </member>
+        <member name="F:BoltConfig.serverDejitterDelayMax">
+            <summary>
+            Max interpolation delay on server
+            </summary>
+        </member>
         <member name="F:BoltConfig.serverConnectionLimit">
             <summary>
             The max number of server connections
@@ -2145,44 +2218,71 @@
             Whether to use automatic or manual mode for accepting incoming client connection requests
             </summary>
         </member>
+        <member name="P:BoltConfig.commandDejitterDelay">
+            <summary>
+            Minimum number of command left in the internal buffer in order to dejitter command base behavior
+            </summary>
+        </member>
         <member name="F:BoltConfig.commandQueueSize">
             <summary>
-            The max number of input commands that can be queued at once
+            The max number of input commands that can be queued at once.
             </summary>
         </member>
         <member name="F:BoltConfig.commandRedundancy">
             <summary>
-            The number of times to redundantly send input commands to the server
+            The number of times to redundantly send input commands to the server.
             </summary>
         </member>
         <member name="F:BoltConfig.useNetworkSimulation">
             <summary>
-            Whether to use network latency simulation
+            Whether to use network latency simulation.
             </summary>
         </member>
         <member name="F:BoltConfig.simulatedLoss">
             <summary>
-            The packet loss rate to use in latency simulation
+            The packet loss rate to use in latency simulation.
             </summary>
         </member>
         <member name="F:BoltConfig.simulatedPingMean">
             <summary>
-            The mean ping in milliseconds to use in latency simulation
+            The mean ping in milliseconds to use in latency simulation.
             </summary>
         </member>
         <member name="F:BoltConfig.simulatedPingJitter">
             <summary>
-            The deviation to use in ping simulation
+            The deviation to use in ping simulation.
             </summary>
         </member>
         <member name="F:BoltConfig.simulatedRandomFunction">
             <summary>
-            Whether to use Perlin Noise or System.Random function to create ping deviations
+            Whether to use Perlin Noise or System.Random function to create ping deviations.
+            </summary>
+        </member>
+        <member name="F:BoltConfig.connectionTimeout">
+            <summary>
+            Amount of time in milliseconds that the connection will be maintained before being closed by lack of response.
+            </summary>
+        </member>
+        <member name="F:BoltConfig.connectionRequestTimeout">
+            <summary>
+            The timeout until a new connect request will be performed.
             </summary>
         </member>
         <member name="F:BoltConfig.connectionRequestAttempts">
             <summary>
-            The max number of allowed connection attempts by a single client
+            The max number of allowed connection attempts by a single client. This value is used to limit the number of
+            direct connection tries before the connection fails.
+            </summary>
+        </member>
+        <member name="F:BoltConfig.disableAutoSceneLoading">
+            <summary>
+            Disables the automatic scene loading controlled by Bolt. By setting this value to True, you need to manage
+            the scene synchronization between server and clients manually.
+            </summary>
+        </member>
+        <member name="F:BoltConfig.EnableIPv6">
+            <summary>
+            Enable IPv6 Support. Bolt will use IPv6 addresses on the client and server.
             </summary>
         </member>
         <member name="T:BoltGlobalBehaviourAttribute">
@@ -2248,8 +2348,7 @@
         </member>
         <member name="T:BoltNetwork">
              <summary>
-             Holds global methods and properties for starting and
-             stopping bolt, instantiating prefabs and other utils
+             Global methods and properties to control Photon Bolt.
              </summary>
              <example>
              *Example:* How to load a map on the server and instantiate a server controlled player.
@@ -2462,23 +2561,7 @@
              </code>
              </example>
         </member>
-        <member name="P:BoltNetwork.IsRunning">
-             <summary>
-             If bolt is running
-             </summary>
-             <example>
-             *Example:* How to use the ```isRunning``` property to detect a downtime and restart the server.
-            
-             <code>
-             void Update() {
-               if(!BoltNetwork.isRunning &amp;&amp; BoltNetwork.time > lastRestart + 30f) {
-                 RestartServer();
-                 lastRestart = BoltNetwork.time;
-               }
-             }
-             </code>
-             </example>
-        </member>
+        <!-- Badly formed XML comment ignored for member "P:BoltNetwork.IsRunning" -->
         <member name="P:BoltNetwork.IsServer">
              <summary>
              Returns true if this host is a server
@@ -2640,6 +2723,11 @@
             Gets the current Bolt version as string.
             </summary>
         </member>
+        <member name="P:BoltNetwork.VersionInfo">
+            <summary>
+            Extra info of the Current Bolt version.
+            </summary>
+        </member>
         <member name="P:BoltNetwork.VersionConfiguration">
             <summary>
             Gets the Bolt Version description.
@@ -2797,29 +2885,12 @@
              </code>
              </example>
         </member>
-        <member name="M:BoltNetwork.Connect(UdpKit.UdpSession,Bolt.IProtocolToken)">
+        <member name="M:BoltNetwork.Connect(System.UInt16,Bolt.IProtocolToken)">
              <summary>
-             Connect to a server using a session description
-             </summary>
-             <param name="session">Session description sent by the server</param>
-             <param name="token">Optional Token used when connecting to server, this can be the client credentials</param>
-             <example>
-             *Example:* A method to connect to any server ip and port as a client.
-            
-             <code>
-             void Connect(UdpSession session) {
-               Credentials cred = new Credentials("DevUser01", "DevPassword");
-            
-               BoltNetwork.Connect(session, cred);
-             }
-             </code>
-             </example>
-        </member>
-        <member name="M:BoltNetwork.Connect(System.UInt16)">
-             <summary>
-             Connect to a server using a session description
+             Connect to a server running on a specific port. This game server must be running on the local machine.
              </summary>
              <param name="port">Connect to a local server using its port</param>
+             <param name="token">Optional Token used when connecting to server, this can be the client credentials</param>
              <example>
              *Example:* A method to connect to any server using only its port as a client.
             
@@ -2884,6 +2955,14 @@
              </code>
              </example>
         </member>
+        <member name="M:BoltNetwork.UpdateCurrentScene">
+            <summary>
+            Updates the internal loaded scene information.
+            This is useful if Bolt is *not* used to manage Scenes and this is done externally by the developer.
+            If the active Scene was changed, this must be invoked in order to signal that the internal data must
+            be updated.
+            </summary>
+        </member>
         <member name="M:BoltNetwork.LoadSceneSync">
              <summary>
              Use this method to sync the local scene on the Client with the remote scene from the Server.
@@ -2943,31 +3022,6 @@
              }
              </code>
              </example>
-        </member>
-        <member name="M:BoltNetwork.SetServerInfo(System.String,Bolt.IProtocolToken)">
-             <summary>
-             Set Session information
-             </summary>
-             <param name="serverName">Name of the server</param>
-             <param name="token">User definable data</param>
-             <example>
-             *Example:* Setting the server info to contain the max number of connections allowed by this server.
-            
-             <code>
-             void SetSessionData(string serverName, string description, int maxPlayers) {
-               SessionData sessionData = new SessionData(description, BoltNetwork.maxConnections);
-            
-               BoltNetwork.SetServerInfo(serverName, sessionData);
-             }
-             </code>
-             </example>
-        </member>
-        <member name="M:BoltNetwork.SetDedicatedServerInfo(System.String,Bolt.IProtocolToken)">
-            <summary>
-            Set Session information on a dedicated server.
-            </summary>
-            <param name="serverName">Server name.</param>
-            <param name="token">Token.</param>
         </member>
         <member name="M:BoltNetwork.Shutdown">
             <summary>
@@ -4019,7 +4073,7 @@
         </member>
         <member name="T:BoltRuntimeSettings">
              <summary>
-             The runtime settings and confugration for the current bolt simulation
+             The Runtime Settings and Confugration for the current Bolt simulation
              </summary>
              <example>
              *Example:* Using the settings instance to get a copy of the server config.
@@ -4078,6 +4132,11 @@
             Whether to log uncaught exceptions
             </summary>
         </member>
+        <member name="F:BoltRuntimeSettings.debugEditorMode">
+            <summary>
+            Editor mode when running using Debug Start
+            </summary>
+        </member>
         <member name="F:BoltRuntimeSettings.consoleToggleKey">
             <summary>
             The keycode that will toggle visibility of the bolt console
@@ -4088,8 +4147,106 @@
             Whether the bolt console is initially visible or not
             </summary>
         </member>
+        <member name="F:BoltRuntimeSettings.compilationWarnLevel">
+            <summary>
+            Warning Level when building the Debug Start standalone clients
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.scopeModeHideWarningInGui">
+            <summary>
+            Flag to signal if Warning of Manual Scoping should be hidden
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.showHelpButtons">
+            <summary>
+            Show help buttons on Bolt Settings window
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.showBoltEntityHints">
+            <summary>
+            Show Help Hints on Bolt Entities
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.serializeProjectAsText">
+            <summary>
+            Serialize project as Text or Binary
+            </summary>
+            @deprecated
+        </member>
         <member name="F:BoltRuntimeSettings.photonAppId">
-            Photon stuff
+            <summary>
+            Photon Application ID
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.photonUsePunch">
+            <summary>
+            Enable NAT Punchthrough
+            </summary>
+        </member>
+        <member name="P:BoltRuntimeSettings.photonCloudRegions">
+            <summary>
+            Photon Region List
+            </summary>
+        </member>
+        <member name="P:BoltRuntimeSettings.photonCloudRegionsId">
+            <summary>
+            Photon Region Code List
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.photonCloudRegionIndex">
+            <summary>
+            Current Selected Photon Region
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.instantiateMode">
+            <summary>
+            Bolt Entity Prefabs Instantiation Mode
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.globalEntityBehaviourQueryOption">
+            <summary>
+            Entity Behaviour Query Option
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.globalEntityPriorityCalculatorQueryOption">
+            <summary>
+            Entity PriorityCalculator Query Option
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.globalEntityReplicationFilterQueryOption">
+            <summary>
+            Entity ReplicationFilter Query Option
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.a2sServerPort">
+            <summary>
+            A2S Server Port
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.enableA2sServer">
+            <summary>
+            Enable A2S Server
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.RoomCreateTimeout">
+            <summary>
+            Timeout for Photon Sessions Creation
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.RoomJoinTimeout">
+            <summary>
+            Timeout to Join a Photon Session
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.enableClientMetrics">
+            <summary>
+            Enable the Client Connection metrics
+            </summary>
+        </member>
+        <member name="F:BoltRuntimeSettings.enableSourceProvider">
+            <summary>
+            Enable Bolt integration with Source Providers, such as Perforce
+            </summary>
         </member>
         <member name="M:BoltRuntimeSettings.GetConfigCopy">
              <summary>
@@ -4222,7 +4379,7 @@
         </member>
         <member name="T:BoltEntity">
              <summary>
-             A game entity within the bolt simulation
+             A Game Entity within the Bolt simulation.
              </summary>
              <example>
              *Example:* Instantiating and taking control of a new <c>BoltEntity</c> that will replicate to all connected clients.

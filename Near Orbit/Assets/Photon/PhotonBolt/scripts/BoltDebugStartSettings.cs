@@ -5,6 +5,11 @@ using System.Runtime.InteropServices;
 public class BoltDebugStartSettings
 {
 #if UNITY_EDITOR
+    public static bool DebugStartIsSinglePlayer
+    {
+        get { return BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.None; }
+    }
+
     public static bool DebugStartIsServer
     {
         get { return BoltRuntimeSettings.instance.debugEditorMode == BoltEditorStartMode.Server; }
@@ -20,6 +25,11 @@ public class BoltDebugStartSettings
         get { return -1; }
     }
 #elif UNITY_STANDALONE
+    public static bool DebugStartIsSinglePlayer
+    {
+        get { return false; }
+    }
+
     public static bool DebugStartIsServer
     {
         get { return Environment.GetCommandLineArgs().Contains("--bolt-debugstart-server"); }
@@ -46,6 +56,11 @@ public class BoltDebugStartSettings
         }
     }
 #else
+    public static bool DebugStartIsSinglePlayer
+    {
+        get { return false; }
+    }
+
     public static bool DebugStartIsServer
     {
         get { return false; }
