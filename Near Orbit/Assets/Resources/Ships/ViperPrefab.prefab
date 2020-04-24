@@ -199,13 +199,9 @@ MonoBehaviour:
     YawRate: 30
     PitchRate: 35
     ThrustRate: 12
-  weaponMounts:
-  - {fileID: 145643363944282389}
-  - {fileID: 5724620347351257393}
+  weaponMounts: []
   weaponMountHeavy: {fileID: 0}
-  specialMounts:
-  - {fileID: 0}
-  - {fileID: 0}
+  specialMounts: []
 --- !u!65 &8260141988039788747
 BoxCollider:
   m_ObjectHideFlags: 0
