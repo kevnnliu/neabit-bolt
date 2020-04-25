@@ -7,7 +7,7 @@ using UdpKit.Platform;
 public class OculusAuth : MonoBehaviour
 {
 
-    public GameObject launcher;
+    public GameObject LauncherPrefab;
 
     private string oculusId;
 
@@ -98,7 +98,7 @@ public class OculusAuth : MonoBehaviour
 
             // do not set loadBalancingClient.AuthValues.Token or authentication will fail
             // connect
-            Instantiate(launcher);
+            Instantiate(LauncherPrefab);
             Destroy(this.gameObject);
         }
     }

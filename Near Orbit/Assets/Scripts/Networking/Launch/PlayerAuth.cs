@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerAuth : MonoBehaviour
 {
 
-    public GameObject oculusAuth;
+    public GameObject OculusAuthPrefab;
 
     // Start is called before the first frame update
     void Start()
     {
-        Instantiate(oculusAuth);
+        Instantiate(OculusAuthPrefab);
         Destroy(this.gameObject);
     }
 

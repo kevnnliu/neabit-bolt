@@ -7,6 +7,8 @@ using Bolt.Photon;
 public class Launcher : Bolt.GlobalEventListener
 {
 
+    public GameObject GameLiftClientPrefab;
+
     public static string Username;
     public static string UserID;
     public static Dictionary<string, object> UserData;
@@ -15,6 +17,7 @@ public class Launcher : Bolt.GlobalEventListener
     {
         Application.targetFrameRate = 60;
         BoltLauncher.StartClient();
+        Instantiate(GameLiftClientPrefab);
     }
 
     public override void BoltStartBegin()

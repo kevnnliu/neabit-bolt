@@ -1,25 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Amazon;
+using Amazon.GameLift;
+using Amazon.GameLift.Model;
 
-public class GameLiftClient : MonoBehaviour
+public class GameLiftClient : Bolt.GlobalEventListener
 {
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private AmazonGameLiftConfig ClientConfig;
 
     public void CreateClientConfiguration()
     {
-
+        ClientConfig = new AmazonGameLiftConfig();
     }
 
 }
