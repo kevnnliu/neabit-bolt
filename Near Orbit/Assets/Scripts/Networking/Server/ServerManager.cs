@@ -4,88 +4,112 @@ using Bolt.Matchmaking;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ServerManager : Bolt.GlobalEventListener {
+/// <summary>
+/// OBSOLETE. Use for reference code.
+/// </summary>
+public class ServerManager : Bolt.GlobalEventListener
+{
 
-    public string Map = "NetworkTest";
-    public string GameType = "";
-    public string RoomID = "";
+    //public string Map = "";
+    //public string Gamemode = "";
+    //public string RoomID = "";
+    //public GameObject GameLiftServerPrefab;
 
-    public override void BoltStartBegin() {
-        // Register any Protocol Token that are you using
-        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
-    }
+    //// Use this for initialization
+    //void Start()
+    //{
+    //    // Get custom arguments from command line
+    //    Map = GetArg("-m", "-map") ?? Map;
+    //    Gamemode = GetArg("-g", "-gamemode") ?? Gamemode; // ex: get game type from command line
+    //    RoomID = GetArg("-r", "-room") ?? RoomID;
 
-    public override void BoltStartDone() {
-        if (BoltNetwork.IsServer) {
-            // Create some room custom properties
-            PhotonRoomProperties roomProperties = new PhotonRoomProperties();
+    //    // Validate the requested Level
+    //    var validMap = false;
 
-            roomProperties.AddRoomProperty("t", GameType); // ex: game type
-            roomProperties.AddRoomProperty("m", Map); // ex: map id
+    //    foreach (string value in BoltScenes.AllScenes)
+    //    {
+    //        if (SceneManager.GetActiveScene().name != value)
+    //        {
+    //            if (Map == value)
+    //            {
+    //                validMap = true;
+    //                break;
+    //            }
+    //        }
+    //    }
 
-            roomProperties.IsOpen = true;
-            roomProperties.IsVisible = true;
+    //    if (!validMap)
+    //    {
+    //        Debug.LogError("Invalid configuration: please verify level name");
+    //        Application.Quit();
+    //    }
 
-            // If RoomID was not set, create a random one
-            if (RoomID.Length == 0) {
-                RoomID = Guid.NewGuid().ToString();
-            }
+    //    // Start the Server
+    //    BoltLauncher.StartServer();
+    //}
 
-            // Create the Photon Room
-            BoltMatchmaking.CreateSession(RoomID, roomProperties);
+    //public override void BoltStartBegin()
+    //{
+    //    // Register any Protocol Token that are you using
+    //    BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+    //}
 
-            // Load the requested Level
-            BoltNetwork.LoadScene(Map);
-        }
-    }
+    //public override void BoltStartDone()
+    //{
+    //    if (BoltNetwork.IsServer)
+    //    {
+    //        // Create some room custom properties
+    //        PhotonRoomProperties roomProperties = new PhotonRoomProperties();
 
-    // Use this for initialization
-    void Start() {
-        // Get custom arguments from command line
-        Map = GetArg("-m", "-map") ?? Map;
-        GameType = GetArg("-t", "-gameType") ?? GameType; // ex: get game type from command line
-        RoomID = GetArg("-r", "-room") ?? RoomID;
+    //        roomProperties.AddRoomProperty("g", Gamemode); // ex: game type
+    //        roomProperties.AddRoomProperty("m", Map); // ex: map id
 
-        // Validate the requested Level
-        var validMap = false;
+    //        roomProperties.IsOpen = true;
+    //        roomProperties.IsVisible = true;
 
-        foreach (string value in BoltScenes.AllScenes) {
-            if (SceneManager.GetActiveScene().name != value) {
-                if (Map == value) {
-                    validMap = true;
-                    break;
-                }
-            }
-        }
+    //        //// If RoomID was not set, create a random one
+    //        //if (RoomID.Length == 0)
+    //        //{
+    //        //    RoomID = Guid.NewGuid().ToString();
+    //        //}
+    //        // If RoomID was not set, throw an error and shut down the server
+    //        if (RoomID.Length == 0)
+    //        {
+    //            Debug.LogError("RoomID not set! Shutting down.");
+    //            Application.Quit();
+    //        }
 
-        if (!validMap) {
-            Debug.LogError("Invalid configuration: please verify level name");
-            Application.Quit();
-        }
+    //        // Create the Photon Room
+    //        BoltMatchmaking.CreateSession(RoomID, roomProperties);
 
-        // Start the Server
-        BoltLauncher.StartServer();
-        DontDestroyOnLoad(this);
-    }
+    //        // Load the requested Level
+    //        BoltNetwork.LoadScene(Map);
+    //    }
+    //}
 
-    /// <summary>
-    /// Utility function to detect if the game instance was started in headless mode.
-    /// </summary>
-    /// <returns><c>true</c>, if headless mode was used, <c>false</c> otherwise.</returns>
-    public static bool IsHeadlessMode() {
-        return Environment.CommandLine.Contains("-batchmode") && Environment.CommandLine.Contains("-nographics");
-    }
+    ///// <summary>
+    ///// Utility function to detect if the game instance was started in headless mode.
+    ///// </summary>
+    ///// <returns><c>true</c>, if headless mode was used, <c>false</c> otherwise.</returns>
+    //public static bool IsHeadlessMode()
+    //{
+    //    return Environment.CommandLine.Contains("-batchmode") && Environment.CommandLine.Contains("-nographics");
+    //}
 
-    static string GetArg(params string[] names) {
-        var args = Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length; i++) {
-            foreach (var name in names) {
-                if (args[i] == name && args.Length > i + 1) {
-                    return args[i + 1];
-                }
-            }
-        }
+    //static string GetArg(params string[] names)
+    //{
+    //    var args = Environment.GetCommandLineArgs();
+    //    for (int i = 0; i < args.Length; i++)
+    //    {
+    //        foreach (var name in names)
+    //        {
+    //            if (args[i] == name && args.Length > i + 1)
+    //            {
+    //                return args[i + 1];
+    //            }
+    //        }
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 }

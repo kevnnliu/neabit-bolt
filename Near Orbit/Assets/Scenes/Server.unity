@@ -153,6 +153,8 @@ MonoBehaviour:
   Map: NetworkTest
   GameType: 
   RoomID: 
+  GameLiftServerPrefab: {fileID: 1356650938231216407, guid: e26a6e59554d8a944813f9e430a9ad3a,
+    type: 3}
 --- !u!4 &2100840174
 Transform:
   m_ObjectHideFlags: 0

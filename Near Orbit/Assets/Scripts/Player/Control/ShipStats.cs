@@ -1,7 +1,8 @@
 ﻿using System;
 
 [Serializable]
-public class ShipStats {
+public class ShipStats
+{
     public float RollRate;
     public float YawRate;
     public float PitchRate;
@@ -9,7 +10,8 @@ public class ShipStats {
 
     public ShipStats() { }
 
-    public ShipStats(float roll, float yaw, float pitch, float thrust) {
+    public ShipStats(float roll, float yaw, float pitch, float thrust)
+    {
         RollRate = roll;
         YawRate = yaw;
         PitchRate = pitch;

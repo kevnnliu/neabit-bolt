@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using Bolt;
 
-public class Impact : MonoBehaviour {
+public class Impact : MonoBehaviour
+{
     [SerializeField]
     private float duration;
 
-    void Update() {
+    void Update()
+    {
         duration -= Time.deltaTime;
-        if (BoltNetwork.IsServer && duration <= 0) {
+        if (BoltNetwork.IsServer && duration <= 0)
+        {
             BoltNetwork.Destroy(gameObject);
         }
     }
