@@ -15,7 +15,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Maps/NetworkTest.unity
     guid: 8ae3c3f855056034cbc8d5bc5fe19a08
   m_configObjects:
-    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 849c8f3d5eba1cc4a93ae8a98bc6c504,
-      type: 2}
+    Unity.XR.Oculus.Settings: {fileID: 0}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: c0e212ff8bc43c24db6cc32abf731988,
       type: 2}
