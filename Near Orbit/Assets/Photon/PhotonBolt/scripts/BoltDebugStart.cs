@@ -5,84 +5,90 @@ using Process = System.Diagnostics.Process;
 
 public partial class BoltDebugStart : BoltInternal.GlobalEventListenerBase
 {
-    UdpEndPoint _serverEndPoint;
-    UdpEndPoint _clientEndPoint;
+	private UdpEndPoint _serverEndPoint;
+	private UdpEndPoint _clientEndPoint;
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-        Application.targetFrameRate = 60;
-    }
+	void Awake()
+	{
+		DontDestroyOnLoad(gameObject);
+		Application.targetFrameRate = 60;
+	}
 
-    void Start()
-    {
+	void Start()
+	{
 #if UNITY_EDITOR_OSX
-        Process p = new Process();
-        p.StartInfo.FileName = "osascript";
-        p.StartInfo.Arguments =
+		Process p = new Process();
+		p.StartInfo.FileName = "osascript";
+		p.StartInfo.Arguments =
 
-    @"-e 'tell application """ + UnityEditor.PlayerSettings.productName + @"""
+	@"-e 'tell application """ + UnityEditor.PlayerSettings.productName + @"""
   activate
 end tell'";
 
-        p.Start();
+		p.Start();
 #endif
 
-        BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
+		BoltRuntimeSettings settings = BoltRuntimeSettings.instance;
 
-        _serverEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, (ushort)settings.debugStartPort);
-        _clientEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, 0);
+		_serverEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, (ushort)settings.debugStartPort);
+		_clientEndPoint = new UdpEndPoint(UdpIPv4Address.Localhost, 0);
 
-        BoltConfig cfg;
+		BoltConfig cfg;
 
-        cfg = settings.GetConfigCopy();
-        cfg.connectionTimeout = 60000000;
-        cfg.connectionRequestTimeout = 500;
-        cfg.connectionRequestAttempts = 1000;
+		cfg = settings.GetConfigCopy();
+		cfg.connectionTimeout = 60000000;
+		cfg.connectionRequestTimeout = 500;
+		cfg.connectionRequestAttempts = 1000;
 
-        if (string.IsNullOrEmpty(settings.debugStartMapName) == false)
-        {
-            if (BoltDebugStartSettings.DebugStartIsServer)
-            {
-                BoltLauncher.StartServer(_serverEndPoint, cfg);
-            }
-            else if (BoltDebugStartSettings.DebugStartIsClient)
-            {
-                BoltLauncher.StartClient(_clientEndPoint, cfg);
-            }
-            else if (BoltDebugStartSettings.DebugStartIsSinglePlayer)
-            {
-                BoltLauncher.StartSinglePlayer(cfg);
-            }
+		if (string.IsNullOrEmpty(settings.debugStartMapName) == false)
+		{
+			if (BoltDebugStartSettings.DebugStartIsServer)
+			{
+				BoltLog.Warn("Starting as SERVER");
 
-            BoltDebugStartSettings.PositionWindow();
-        }
-        else
-        {
-            BoltLog.Error("No map found to start from");
-        }
-    }
+				BoltLauncher.StartServer(_serverEndPoint, cfg);
+			}
+			else if (BoltDebugStartSettings.DebugStartIsClient)
+			{
+				BoltLog.Warn("Starting as CLIENT");
 
-    public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
-    {
-        BoltLog.Error("Failed to start debug mode");
-    }
+				BoltLauncher.StartClient(_clientEndPoint, cfg);
+			}
+			else if (BoltDebugStartSettings.DebugStartIsSinglePlayer)
+			{
+				BoltLog.Warn("Starting as SINGLE PLAYER");
 
-    public override void BoltStartDone()
-    {
-        if (BoltNetwork.IsServer || BoltNetwork.IsSinglePlayer)
-        {
-            BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
-        }
-        else if (BoltNetwork.IsClient)
-        {
-            BoltNetwork.Connect((ushort)BoltRuntimeSettings.instance.debugStartPort);
-        }
-    }
+				BoltLauncher.StartSinglePlayer(cfg);
+			}
 
-    public override void SceneLoadLocalDone(string scene, IProtocolToken token)
-    {
-        Destroy(gameObject);
-    }
+			BoltDebugStartSettings.PositionWindow();
+		}
+		else
+		{
+			BoltLog.Error("No map found to start from");
+		}
+	}
+
+	public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
+	{
+		BoltLog.Error("Failed to start debug mode");
+	}
+
+	public override void BoltStartDone()
+	{
+		if (BoltNetwork.IsServer || BoltNetwork.IsSinglePlayer)
+		{
+			BoltNetwork.LoadScene(BoltRuntimeSettings.instance.debugStartMapName);
+		}
+		else if (BoltNetwork.IsClient)
+		{
+			BoltNetwork.Connect((ushort)BoltRuntimeSettings.instance.debugStartPort);
+		}
+	}
+
+	public override void SceneLoadLocalDone(string scene, IProtocolToken token)
+	{
+		Destroy(gameObject);
+	}
 }
 

@@ -147,14 +147,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2100840172}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a91d2f65fbb4064eb10e41c12bec723, type: 3}
+  m_Script: {fileID: 11500000, guid: 696a0a797ff22d74ead3b82f0e59ef5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Map: NetworkTest
-  GameType: 
-  RoomID: 
-  GameLiftServerPrefab: {fileID: 1356650938231216407, guid: e26a6e59554d8a944813f9e430a9ad3a,
-    type: 3}
+  StartedGameLift: 0
 --- !u!4 &2100840174
 Transform:
   m_ObjectHideFlags: 0

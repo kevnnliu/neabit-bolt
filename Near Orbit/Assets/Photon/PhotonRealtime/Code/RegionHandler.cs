@@ -13,7 +13,7 @@
 #define SUPPORTED_UNITY
 #endif
 
-#if UNITY_WEBGL || UNITY_SWITCH
+#if UNITY_WEBGL
 #define PING_VIA_COROUTINE
 #endif
 
@@ -53,6 +53,10 @@ namespace Photon.Realtime
     /// </remarks>
     public class RegionHandler
     {
+        /// <summary>The implementation of PhotonPing to use for region pinging (Best Region detection).</summary>
+        /// <remarks>Defaults to null, which means the Type is set automatically.</remarks>
+        public static Type PingImplementation;
+
         /// <summary>A list of region names for the Photon Cloud. Set by the result of OpGetRegions().</summary>
         /// <remarks>
         /// Implement ILoadBalancingCallbacks and register for the callbacks to get OnRegionListReceived(RegionHandler regionHandler).
@@ -80,7 +84,7 @@ namespace Photon.Realtime
                     return this.bestRegionCache;
                 }
 
-                this.EnabledRegions.Sort((a, b) => { return (a.Ping == b.Ping) ? 0 : (a.Ping < b.Ping) ? -1 : 1; });
+                this.EnabledRegions.Sort((a, b) => a.Ping.CompareTo(b.Ping) );
 
                 this.bestRegionCache = this.EnabledRegions[0];
                 return this.bestRegionCache;
@@ -166,6 +170,7 @@ namespace Photon.Realtime
         public bool IsPinging { get; private set; }
         private string previousSummaryProvided;
 
+
         public bool PingMinimumOfRegions(Action<RegionHandler> onCompleteCallback, string previousSummary)
         {
             if (this.EnabledRegions == null || this.EnabledRegions.Count == 0)
@@ -178,7 +183,7 @@ namespace Photon.Realtime
             if (this.IsPinging)
             {
                 //TODO: log warning
-                //Debug.LogWarning("PingMinimumOfRegions() skipped, because this RegionHander is already pinging some regions.");
+                //Debug.LogWarning("PingMinimumOfRegions() skipped, because this RegionHandler is already pinging some regions.");
                 return false;
             }
 
@@ -316,32 +321,46 @@ namespace Photon.Realtime
             this.onDoneCall = onDoneCallback;
         }
 
+        /// <summary>Selects the best fitting ping implementation or uses the one set in RegionHandler.PingImplementation.</summary>
+        /// <returns>PhotonPing instance to use.</returns>
         private PhotonPing GetPingImplementation()
         {
             PhotonPing ping = null;
 
-            #if !NETFX_CORE
-            if (LoadBalancingPeer.PingImplementation == typeof(PingMono))
+            // using each type explicitly in the conditional code, makes sure Unity doesn't strip the class / constructor.
+
+            #if !UNITY_EDITOR && NETFX_CORE
+            if (RegionHandler.PingImplementation == null || RegionHandler.PingImplementation == typeof(PingWindowsStore))
             {
-                ping = new PingMono(); // using this type explicitly saves it from IL2CPP bytecode stripping
+                ping = new PingWindowsStore();
             }
-            #endif
-            #if NATIVE_SOCKETS
-            if (LoadBalancingPeer.PingImplementation == typeof(PingNativeDynamic))
+            #elif NATIVE_SOCKETS || NO_SOCKET
+            if (RegionHandler.PingImplementation == null || RegionHandler.PingImplementation == typeof(PingNativeDynamic))
             {
                 ping = new PingNativeDynamic();
             }
-            #endif
-            #if UNITY_WEBGL
-            if (LoadBalancingPeer.PingImplementation == typeof(PingHttp))
+            #elif UNITY_WEBGL
+            if (RegionHandler.PingImplementation == null || RegionHandler.PingImplementation == typeof(PingHttp))
             {
                 ping = new PingHttp();
+            }
+            #else
+            if (RegionHandler.PingImplementation == null || RegionHandler.PingImplementation == typeof(PingMono))
+            {
+                ping = new PingMono();
             }
             #endif
 
             if (ping == null)
             {
-                ping = (PhotonPing)Activator.CreateInstance(LoadBalancingPeer.PingImplementation);
+                if (RegionHandler.PingImplementation == null)
+                {
+                    ping = new PingMono();
+                }
+                else
+                {
+                    ping = (PhotonPing)Activator.CreateInstance(RegionHandler.PingImplementation);
+                }
             }
 
             return ping;
@@ -511,7 +530,6 @@ namespace Photon.Realtime
             //Debug.Log("Done: "+ this.region.Code);
             this.Done = true;
             this.ping.Dispose();
-
             this.onDoneCall(this.region);
             yield return null;
         }

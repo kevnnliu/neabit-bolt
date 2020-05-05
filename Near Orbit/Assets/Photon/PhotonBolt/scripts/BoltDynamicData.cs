@@ -39,10 +39,10 @@ namespace Bolt
 			UnitySettings.IsBuildDotNet = true;
 #endif
 
-            UnitySettings.CurrentPlatform = Application.platform;
-        }
+			UnitySettings.CurrentPlatform = Application.platform;
+		}
 
-        static int GetActiveSceneIndex()
+		static int GetActiveSceneIndex()
 		{
 			return SceneManager.GetActiveScene().buildIndex;
 		}
@@ -73,7 +73,7 @@ namespace Bolt
 					{
 						if (typeof(MonoBehaviour).IsAssignableFrom(type))
 						{
-							var attrs = (BoltGlobalBehaviourAttribute[]) type.GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
+							var attrs = (BoltGlobalBehaviourAttribute[])type.GetCustomAttributes(typeof(BoltGlobalBehaviourAttribute), false);
 
 							if (attrs.Length == 1)
 							{

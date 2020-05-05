@@ -62,6 +62,12 @@ public class GameLiftServer : GlobalEventListener
                     //invoke GameLiftServerAPI.ActivateGameSession()
                     GameLiftServerAPI.ActivateGameSession();
                 },
+                (updateGameSession) => {
+                    //When a game session is updated (e.g. by FlexMatch backfill), GameLiftsends a request to the game
+                    //server containing the updated game session object.  The game server can then examine the provided
+                    //matchmakerData and handle new incoming players appropriately.
+                    //updateReason is the reason this update is being supplied.
+                },
                 () =>
                 {
                     BoltNetwork.Shutdown();

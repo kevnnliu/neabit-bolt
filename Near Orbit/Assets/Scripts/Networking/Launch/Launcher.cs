@@ -16,7 +16,6 @@ public class Launcher : Bolt.GlobalEventListener
     void Awake()
     {
         Application.targetFrameRate = 60;
-        BoltLauncher.StartClient();
         Instantiate(GameLiftClientPrefab);
     }
 

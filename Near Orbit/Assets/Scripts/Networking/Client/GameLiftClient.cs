@@ -4,6 +4,8 @@ using UnityEngine;
 using Amazon.GameLift;
 using Amazon.GameLift.Model;
 using Bolt;
+using UdpKit;
+using Bolt.Matchmaking;
 
 public class GameLiftClient : GlobalEventListener
 {
@@ -15,6 +17,9 @@ public class GameLiftClient : GlobalEventListener
     private AmazonGameLiftConfig ClientConfig;
     private Credentials ClientCredentials;
     private AmazonGameLiftClient ClientInstance;
+
+    private GameSession CurrentGameSession;
+    private PlayerSession CurrentPlayerSession;
 
     void Start()
     {
@@ -51,11 +56,26 @@ public class GameLiftClient : GlobalEventListener
         ClientInstance = new AmazonGameLiftClient(ClientCredentials, ClientConfig);
     }
 
+    public override void BoltStartDone()
+    {
+        if (BoltNetwork.IsClient)
+        {
+            ClientToken token = new ClientToken
+            {
+                UserId = Launcher.UserID,
+                Username = Launcher.Username,
+                SessionId = CurrentPlayerSession.PlayerSessionId
+            };
+            //UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
+            BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
+        }
+    }
+
     #region Non-matchmaking Game Session Management
 
     public void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties)
     {
-        CreateGameSessionRequest gameSessionRequest = new CreateGameSessionRequest
+        var gameSessionRequest = new CreateGameSessionRequest
         {
             IdempotencyToken = sessionToken,
             MaximumPlayerSessionCount = maxPlayers,
@@ -92,7 +112,7 @@ public class GameLiftClient : GlobalEventListener
     /// <param name="sortQuery">Instructions on how to sort the search results. If no sort expression is included, the request returns results in random order.</param>
     public void FindGameSession(string filterQuery, string sortQuery)
     {
-        SearchGameSessionsRequest gameSessionsRequest = new SearchGameSessionsRequest
+        var gameSessionsRequest = new SearchGameSessionsRequest
         {
             FleetId = GameLiftFleetId,
             FilterExpression = filterQuery,
@@ -125,8 +145,9 @@ public class GameLiftClient : GlobalEventListener
     public void JoinGameSession(GameSession selectedGameSession)
     {
         Debug.LogFormat("%d/%d players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
+        CurrentGameSession = selectedGameSession;
 
-        CreatePlayerSessionRequest playerSessionRequest = new CreatePlayerSessionRequest
+        var playerSessionRequest = new CreatePlayerSessionRequest
         {
             GameSessionId = selectedGameSession.GameSessionId,
             PlayerData = Launcher.Username,
@@ -146,11 +167,13 @@ public class GameLiftClient : GlobalEventListener
 
         if (playerSessionResponse == null)
         {
-            Debug.LogErrorFormat("Unable to create player session for player %s with game session %s", Launcher.UserID, selectedGameSession.GameSessionId);
+            Debug.LogErrorFormat("Unable to create session for player %s with game session %s", Launcher.UserID, selectedGameSession.GameSessionId);
         }
         else
         {
-            Debug.LogFormat("Successfully created player session %s with game session %s", Launcher.UserID, selectedGameSession.GameSessionId);
+            CurrentPlayerSession = playerSessionResponse.PlayerSession;
+            Debug.LogFormat("Successfully created player session %s with game session %s", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
+            BoltLauncher.StartClient();
         }
     }
 

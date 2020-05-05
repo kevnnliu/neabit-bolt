@@ -13,17 +13,21 @@ Added: "SessionCreationFailed" callback with a "UdpSessionError" to signal error
 
 Changed: Deprecated "BoltShutdownBegin" callback without "UdpConnectionDisconnectReason" as argument.
 Changed: Deprecated "SceneLoad" callbacks without "IProtocolToken" as an argument. This change aims to follow the Bolt pattern of using callbacks with the "IProtocolToken".
-Changed: Update version of Photon Realtime to 4.1.2.20.
+Changed: Update version of Photon Realtime to 4.1.3.0.
 Changed: Package Overflow check. It warns the user when trying to package a ProtocolToken that exceeds the maximum package size.
 Changed: Warning when Photon Application ID is not set.
 Changed: Update Console integrations with the latest Bolt SDK.
 Changed: Photon Platform metadata key for the current Region: from "region" to "Region". The lowercase version still exists but will be removed on future versions.
+Changed: Debug Scene visuals.
 
+Fixed: Debug Scene issue of Obsolete component in Camera.
 Fixed: Timeout connection in the background. The application will continue to ping the Game Server in the background, maintaining the connection.
 Fixed: Data Stream in Reliable Mode. The major issue was a Memory Leak after finishing the transmission.
 Fixed: Source Provider MissingMethodException that may occur on some versions of the Unity Editor.
 Fixed: Bolt Compiler does not work in Release Mode.
 Fixed: Bolt cannot be started if invoking ShutdownImmediate before BoltStartDone.
+
+Removed: Overload BoltNetwork.Connect(udpSession, userJoinToken). You should use the method from the BoltMatchmaking API in order to join a Game Session (BoltMatchmaking.JoinSession(udpSession, userJoinToken)).
 
 1.2.11
 
