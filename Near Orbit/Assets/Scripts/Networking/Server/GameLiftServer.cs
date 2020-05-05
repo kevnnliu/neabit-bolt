@@ -23,7 +23,7 @@ public class GameLiftServer : GlobalEventListener
         int listeningPort = 7777;
         //int listeningPort = int.Parse(GetArg("-p", "-port") ?? "7777");
 
-        StartGameLift(listeningPort);
+        StartGameLiftServer(listeningPort);
     }
 
     void OnApplicationQuit()
@@ -40,7 +40,7 @@ public class GameLiftServer : GlobalEventListener
 
     //This is an example of a simple integration with GameLift server SDK that makes game server 
     //processes go active on Amazon GameLift
-    public void StartGameLift(int listeningPort)
+    public void StartGameLiftServer(int listeningPort)
     {
         StartedGameLift = true;
         Debug.LogFormat("Port: {0}", listeningPort);
@@ -134,8 +134,7 @@ public class GameLiftServer : GlobalEventListener
         (1) provide a PlayerSessionId to request a specific player session; 
         (2) provide a GameSessionId to request all player sessions in the specified game session; or
         (3) provide a PlayerId to request all player sessions for the specified player.
-        For large collections of player sessions, 
-        use the pagination parameters to retrieve results as sequential pages.
+        For large collections of player sessions, use the pagination parameters to retrieve results as sequential pages.
         */
         DescribePlayerSessionsRequest sessions = new DescribePlayerSessionsRequest()
         {
@@ -187,9 +186,11 @@ public class GameLiftServer : GlobalEventListener
             }
 
             List<GameProperty> gameProperties = ServerSession.GameProperties;
-            PhotonRoomProperties roomProperties = new PhotonRoomProperties();
-            roomProperties.IsOpen = true;
-            roomProperties.IsVisible = true;
+            PhotonRoomProperties roomProperties = new PhotonRoomProperties
+            {
+                IsOpen = true,
+                IsVisible = true
+            };
 
             foreach (GameProperty gameProperty in gameProperties)
             {
