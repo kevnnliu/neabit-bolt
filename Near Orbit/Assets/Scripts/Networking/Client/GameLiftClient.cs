@@ -10,7 +10,7 @@ using Bolt.Matchmaking;
 public class GameLiftClient : GlobalEventListener
 {
 
-    private const string GameLiftFleetId = "";
+    private const string GameLiftFleetId = "testfleetid";
     private const string AccessKey = "AKIAQMSDIM7C7YPYMKO6";
     private const string SecretKey = "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";
 
@@ -36,7 +36,7 @@ public class GameLiftClient : GlobalEventListener
             }
         };
         CreateGameSession(4, "asdfasdfasdfasdf", gameProperties);
-        //FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC");
+        FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC");
     }
 
     public void StartGameLiftClient()
@@ -101,7 +101,7 @@ public class GameLiftClient : GlobalEventListener
         }
         else
         {
-            Debug.LogFormat("Successfully created game session %s", gameSessionResponse.GameSession.GameSessionId);
+            Debug.LogFormat("Successfully created game session {0}", gameSessionResponse.GameSession.GameSessionId);
         }
     }
 
@@ -133,18 +133,18 @@ public class GameLiftClient : GlobalEventListener
 
         if (gameSessionsResponse == null)
         {
-            Debug.LogErrorFormat("Could not find any game session with the following parameters: %s", filterQuery);
+            Debug.LogErrorFormat("Could not find any game session with the following parameters: {0}", filterQuery);
         }
         else
         {
-            Debug.LogFormat("Successfully found game session with the following parameters: %s", filterQuery);
+            Debug.LogFormat("Successfully found game session with the following parameters: {0}", filterQuery);
             JoinGameSession(gameSessionsResponse.GameSessions[0]);
         }
     }
 
     public void JoinGameSession(GameSession selectedGameSession)
     {
-        Debug.LogFormat("%d/%d players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
+        Debug.LogFormat("{0}/{1} players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
         CurrentGameSession = selectedGameSession;
 
         var playerSessionRequest = new CreatePlayerSessionRequest
@@ -167,12 +167,12 @@ public class GameLiftClient : GlobalEventListener
 
         if (playerSessionResponse == null)
         {
-            Debug.LogErrorFormat("Unable to create session for player %s with game session %s", Launcher.UserID, selectedGameSession.GameSessionId);
+            Debug.LogErrorFormat("Unable to create session for player {0} with game session {1}", Launcher.UserID, selectedGameSession.GameSessionId);
         }
         else
         {
             CurrentPlayerSession = playerSessionResponse.PlayerSession;
-            Debug.LogFormat("Successfully created player session %s with game session %s", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
+            Debug.LogFormat("Successfully created player session {0} with game session {1}", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
             BoltLauncher.StartClient();
         }
     }

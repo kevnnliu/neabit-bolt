@@ -97,8 +97,7 @@ public class GameLiftServer : GlobalEventListener
                 {
                     //Here, the game server tells GameLift what set of files to upload when the game session ends.
                     //GameLift uploads everything specified here for the developers to fetch later.
-                    //"/local/game/logs/myserver.log"
-                    string.Format("local/game/logs/{0}.log", ServerSession.GameSessionId)
+                    "/local/game/logs/myserver.log"
                 }));
 
             //Calling ProcessReady tells GameLift this game server is ready to receive incoming game sessions!
