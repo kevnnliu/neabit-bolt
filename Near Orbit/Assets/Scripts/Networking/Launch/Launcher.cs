@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UdpKit;
 using Bolt.Matchmaking;
 using Bolt.Photon;
 
+[BoltGlobalBehaviour(BoltNetworkModes.Client)]
 public class Launcher : Bolt.GlobalEventListener
 {
 
@@ -16,12 +17,14 @@ public class Launcher : Bolt.GlobalEventListener
     void Awake()
     {
         Application.targetFrameRate = 60;
+
         Instantiate(GameLiftClientPrefab);
+        Debug.Log("Started GameLift client!");
     }
 
     public override void BoltStartBegin()
     {
-        // Register any Protocol Token that are you using
+        // Register any IProtocolToken that you are using
         BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
         BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
         BoltNetwork.RegisterTokenClass<ClientToken>();
@@ -33,7 +36,7 @@ public class Launcher : Bolt.GlobalEventListener
         var meta = BoltMatchmaking.CurrentMetadata;
 
         // Read all custom data sent from your auth server
-        if (meta.TryGetValue("Data", out object customData))
+        if (meta.TryGetValue("data", out object customData))
         {
             var text = "";
             UserData = (Dictionary<string, object>)customData;

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Oculus.Platform;
 using Oculus.Platform.Models;
 using Photon.Realtime;
@@ -61,7 +61,7 @@ public class OculusAuth : MonoBehaviour
         {
             oculusId = msg.Data.ID.ToString(); // do not use msg.Data.OculusID;
             oculusNickname = msg.Data.OculusID.ToString();
-            Debug.LogFormat("Oculus: Got user with ID: {0} and Nickname: {1}", oculusId, oculusNickname);
+            Debug.LogFormat("Oculus: Got player with ID: {0} and Nickname: {1}", oculusId, oculusNickname);
             GetUserProof();
         }
     }

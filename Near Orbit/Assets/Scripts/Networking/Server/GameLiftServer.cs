@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Aws.GameLift;
@@ -45,7 +45,7 @@ public class GameLiftServer : GlobalEventListener
     public void StartGameLiftServer(int listeningPort)
     {
         StartedGameLift = true;
-        Debug.LogFormat("Port: {0}", listeningPort);
+        Debug.LogFormat("Listening port: {0}", listeningPort);
 
         //InitSDK establishes a local connection with the Amazon GameLift agent to enable 
         //further communication.
@@ -64,6 +64,7 @@ public class GameLiftServer : GlobalEventListener
                     ServerSession = gameSession;
                     BoltLauncher.SetUdpPlatform(new PhotonPlatform());
                     BoltLauncher.StartServer(listeningPort);
+                    Debug.Log("Started Bolt server!");
                 },
                 (updateGameSession) => {
                     //When a game session is updated (e.g. by FlexMatch backfill), GameLiftsends a request to the game
@@ -131,10 +132,12 @@ public class GameLiftServer : GlobalEventListener
         if (outCome.Success)
         {
             BoltNetwork.Accept(endpoint);
+            Debug.Log("Connect request accepted");
         }
         else
         {
             BoltNetwork.Refuse(endpoint);
+            Debug.Log("Connect request refused");
         }
 
         /*
@@ -163,7 +166,7 @@ public class GameLiftServer : GlobalEventListener
         {
             ClientToken myToken = (ClientToken)connection.ConnectToken;
             connection.UserData = myToken.PlayerSessionId;
-            GameLiftServerAPI.AcceptPlayerSession(myToken.PlayerSessionId);
+            //GameLiftServerAPI.AcceptPlayerSession(myToken.PlayerSessionId);
         }
     }
 
@@ -200,11 +203,11 @@ public class GameLiftServer : GlobalEventListener
                 roomProperties.AddRoomProperty(gameProperty.Key, gameProperty.Value);
             }
 
-            // Create the Bolt session
-            BoltMatchmaking.CreateSession(sessionId, roomProperties);
+            string requestedMap = (string)roomProperties.CustomRoomProperties["m"];
 
-            // Load the requested map
-            BoltNetwork.LoadScene((string)roomProperties.CustomRoomProperties["m"]);
+            // Create the Bolt session
+            BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
+            Debug.LogFormat("Created Bolt session {0} and map {1}", sessionId, requestedMap);
         }
         else
         {

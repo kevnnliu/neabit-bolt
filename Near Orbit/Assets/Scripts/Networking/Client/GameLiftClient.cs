@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Amazon.GameLift;
@@ -47,7 +47,7 @@ public class GameLiftClient : GlobalEventListener
                 }
             };
             CreateGameSession(4, "asdfasdfasdfasdf", gameProperties);
-            //FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC"); //Apparently doesn't exist?
+            //FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC", true); //Apparently doesn't exist?
         }
     }
 
@@ -66,6 +66,7 @@ public class GameLiftClient : GlobalEventListener
         };
 
         ClientInstance = new AmazonGameLiftClient(ClientCredentials, ClientConfig);
+        Debug.Log("AmazonGameLiftClient instance created!");
     }
 
     public override void BoltStartDone()
@@ -80,7 +81,13 @@ public class GameLiftClient : GlobalEventListener
             };
             Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
             //UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
-            BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
+            //BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
+            BoltMatchmaking.JoinRandomSession(token);
+            Debug.LogFormat("Joined bolt session {0}", BoltMatchmaking.CurrentSession.Id);
+        }
+        else
+        {
+            Debug.LogError("Attempted to join Bolt session not as client!");
         }
     }
 
@@ -126,7 +133,7 @@ public class GameLiftClient : GlobalEventListener
     /// If no filter expression is included, the request returns results for all game sessions in the fleet that are in ACTIVE status.</param>
     /// <param name="sortQuery">Instructions on how to sort the search results. 
     /// If no sort expression is included, the request returns results in random order.</param>
-    public void FindGameSession(string filterQuery, string sortQuery)
+    public void FindGameSession(string filterQuery, string sortQuery, bool joinImmediately)
     {
         var gameSessionsRequest = new SearchGameSessionsRequest
         {
@@ -154,7 +161,10 @@ public class GameLiftClient : GlobalEventListener
         else
         {
             Debug.LogFormat("Successfully found game session with the following parameters: {0}", filterQuery);
-            JoinGameSession(gameSessionsResponse.GameSessions[0]);
+            if (joinImmediately)
+            {
+                JoinGameSession(gameSessionsResponse.GameSessions[0]);
+            }
         }
     }
 
