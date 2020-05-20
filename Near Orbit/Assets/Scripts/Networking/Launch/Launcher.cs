@@ -23,6 +23,9 @@ public class Launcher : Bolt.GlobalEventListener
     {
         // Register any Protocol Token that are you using
         BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+        BoltNetwork.RegisterTokenClass<ClientToken>();
+        BoltNetwork.RegisterTokenClass<ProjectileToken>();
     }
 
     public override void BoltStartDone()
@@ -30,8 +33,7 @@ public class Launcher : Bolt.GlobalEventListener
         var meta = BoltMatchmaking.CurrentMetadata;
 
         // Read all custom data sent from your auth server
-        object customData;
-        if (meta.TryGetValue("Data", out customData))
+        if (meta.TryGetValue("Data", out object customData))
         {
             var text = "";
             UserData = (Dictionary<string, object>)customData;
@@ -43,22 +45,6 @@ public class Launcher : Bolt.GlobalEventListener
 
             BoltLog.Info(text);
         }
-
-        // Read the UserId of the local player
-        if (meta.TryGetValue("UserId", out object userID))
-        {
-            UserID = (string)userID;
-            BoltLog.Info("UserID: {0}", UserID);
-        }
-
-        // Read the Nickname of the local player
-        if (meta.TryGetValue("Nickname", out object nickName))
-        {
-            Username = (string)nickName;
-            BoltLog.Info("Nickname: {0}", Username);
-        }
-
-        // Your usual BoltStartDone behaviour: setup game server or join a session
     }
 
     public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)

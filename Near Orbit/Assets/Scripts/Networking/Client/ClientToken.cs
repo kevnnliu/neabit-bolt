@@ -8,19 +8,19 @@ public class ClientToken : IProtocolToken
 {
     public string UserId;
     public string Username;
-    public string SessionId;
+    public string PlayerSessionId;
 
     public void Read(UdpPacket packet)
     {
         UserId = packet.ReadString();
         Username = packet.ReadString();
-        SessionId = packet.ReadString();
+        PlayerSessionId = packet.ReadString();
     }
 
     public void Write(UdpPacket packet)
     {
         packet.WriteString(UserId);
         packet.WriteString(Username);
-        packet.WriteString(SessionId);
+        packet.WriteString(PlayerSessionId);
     }
 }

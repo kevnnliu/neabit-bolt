@@ -8,7 +8,9 @@ using UdpKit;
 using Bolt;
 using Bolt.Photon;
 using Bolt.Matchmaking;
+using UdpKit.Platform;
 
+[BoltGlobalBehaviour(BoltNetworkModes.Server)]
 public class GameLiftServer : GlobalEventListener
 {
 
@@ -53,14 +55,15 @@ public class GameLiftServer : GlobalEventListener
             ProcessParameters processParameters = new ProcessParameters(
                 (gameSession) =>
                 {
-                    ServerSession = gameSession;
-                    BoltLauncher.StartServer(listeningPort);
-
-                    //Respond to new game session activation request.GameLift sends activation request
+                    //Respond to new game session activation request. GameLift sends activation request
                     //to the game server along with a game session object containing game properties
-                    //and other settings.Once the game server is ready to receive player connections, 
+                    //and other settings. Once the game server is ready to receive player connections, 
                     //invoke GameLiftServerAPI.ActivateGameSession()
                     GameLiftServerAPI.ActivateGameSession();
+
+                    ServerSession = gameSession;
+                    BoltLauncher.SetUdpPlatform(new PhotonPlatform());
+                    BoltLauncher.StartServer(listeningPort);
                 },
                 (updateGameSession) => {
                     //When a game session is updated (e.g. by FlexMatch backfill), GameLiftsends a request to the game
@@ -70,13 +73,13 @@ public class GameLiftServer : GlobalEventListener
                 },
                 () =>
                 {
-                    BoltNetwork.Shutdown();
-
                     //OnProcessTerminate callback. GameLift invokes this callback before shutting down 
                     //an instance hosting this game server. It gives this game server a chance to save
                     //its state, communicate with services, etc., before being shut down. 
                     //In this case, we simply tell GameLift we are indeed going to shut down.
                     GameLiftServerAPI.ProcessEnding();
+
+                    BoltNetwork.Shutdown();
                 },
                 () =>
                 {
@@ -121,9 +124,10 @@ public class GameLiftServer : GlobalEventListener
     public override void ConnectRequest(UdpEndPoint endpoint, IProtocolToken token)
     {
         ClientToken clientToken = (ClientToken)token;
+        Debug.LogFormat("Received client token for player session {0}", clientToken.PlayerSessionId);
 
         //Ask GameLift to verify sessionID is valid, it will change player slot from "RESERVED" to "ACTIVE"
-        GenericOutcome outCome = GameLiftServerAPI.AcceptPlayerSession(clientToken.SessionId);
+        GenericOutcome outCome = GameLiftServerAPI.AcceptPlayerSession(clientToken.PlayerSessionId);
         if (outCome.Success)
         {
             BoltNetwork.Accept(endpoint);
@@ -143,14 +147,14 @@ public class GameLiftServer : GlobalEventListener
         */
         DescribePlayerSessionsRequest sessions = new DescribePlayerSessionsRequest()
         {
-            PlayerSessionId = clientToken.SessionId,
+            PlayerSessionId = clientToken.PlayerSessionId,
             GameSessionId = ServerSession.GameSessionId,
             PlayerId = clientToken.UserId
         };
 
         DescribePlayerSessionsOutcome sessionsOutcome = GameLiftServerAPI.DescribePlayerSessions(sessions);
         string playerId = sessionsOutcome.Result.PlayerSessions[0].PlayerId;
-        Debug.LogFormat("Player ID: {0}", playerId);
+        Debug.LogFormat("Connect request player ID: {0}", playerId);
     }
 
     public override void Connected(BoltConnection connection)
@@ -158,7 +162,8 @@ public class GameLiftServer : GlobalEventListener
         if (BoltNetwork.IsServer)
         {
             ClientToken myToken = (ClientToken)connection.ConnectToken;
-            connection.UserData = myToken.SessionId;
+            connection.UserData = myToken.PlayerSessionId;
+            GameLiftServerAPI.AcceptPlayerSession(myToken.PlayerSessionId);
         }
     }
 
@@ -168,13 +173,6 @@ public class GameLiftServer : GlobalEventListener
         {
             GameLiftServerAPI.RemovePlayerSession((string)connection.UserData);
         }
-    }
-
-    public override void BoltStartBegin()
-    {
-        //Register any Protocol Token that are you using
-        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
-        BoltNetwork.RegisterTokenClass<ClientToken>();
     }
 
     public override void BoltStartDone()

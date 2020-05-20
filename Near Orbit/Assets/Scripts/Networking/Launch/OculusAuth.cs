@@ -10,6 +10,7 @@ public class OculusAuth : MonoBehaviour
     public GameObject LauncherPrefab;
 
     private string oculusId;
+    private string oculusNickname;
 
     private void Start()
     {
@@ -59,7 +60,8 @@ public class OculusAuth : MonoBehaviour
         else
         {
             oculusId = msg.Data.ID.ToString(); // do not use msg.Data.OculusID;
-            Debug.LogFormat("Oculus: Got user with ID: {0}", oculusId);
+            oculusNickname = msg.Data.OculusID.ToString();
+            Debug.LogFormat("Oculus: Got user with ID: {0} and Nickname: {1}", oculusId, oculusNickname);
             GetUserProof();
         }
     }
@@ -80,11 +82,13 @@ public class OculusAuth : MonoBehaviour
         {
             string oculusNonce = msg.Data.Value;
             Debug.Log("Oculus: Got user proof.");
-            // Photon Authentication can be done here
-            var auth = new AuthenticationValues();
 
-            auth.UserId = oculusId;
-            auth.AuthType = CustomAuthenticationType.Oculus;
+            var auth = new AuthenticationValues
+            {
+                UserId = oculusId,
+                AuthType = CustomAuthenticationType.Oculus
+            };
+
             auth.AddAuthParameter("userid", oculusId);
             auth.AddAuthParameter("nonce", oculusNonce);
             auth.AddAuthParameter("version", BoltNetwork.CurrentVersion);
@@ -96,8 +100,11 @@ public class OculusAuth : MonoBehaviour
 
             BoltLauncher.SetUdpPlatform(platform);
 
-            // do not set loadBalancingClient.AuthValues.Token or authentication will fail
-            // connect
+            Launcher.UserID = oculusId;
+            Launcher.Username = oculusNickname;
+
+            Debug.Log("Oculus: Login completed successfully!");
+
             Instantiate(LauncherPrefab);
             Destroy(this.gameObject);
         }

@@ -7,6 +7,7 @@ using Bolt;
 using UdpKit;
 using Bolt.Matchmaking;
 
+[BoltGlobalBehaviour(BoltNetworkModes.Client)]
 public class GameLiftClient : GlobalEventListener
 {
 
@@ -25,26 +26,37 @@ public class GameLiftClient : GlobalEventListener
     {
         DontDestroyOnLoad(this.gameObject);
         StartGameLiftClient();
+    }
 
-        // Testing
-        List<GameProperty> gameProperties = new List<GameProperty>
+    //TESTING
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.J))
         {
-            new GameProperty
+            Debug.Log("Pressed to join!");
+            JoinGameSession(CurrentGameSession);
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            List<GameProperty> gameProperties = new List<GameProperty>
             {
-                Key = "m",
-                Value = "NetworkTest"
-            }
-        };
-        CreateGameSession(4, "asdfasdfasdfasdf", gameProperties);
-        FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC");
+                new GameProperty
+                {
+                    Key = "m",
+                    Value = "NetworkTest"
+                }
+            };
+            CreateGameSession(4, "asdfasdfasdfasdf", gameProperties);
+            //FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC"); //Apparently doesn't exist?
+        }
     }
 
     public void StartGameLiftClient()
     {
         ClientConfig = new AmazonGameLiftConfig
         {
-            ServiceURL = "http://localhost:9080"
-            //RegionEndpoint = RegionEndpoint.USWest2
+            ServiceURL = "http://localhost:9080" //Use for local testing, comment out for live build
+            //RegionEndpoint = RegionEndpoint.USWest2 //Use for live build, comment out for local testing
         };
 
         ClientCredentials = new Credentials
@@ -64,14 +76,15 @@ public class GameLiftClient : GlobalEventListener
             {
                 UserId = Launcher.UserID,
                 Username = Launcher.Username,
-                SessionId = CurrentPlayerSession.PlayerSessionId
+                PlayerSessionId = CurrentPlayerSession.PlayerSessionId
             };
+            Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
             //UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
             BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
         }
     }
 
-    #region Non-matchmaking Game Session Management
+    #region Game Session Management
 
     public void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties)
     {
@@ -83,7 +96,7 @@ public class GameLiftClient : GlobalEventListener
             FleetId = GameLiftFleetId
         };
 
-        CreateGameSessionResponse gameSessionResponse = null;
+        CreateGameSessionResponse gameSessionResponse;
         try
         {
             gameSessionResponse = ClientInstance.CreateGameSession(gameSessionRequest);
@@ -102,14 +115,17 @@ public class GameLiftClient : GlobalEventListener
         else
         {
             Debug.LogFormat("Successfully created game session {0}", gameSessionResponse.GameSession.GameSessionId);
+            CurrentGameSession = gameSessionResponse.GameSession; //TESTING
         }
     }
 
     /// <summary>
     /// Finds and joins the first available game session based on filterQuery and sortQuery.
     /// </summary>
-    /// <param name="filterQuery">String containing the search criteria for the session search. If no filter expression is included, the request returns results for all game sessions in the fleet that are in ACTIVE status.</param>
-    /// <param name="sortQuery">Instructions on how to sort the search results. If no sort expression is included, the request returns results in random order.</param>
+    /// <param name="filterQuery">String containing the search criteria for the session search. 
+    /// If no filter expression is included, the request returns results for all game sessions in the fleet that are in ACTIVE status.</param>
+    /// <param name="sortQuery">Instructions on how to sort the search results. 
+    /// If no sort expression is included, the request returns results in random order.</param>
     public void FindGameSession(string filterQuery, string sortQuery)
     {
         var gameSessionsRequest = new SearchGameSessionsRequest
@@ -120,7 +136,7 @@ public class GameLiftClient : GlobalEventListener
             Limit = 1
         };
 
-        SearchGameSessionsResponse gameSessionsResponse = null;
+        SearchGameSessionsResponse gameSessionsResponse;
         try
         {
             gameSessionsResponse = ClientInstance.SearchGameSessions(gameSessionsRequest);
@@ -154,7 +170,7 @@ public class GameLiftClient : GlobalEventListener
             PlayerId = Launcher.UserID
         };
 
-        CreatePlayerSessionResponse playerSessionResponse = null;
+        CreatePlayerSessionResponse playerSessionResponse;
         try
         {
             playerSessionResponse = ClientInstance.CreatePlayerSession(playerSessionRequest);
