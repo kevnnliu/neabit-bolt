@@ -13,8 +13,8 @@ public class GameLiftClient : GlobalEventListener
 {
 
     private const string GameLiftFleetId = "testfleetid";
-    private const string AccessKey = "AKIAQMSDIM7C7YPYMKO6";
-    private const string SecretKey = "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";
+    private const string AccessKey = "AKIAQMSDIM7CTX4W3UWH";
+    private const string SecretKey = "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";
 
     private AmazonGameLiftConfig ClientConfig;
     private Credentials ClientCredentials;
