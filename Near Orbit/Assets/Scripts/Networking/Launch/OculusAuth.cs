@@ -7,7 +7,7 @@ using UdpKit.Platform;
 public class OculusAuth : MonoBehaviour
 {
 
-    public GameObject LauncherPrefab;
+    public GameObject GameLiftClientPrefab;
 
     private string oculusId;
     private string oculusNickname;
@@ -105,7 +105,8 @@ public class OculusAuth : MonoBehaviour
 
             Debug.Log("Oculus: Login completed successfully!");
 
-            Instantiate(LauncherPrefab);
+            Instantiate(GameLiftClientPrefab);
+            Debug.Log("Created GameLiftClient!");
             Destroy(this.gameObject);
         }
     }

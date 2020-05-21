@@ -6,6 +6,7 @@ using Amazon.GameLift.Model;
 using Bolt;
 using UdpKit;
 using Bolt.Matchmaking;
+using Bolt.Photon;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Client)]
 public class GameLiftClient : GlobalEventListener
@@ -25,30 +26,21 @@ public class GameLiftClient : GlobalEventListener
     void Start()
     {
         DontDestroyOnLoad(this.gameObject);
-        StartGameLiftClient();
-    }
 
-    //TESTING
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            Debug.Log("Pressed to join!");
-            JoinGameSession(CurrentGameSession);
-        }
-        else if (Input.GetKeyDown(KeyCode.C))
-        {
-            List<GameProperty> gameProperties = new List<GameProperty>
-            {
-                new GameProperty
-                {
-                    Key = "m",
-                    Value = "NetworkTest"
-                }
-            };
-            CreateGameSession(4, "asdfasdfasdfasdf", gameProperties);
-            //FindGameSession("hasAvailablePlayerSessions=true", "playerSessionCount DESC", true); //Apparently doesn't exist?
-        }
+        //StartGameLiftClient();
+
+        #region TESTING
+        //List<GameProperty> gameProperties = new List<GameProperty>
+        //    {
+        //        new GameProperty
+        //        {
+        //            Key = "m",
+        //            Value = "NetworkTest"
+        //        }
+        //    };
+        //CreateGameSession(4, "asdfasdfasdfasdf", gameProperties, true);
+        BoltLauncher.StartClient();
+        #endregion
     }
 
     public void StartGameLiftClient()
@@ -66,24 +58,44 @@ public class GameLiftClient : GlobalEventListener
         };
 
         ClientInstance = new AmazonGameLiftClient(ClientCredentials, ClientConfig);
-        Debug.Log("AmazonGameLiftClient instance created!");
+        Debug.Log("Started GameLift client!");
+    }
+
+    public override void BoltStartBegin()
+    {
+        // Register any IProtocolToken that you are using
+        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+        BoltNetwork.RegisterTokenClass<ClientToken>();
+        BoltNetwork.RegisterTokenClass<ProjectileToken>();
+
+        Debug.Log("Finished registering custom token classes");
     }
 
     public override void BoltStartDone()
     {
         if (BoltNetwork.IsClient)
         {
+            //ClientToken token = new ClientToken
+            //{
+            //    UserId = Launcher.UserID,
+            //    Username = Launcher.Username,
+            //    PlayerSessionId = CurrentPlayerSession.PlayerSessionId
+            //};
+            //Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
+
+            ////UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
+            //BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
+            //Debug.LogFormat("Joined Bolt session {0}", BoltMatchmaking.CurrentSession.Id);
+            Debug.Log("Started Bolt client!");
             ClientToken token = new ClientToken
             {
                 UserId = Launcher.UserID,
                 Username = Launcher.Username,
-                PlayerSessionId = CurrentPlayerSession.PlayerSessionId
+                PlayerSessionId = "psess-12345"
             };
             Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
-            //UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
-            //BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
-            BoltMatchmaking.JoinRandomSession(token);
-            Debug.LogFormat("Joined bolt session {0}", BoltMatchmaking.CurrentSession.Id);
+            BoltMatchmaking.JoinSession("asdfasdfasdf", token);
+            Debug.LogFormat("Joined Bolt session {0}", BoltMatchmaking.CurrentSession.Id);
         }
         else
         {
@@ -91,9 +103,14 @@ public class GameLiftClient : GlobalEventListener
         }
     }
 
+    public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
+    {
+        Debug.LogErrorFormat("BoltStartFailed. Reason: {0}", disconnectReason);
+    }
+
     #region Game Session Management
 
-    public void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties)
+    public void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties, bool joinImmediately)
     {
         var gameSessionRequest = new CreateGameSessionRequest
         {
@@ -122,7 +139,11 @@ public class GameLiftClient : GlobalEventListener
         else
         {
             Debug.LogFormat("Successfully created game session {0}", gameSessionResponse.GameSession.GameSessionId);
-            CurrentGameSession = gameSessionResponse.GameSession; //TESTING
+            if (joinImmediately)
+            {
+                CurrentGameSession = gameSessionResponse.GameSession;
+                CreatePlayerSession(CurrentGameSession, true);
+            }
         }
     }
 
@@ -163,12 +184,12 @@ public class GameLiftClient : GlobalEventListener
             Debug.LogFormat("Successfully found game session with the following parameters: {0}", filterQuery);
             if (joinImmediately)
             {
-                JoinGameSession(gameSessionsResponse.GameSessions[0]);
+                CreatePlayerSession(gameSessionsResponse.GameSessions[0], true);
             }
         }
     }
 
-    public void JoinGameSession(GameSession selectedGameSession)
+    public void CreatePlayerSession(GameSession selectedGameSession, bool joinImmediately)
     {
         Debug.LogFormat("{0}/{1} players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
         CurrentGameSession = selectedGameSession;
@@ -199,7 +220,11 @@ public class GameLiftClient : GlobalEventListener
         {
             CurrentPlayerSession = playerSessionResponse.PlayerSession;
             Debug.LogFormat("Successfully created player session {0} with game session {1}", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
-            BoltLauncher.StartClient();
+            if (joinImmediately)
+            {
+                BoltLauncher.StartClient();
+                Debug.Log("Started Bolt client!");
+            }
         }
     }
 
