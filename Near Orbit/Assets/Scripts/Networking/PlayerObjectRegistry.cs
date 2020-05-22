@@ -4,7 +4,7 @@ public static class PlayerObjectRegistry
 {
 
     // keeps a list of all the players
-    static List<PlayerObject> players = new List<PlayerObject>();
+    static readonly List<PlayerObject> Players = new List<PlayerObject>();
 
     // create a player for a connection
     // note: connection can be null
@@ -14,8 +14,10 @@ public static class PlayerObjectRegistry
 
         // create a new player object, assign the connection property
         // of the object to the connection was passed in
-        player = new PlayerObject();
-        player.connection = connection;
+        player = new PlayerObject
+        {
+            connection = connection
+        };
 
         // if we have a connection, assign this player
         // as the user data for the connection so that we
@@ -27,7 +29,7 @@ public static class PlayerObjectRegistry
         }
 
         // add to list of all players
-        players.Add(player);
+        Players.Add(player);
 
         return player;
     }
@@ -39,7 +41,7 @@ public static class PlayerObjectRegistry
     {
         get
         {
-            return players;
+            return Players;
         }
     }
 
@@ -49,7 +51,7 @@ public static class PlayerObjectRegistry
     {
         get
         {
-            return players.Find(player => player.IsServer);
+            return Players.Find(player => player.IsServer);
         }
     }
 

@@ -9,11 +9,11 @@ using Bolt;
 using Bolt.Photon;
 using Bolt.Matchmaking;
 using UdpKit.Platform;
+using System.Collections;
 
 [BoltGlobalBehaviour(BoltNetworkModes.Server)]
 public class GameLiftServer : GlobalEventListener
 {
-
     public GameSession ServerSession;
 
     private bool StartedGameLift;
@@ -37,65 +37,11 @@ public class GameLiftServer : GlobalEventListener
         if (StartedGameLift)
         {
             GameLiftServerAPI.Destroy();
+            LogToConsoleDispatcher("Application quit! GameLiftServer instance destroyed!");
         }
 
+        LogToConsoleDispatcher("Application quit! Shutting down Bolt!");
         BoltNetwork.Shutdown();
-    }
-
-    public override void BoltStartBegin()
-    {
-        // Register any IProtocolToken that you are using
-        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
-
-        Debug.Log("Finished registering custom token classes");
-    }
-
-    public override void BoltStartDone()
-    {
-        if (BoltNetwork.IsServer)
-        {
-            //string sessionId = ServerSession.GameSessionId;
-            ////If GameSessionId was not set, throw an error and shut down the BoltNetwork
-            //if (sessionId.Length == 0)
-            //{
-            //    Debug.LogError("GameSessionId not set! Shutting down.");
-            //    BoltNetwork.Shutdown();
-            //    return;
-            //}
-
-            //List<GameProperty> gameProperties = ServerSession.GameProperties;
-            //PhotonRoomProperties roomProperties = new PhotonRoomProperties
-            //{
-            //    IsOpen = true,
-            //    IsVisible = true
-            //};
-
-            //foreach (GameProperty gameProperty in gameProperties)
-            //{
-            //    roomProperties.AddRoomProperty(gameProperty.Key, gameProperty.Value);
-            //}
-
-            //string requestedMap = (string)roomProperties.CustomRoomProperties["m"];
-
-            //// Create the Bolt session
-            //BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
-            //Debug.LogFormat("Created Bolt session {0} and map {1}", sessionId, requestedMap);
-            Debug.Log("Started Bolt server!");
-            PhotonRoomProperties roomProperties = new PhotonRoomProperties
-            {
-                IsOpen = true,
-                IsVisible = true
-            };
-            string sessionId = "asdfasdfasdf";
-            string requestedMap = "NetworkTest";
-            BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
-            Debug.LogFormat("Created Bolt session {0} and map {1}", sessionId, requestedMap);
-        }
-        else
-        {
-            Debug.LogError("Attempting to create game not as server! Shutting down.");
-            BoltNetwork.Shutdown();
-        }
     }
 
     //This is an example of a simple integration with GameLift server SDK that makes game server 
@@ -103,7 +49,7 @@ public class GameLiftServer : GlobalEventListener
     public void StartGameLiftServer(int listeningPort)
     {
         StartedGameLift = true;
-        Debug.LogFormat("Listening port: {0}", listeningPort);
+        Debug.LogFormat("Starting GameLiftServer with Bolt server on port {0}", listeningPort);
 
         //InitSDK establishes a local connection with the Amazon GameLift agent to enable 
         //further communication.
@@ -120,9 +66,9 @@ public class GameLiftServer : GlobalEventListener
                     GameLiftServerAPI.ActivateGameSession();
 
                     ServerSession = gameSession;
-                    BoltLauncher.SetUdpPlatform(new PhotonPlatform());
-                    BoltLauncher.StartServer(listeningPort);
-                    Debug.Log("Started Bolt server!");
+
+                    UnityMainThreadDispatcher.Instance().Enqueue(StartBoltServerTask(listeningPort));
+                    LogToConsoleDispatcher(string.Format("Enqueued StartBoltServerTask for game session {0}", ServerSession.GameSessionId));
                 },
                 (updateGameSession) => {
                     //When a game session is updated (e.g. by FlexMatch backfill), GameLiftsends a request to the game
@@ -138,6 +84,7 @@ public class GameLiftServer : GlobalEventListener
                     //In this case, we simply tell GameLift we are indeed going to shut down.
                     GameLiftServerAPI.ProcessEnding();
 
+                    LogToConsoleDispatcher("GameLift OnProcessTerminate! Shutting down Bolt!");
                     BoltNetwork.Shutdown();
                 },
                 () =>
@@ -159,14 +106,14 @@ public class GameLiftServer : GlobalEventListener
                 {
                     //Here, the game server tells GameLift what set of files to upload when the game session ends.
                     //GameLift uploads everything specified here for the developers to fetch later.
-                    "/local/game/logs/myserver.log"
+                    "/local/game/NearOrbit/server/logs"
                 }));
 
             //Calling ProcessReady tells GameLift this game server is ready to receive incoming game sessions!
             var processReadyOutcome = GameLiftServerAPI.ProcessReady(processParameters);
             if (processReadyOutcome.Success)
             {
-                Debug.Log("ProcessReady success. GameLift ready to host game sessions.");
+                LogToConsoleDispatcher("ProcessReady success, GameLift ready to host game sessions");
             }
             else
             {
@@ -180,22 +127,79 @@ public class GameLiftServer : GlobalEventListener
         }
     }
 
+    #region Bolt Callbacks
+
+    public override void BoltStartBegin()
+    {
+        // Register any IProtocolToken that you are using
+        BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+
+        LogToConsoleDispatcher("Finished registering custom token classes");
+    }
+
+    public override void BoltStartDone()
+    {
+        if (BoltNetwork.IsServer)
+        {
+            //string sessionId = ServerSession.GameSessionId;
+            ////If GameSessionId was not set, throw an error and shut down the BoltNetwork
+            //if (sessionId.Length == 0)
+            //{
+            //    LogToConsoleDispatcher("GameSessionId not set! Shutting down Bolt.");
+            //    BoltNetwork.Shutdown();
+            //    return;
+            //}
+
+            //List<GameProperty> gameProperties = ServerSession.GameProperties;
+            //PhotonRoomProperties roomProperties = new PhotonRoomProperties
+            //{
+            //    IsOpen = true,
+            //    IsVisible = true
+            //};
+
+            //foreach (GameProperty gameProperty in gameProperties)
+            //{
+            //    roomProperties.AddRoomProperty(gameProperty.Key, gameProperty.Value);
+            //}
+
+            //string requestedMap = (string)roomProperties.CustomRoomProperties["m"];
+
+            //// Create the Bolt session
+            //BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
+            //LogToConsoleDispatcher(string.Format("Created Bolt session {0} and map {1}", sessionId, requestedMap));
+            PhotonRoomProperties roomProperties = new PhotonRoomProperties
+            {
+                IsOpen = true,
+                IsVisible = true
+            };
+            string sessionId = "asdfasdfasdf";
+            string requestedMap = "NetworkTest";
+            BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
+            LogToConsoleDispatcher(string.Format("Created Bolt session {0} and map {1}", sessionId, requestedMap));
+        }
+        else
+        {
+            LogToConsoleDispatcher("Attempting to create game not as server! Shutting down Bolt!");
+            BoltNetwork.Shutdown();
+        }
+    }
+
     public override void ConnectRequest(UdpEndPoint endpoint, IProtocolToken token)
     {
         ClientToken clientToken = (ClientToken)token;
-        Debug.LogFormat("Received client token for player session {0}", clientToken.PlayerSessionId);
+        LogToConsoleDispatcher(string.Format("Received client token for player session {0}", clientToken.PlayerSessionId));
 
         //Ask GameLift to verify sessionID is valid, it will change player slot from "RESERVED" to "ACTIVE"
         GenericOutcome outCome = GameLiftServerAPI.AcceptPlayerSession(clientToken.PlayerSessionId);
         if (outCome.Success)
         {
             BoltNetwork.Accept(endpoint);
-            Debug.Log("Connect request accepted");
+            LogToConsoleDispatcher("Connect request accepted");
         }
         else
         {
             BoltNetwork.Refuse(endpoint);
-            Debug.Log("Connect request refused");
+            LogToConsoleDispatcher("Connect request refused");
         }
 
         /*
@@ -215,7 +219,7 @@ public class GameLiftServer : GlobalEventListener
 
         DescribePlayerSessionsOutcome sessionsOutcome = GameLiftServerAPI.DescribePlayerSessions(sessions);
         string playerId = sessionsOutcome.Result.PlayerSessions[0].PlayerId;
-        Debug.LogFormat("Connect request player ID: {0}", playerId);
+        LogToConsoleDispatcher(string.Format("Connect request for player ID {0}", playerId));
     }
 
     public override void Connected(BoltConnection connection)
@@ -225,6 +229,7 @@ public class GameLiftServer : GlobalEventListener
             ClientToken myToken = (ClientToken)connection.ConnectToken;
             connection.UserData = myToken.PlayerSessionId;
             //GameLiftServerAPI.AcceptPlayerSession(myToken.PlayerSessionId);
+            LogToConsoleDispatcher(string.Format("Player session {0} connected!", (string)connection.UserData));
         }
     }
 
@@ -233,6 +238,27 @@ public class GameLiftServer : GlobalEventListener
         if (BoltNetwork.IsServer)
         {
             GameLiftServerAPI.RemovePlayerSession((string)connection.UserData);
+            LogToConsoleDispatcher(string.Format("Player session {0} disconnected!", (string)connection.UserData));
         }
     }
+
+    #endregion
+
+    #region Utility Functions
+
+    private IEnumerator StartBoltServerTask(int listeningPort)
+    {
+        BoltLauncher.SetUdpPlatform(new PhotonPlatform());
+        BoltLauncher.StartServer(listeningPort);
+        LogToConsoleDispatcher("Started Bolt server!");
+
+        yield return null;
+    }
+
+    private void LogToConsoleDispatcher(string logText)
+    {
+        UnityMainThreadDispatcher.Instance().Enqueue(() => Debug.Log(logText));
+    }
+
+    #endregion
 }
