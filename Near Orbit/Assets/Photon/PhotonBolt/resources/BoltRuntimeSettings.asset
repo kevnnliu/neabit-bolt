@@ -50,7 +50,7 @@ MonoBehaviour:
   debugPlayAsServer: 0
   showDebugInfo: 1
   overrideTimeScale: 1
-  logUncaughtExceptions: 1
+  logUncaughtExceptions: 0
   debugEditorMode: 1
   consoleToggleKey: 9
   consoleVisibleByDefault: 1
