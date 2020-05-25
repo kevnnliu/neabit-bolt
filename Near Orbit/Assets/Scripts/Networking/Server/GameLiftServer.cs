@@ -25,8 +25,7 @@ public class GameLiftServer : GlobalEventListener
         int listeningPort = 7777;
         //int listeningPort = int.Parse(GetArg("-p", "-port") ?? "7777");
 
-        //StartGameLiftServer(listeningPort);
-        BoltLauncher.StartServer(listeningPort);
+        StartGameLiftServer(listeningPort);
     }
 
     void OnApplicationQuit()
@@ -142,39 +141,30 @@ public class GameLiftServer : GlobalEventListener
     {
         if (BoltNetwork.IsServer)
         {
-            //string sessionId = ServerSession.GameSessionId;
-            ////If GameSessionId was not set, throw an error and shut down the BoltNetwork
-            //if (sessionId.Length == 0)
-            //{
-            //    LogToConsoleDispatcher("GameSessionId not set! Shutting down Bolt.");
-            //    BoltNetwork.Shutdown();
-            //    return;
-            //}
+            string sessionId = ServerSession.GameSessionId;
+            //If GameSessionId was not set, throw an error and shut down the BoltNetwork
+            if (sessionId.Length == 0)
+            {
+                LogToConsoleDispatcher("GameSessionId not set! Shutting down Bolt.");
+                BoltNetwork.Shutdown();
+                return;
+            }
 
-            //List<GameProperty> gameProperties = ServerSession.GameProperties;
-            //PhotonRoomProperties roomProperties = new PhotonRoomProperties
-            //{
-            //    IsOpen = true,
-            //    IsVisible = true
-            //};
-
-            //foreach (GameProperty gameProperty in gameProperties)
-            //{
-            //    roomProperties.AddRoomProperty(gameProperty.Key, gameProperty.Value);
-            //}
-
-            //string requestedMap = (string)roomProperties.CustomRoomProperties["m"];
-
-            //// Create the Bolt session
-            //BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
-            //LogToConsoleDispatcher(string.Format("Created Bolt session {0} and map {1}", sessionId, requestedMap));
+            List<GameProperty> gameProperties = ServerSession.GameProperties;
             PhotonRoomProperties roomProperties = new PhotonRoomProperties
             {
                 IsOpen = true,
                 IsVisible = true
             };
-            string sessionId = "asdfasdfasdf";
-            string requestedMap = "NetworkTest";
+
+            foreach (GameProperty gameProperty in gameProperties)
+            {
+                roomProperties.AddRoomProperty(gameProperty.Key, gameProperty.Value);
+            }
+
+            string requestedMap = (string)roomProperties.CustomRoomProperties["m"];
+
+            // Create the Bolt session
             BoltMatchmaking.CreateSession(sessionId, roomProperties, requestedMap);
             LogToConsoleDispatcher(string.Format("Created Bolt session {0} and map {1}", sessionId, requestedMap));
         }

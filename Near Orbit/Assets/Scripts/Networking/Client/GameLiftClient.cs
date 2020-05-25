@@ -26,19 +26,17 @@ public class GameLiftClient : GlobalEventListener
     {
         DontDestroyOnLoad(this.gameObject);
 
-        //StartGameLiftClient();
+        StartGameLiftClient();
 
-        //List<GameProperty> gameProperties = new List<GameProperty>
-        //    {
-        //        new GameProperty
-        //        {
-        //            Key = "m",
-        //            Value = "NetworkTest"
-        //        }
-        //    };
-        //CreateGameSession(4, "asdfasdfasdfasdf", gameProperties, true);
-        BoltLauncher.StartClient();
-        Debug.Log("Started Bolt client!");
+        List<GameProperty> gameProperties = new List<GameProperty>
+            {
+                new GameProperty
+                {
+                    Key = "m",
+                    Value = "NetworkTest"
+                }
+            };
+        CreateGameSession(4, "asdfasdfasdfasdf", gameProperties, true);
     }
 
     public void StartGameLiftClient()
@@ -73,25 +71,16 @@ public class GameLiftClient : GlobalEventListener
     {
         if (BoltNetwork.IsClient)
         {
-            //ClientToken token = new ClientToken
-            //{
-            //    UserId = Launcher.UserID,
-            //    Username = Launcher.Username,
-            //    PlayerSessionId = CurrentPlayerSession.PlayerSessionId
-            //};
-            //Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
-
-            ////UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
-            //BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
-            //Debug.LogFormat("Joined Bolt session {0}", BoltMatchmaking.CurrentSession.Id);
             ClientToken token = new ClientToken
             {
                 UserId = Launcher.UserID,
                 Username = Launcher.Username,
-                PlayerSessionId = "psess-12345"
+                PlayerSessionId = CurrentPlayerSession.PlayerSessionId
             };
             Debug.LogFormat("Created client token with player session {0}", token.PlayerSessionId);
-            BoltMatchmaking.JoinSession("asdfasdfasdf", token);
+
+            //UdpEndPoint endPoint = new UdpEndPoint(UdpIPv4Address.Parse(CurrentGameSession.IpAddress), (ushort)CurrentGameSession.Port);
+            BoltMatchmaking.JoinSession(CurrentGameSession.GameSessionId, token);
             Debug.LogFormat("Joined Bolt session {0}", BoltMatchmaking.CurrentSession.Id);
         }
         else
@@ -103,6 +92,12 @@ public class GameLiftClient : GlobalEventListener
     public override void BoltStartFailed(UdpConnectionDisconnectReason disconnectReason)
     {
         Debug.LogErrorFormat("BoltStartFailed. Reason: {0}", disconnectReason);
+    }
+
+    public override void Disconnected(BoltConnection connection)
+    {
+        base.Disconnected(connection);
+        BoltLauncher.Shutdown();
     }
 
     #region GameLift Game Sessions
