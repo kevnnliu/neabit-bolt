@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class ReticleAimConstants {
+public sealed class ReticleAimConstants
+{
     public const float IntersectRadius = 4f;
     public const float MinPointDist = 3f;
     public const float MaxReticleDist = 20f;

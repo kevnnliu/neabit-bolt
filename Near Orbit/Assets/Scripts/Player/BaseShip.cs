@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.XR;
 using Bolt;
 
-public class BaseShip : EntityBehaviour<IShipState> {
+public class BaseShip : EntityBehaviour<IShipState>
+{
 
     #region Serialized Fields
-    
+
     [SerializeField]
     private int baseHealth = 400;
     [SerializeField]
@@ -35,18 +36,22 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
     #region Bolt Functions
 
-    public override void Attached() {
+    public override void Attached()
+    {
         state.SetTransforms(state.Transform, transform);
-        
-        if (entity.IsOwner) {
+
+        if (entity.IsOwner)
+        {
             state.Health = baseHealth;
         }
 
         Debug.Log("Attached");
     }
 
-    public override void SimulateController() {
-        if (input.ReadInputs) {
+    public override void SimulateController()
+    {
+        if (input.ReadInputs)
+        {
             IShipCommandInput moveCommandInput = ShipCommand.Create();
 
             moveCommandInput.Thrust = input.GetThrustInput();
@@ -54,7 +59,7 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommandInput.ReticlePoint = input.GetReticlePoint();
 
             moveCommandInput.Fire = input.WeaponActivated();
-            
+
             input.MarkAsRead();
 
             entity.QueueInput(moveCommandInput);
@@ -62,20 +67,25 @@ public class BaseShip : EntityBehaviour<IShipState> {
         }
     }
 
-    public override void ExecuteCommand(Command command, bool resetState) {
+    public override void ExecuteCommand(Command command, bool resetState)
+    {
         ShipCommand moveCommand = (ShipCommand)command;
 
-        if (resetState) {
+        if (resetState)
+        {
             Movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
             ApplyMovement();
 
             input.SetAimPoint(moveCommand.Result.AimPoint);
-            
-            foreach (var weapon in weapons) {
+
+            foreach (var weapon in weapons)
+            {
                 weapon.Firing = moveCommand.Result.Firing;
             }
             //Debug.Log("Reset state");
-        } else {
+        }
+        else
+        {
             Movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
             ApplyMovement();
 
@@ -84,10 +94,11 @@ public class BaseShip : EntityBehaviour<IShipState> {
             moveCommand.Result.Position = Movement.GetNewPosition();
             moveCommand.Result.Rotation = Movement.GetNewRotation();
             moveCommand.Result.AimPoint = input.GetAimPoint();
-            
+
             moveCommand.Result.Firing = moveCommand.Input.Fire;
-            
-            foreach (var weapon in weapons) {
+
+            foreach (var weapon in weapons)
+            {
                 weapon.Firing = moveCommand.Result.Firing;
             }
             //Debug.Log("Processed inputs");
@@ -96,18 +107,21 @@ public class BaseShip : EntityBehaviour<IShipState> {
 
     #endregion
 
-    void Awake() {
+    void Awake()
+    {
         SetupControl();
         LoadBaseShip();
     }
 
-    void Update() {
+    void Update()
+    {
         invincible = false; // TODO: Check if in safe zone, if yes then invincible = true
-        
+
         input.UpdateInput();
     }
 
-    public void AddWeapon(string prefabID) {
+    public void AddWeapon(string prefabID)
+    {
         var prefab = Resources.Load<GameObject>(prefabID);
         Weapon weapon = Instantiate(prefab, weaponMounts[weapons.Count].position, weaponMounts[weapons.Count].rotation, transform)
             .GetComponent<Weapon>();
@@ -115,18 +129,22 @@ public class BaseShip : EntityBehaviour<IShipState> {
         weapons.Add(weapon);
     }
 
-    public void SetInvincibility(bool enabled) {
+    public void SetInvincibility(bool enabled)
+    {
         invincible = enabled;
     }
 
     /// <summary>
     /// Checks invincibility, subtracts from Health, and initiates respawn when necessary.
     /// </summary>
-    public void TakeDamage(int damage) {
-        if (!invincible) {
+    public void TakeDamage(int damage)
+    {
+        if (!invincible)
+        {
             BoltLog.Warn("Ouch! Took " + damage + " damage");
             state.Health -= damage;
-            if (state.Health <= 0f) {
+            if (state.Health <= 0f)
+            {
                 Respawn();
             }
         }
@@ -135,37 +153,43 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// <summary>
     /// Called by projectile or beam to show hitmarker on hit.
     /// </summary>
-    public void ShowHitMarker() {
+    public void ShowHitMarker()
+    {
         // TODO: Implement showing hitmarker
     }
 
     /// <summary>
     /// Returns the Vector3 point that is being aimed at.
     /// </summary>
-    public Vector3 AimTarget() {
+    public Vector3 AimTarget()
+    {
         return input.GetAimPoint();
     }
 
     /// <summary>
     /// Initializes control, movement, and module instances.
     /// </summary>
-    private void LoadBaseShip() {
+    private void LoadBaseShip()
+    {
 
         Movement = new Movement(stats, transform);
-        
+
         AddWeapon("Weapons/LaserGun");
         AddWeapon("Weapons/MachineGun");
     }
 
-    private void Respawn() {
+    private void Respawn()
+    {
         // TODO: Implement networked respawning and reset health/energy
     }
 
     /// <summary>
     /// OBSOLETE. Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
-    private void ConvertInputs() {
-        if (input.ReadInputs) {
+    private void ConvertInputs()
+    {
+        if (input.ReadInputs)
+        {
             input.UpdateInput();
             Movement.ComputeNewTransform(transform, input.GetRotationInput(), input.GetThrustInput());
         }
@@ -174,8 +198,10 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// <summary>
     /// Applies the Movement instance by updating the ship's Transform component.
     /// </summary>
-    private void ApplyMovement() {
-        if (Movement != null) {
+    private void ApplyMovement()
+    {
+        if (Movement != null)
+        {
             transform.position = Movement.GetNewPosition();
             transform.rotation = Movement.GetNewRotation();
         }
@@ -185,12 +211,15 @@ public class BaseShip : EntityBehaviour<IShipState> {
     /// Detects whether or not there is a VR device connected and enables
     /// the corresponding control scheme.
     /// </summary>
-    private void SetupControl() {
-        if (XRSettings.isDeviceActive) {
+    private void SetupControl()
+    {
+        if (XRSettings.isDeviceActive)
+        {
             input = new GestureInput(transform);
             Debug.Log("Gesture input enabled");
         }
-        else {
+        else
+        {
             input = new KeyboardInput(transform);
             Debug.Log("Keyboard input enabled");
         }

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using Bolt;
 
-public class Weapon : MonoBehaviour {
+public class Weapon : MonoBehaviour
+{
     private PrefabId projectileType;
     [SerializeField]
     private GameObject projectile;
@@ -28,15 +29,19 @@ public class Weapon : MonoBehaviour {
     private int lastReloaded;
     private int clip;
 
-    public void Start() {
+    public void Start()
+    {
         projectileType = projectile.GetComponent<BoltEntity>().PrefabId;
     }
 
-    public void Update() {
+    public void Update()
+    {
         int fireDelay = BoltNetwork.ServerFrame - lastFired;
         int reloadDelay = BoltNetwork.ServerFrame - lastReloaded;
-        if (Firing && clip > 0) {
-            if (fireDelay >= FireInterval) {
+        if (Firing && clip > 0)
+        {
+            if (fireDelay >= FireInterval)
+            {
                 lastFired = BoltNetwork.ServerFrame;
                 clip--;
                 // Old code: Server instantiates projectile
@@ -46,7 +51,8 @@ public class Weapon : MonoBehaviour {
                 //        .Init(BoltNetwork.ServerFrame, transform.position, Owner.AimTarget());
                 //}
                 // New code: Client sends information, server instantiates projectile
-                if (BoltNetwork.IsClient) {
+                if (BoltNetwork.IsClient)
+                {
                     var evnt = FireProjectile.Create();
                     evnt.Owner = Owner.entity.NetworkId;
                     evnt.Frame = BoltNetwork.ServerFrame;
@@ -56,13 +62,16 @@ public class Weapon : MonoBehaviour {
                     evnt.Send();
                     Debug.Log("Ammo: " + clip + "/" + clipSize);
                 }
-                if (BoltNetwork.IsServer) {
+                if (BoltNetwork.IsServer)
+                {
 
                 }
                 BoltLog.Warn("Firing at time: " + BoltNetwork.ServerTime);
             }
-        } else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
-                reloadDelay >= ReloadInterval && clip < clipSize) {
+        }
+        else if (fireDelay >= cooldownDelay * BoltNetwork.FramesPerSecond &&
+              reloadDelay >= ReloadInterval && clip < clipSize)
+        {
             lastReloaded = BoltNetwork.ServerFrame;
             clip++;
         }

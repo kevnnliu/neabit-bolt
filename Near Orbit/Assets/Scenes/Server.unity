@@ -121,6 +121,49 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &391354116
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 391354118}
+  - component: {fileID: 391354117}
+  m_Layer: 0
+  m_Name: UnityMainThreadDispatcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &391354117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391354116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d81680c68d08d0f4ea664950abec97b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &391354118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391354116}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2100840172
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,7 +175,7 @@ GameObject:
   - component: {fileID: 2100840174}
   - component: {fileID: 2100840173}
   m_Layer: 0
-  m_Name: ServerManager
+  m_Name: GameLiftServer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,12 +190,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2100840172}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a91d2f65fbb4064eb10e41c12bec723, type: 3}
+  m_Script: {fileID: 11500000, guid: 696a0a797ff22d74ead3b82f0e59ef5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Map: NetworkTest
-  GameType: 
-  RoomID: 
 --- !u!4 &2100840174
 Transform:
   m_ObjectHideFlags: 0

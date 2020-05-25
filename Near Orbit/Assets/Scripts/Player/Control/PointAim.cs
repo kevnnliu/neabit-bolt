@@ -5,7 +5,8 @@ using UnityEngine;
 /// <summary>
 /// Attached to a controller and handles point aiming.
 /// </summary>
-public class PointAim {
+public class PointAim
+{
 
     private Transform eyeTrack;
     private Transform rightController;
@@ -13,7 +14,8 @@ public class PointAim {
     private float baseScale;
     private BaseShip ship;
 
-    public PointAim(Transform shipT) {
+    public PointAim(Transform shipT)
+    {
         Transform trackSpace = PlayerCamera.instance.GetTrackingSpace();
         eyeTrack = trackSpace.Find("CenterEyeAnchor");
         rightController = trackSpace.Find("RightHandAnchor");
@@ -21,7 +23,8 @@ public class PointAim {
         baseScale = reticlePoint.localScale.x;
         ship = shipT.GetComponent<BaseShip>();
     }
-    public void UpdateAim() {
+    public void UpdateAim()
+    {
         reticlePoint.position = GetReticlePoint();
         float newScale = Vector3.Distance(rightController.position, reticlePoint.position) / ReticleAimConstants.MaxReticleDist;
         reticlePoint.localScale = Vector3.one * baseScale * newScale;
@@ -31,7 +34,8 @@ public class PointAim {
     /// <summary>
     /// Returns the Vector3 position of the aim point.
     /// </summary>
-    public Vector3 GetAimPoint(Vector3 reticlePosition) {
+    public Vector3 GetAimPoint(Vector3 reticlePosition)
+    {
         Vector3 aimVector = (reticlePosition - eyeTrack.position).normalized;
 
         RaycastHit hit;
@@ -43,7 +47,8 @@ public class PointAim {
     /// <summary>
     /// Returns the Vector3 position of the reticle.
     /// </summary>
-    public Vector3 GetReticlePoint() {
+    public Vector3 GetReticlePoint()
+    {
         Vector3 vectorA = eyeTrack.position - rightController.position;
         Vector3 vectorP = rightController.forward * int.MaxValue;
         float degXYW = Vector3.Angle(vectorA, vectorP);
@@ -58,7 +63,8 @@ public class PointAim {
         Vector3 aimVector = (intersectPosition - eyeTrack.position).normalized;
 
         float angle = Vector3.Angle(aimVector, ship.transform.forward);
-        if (angle > ReticleAimConstants.MaxFiringAngle) {
+        if (angle > ReticleAimConstants.MaxFiringAngle)
+        {
             aimVector = ClampAimAngle(angle, aimVector);
         }
 
@@ -71,28 +77,37 @@ public class PointAim {
     /// <summary>
     /// Returns c in the law of cosines equation.
     /// </summary>
-    private float LawOfCosines(float lenA, float lenB, float radC) {
+    private float LawOfCosines(float lenA, float lenB, float radC)
+    {
         return Mathf.Sqrt(Mathf.Pow(lenA, 2) + Mathf.Pow(lenB, 2) - (2 * lenA * lenB * Mathf.Cos(radC)));
     }
 
     /// <summary>
     /// Clamps the raycast hit distance, returns the correct ray endpoint.
     /// </summary>
-    private Vector3 ClampRay(bool hitSomething, RaycastHit hit, Vector3 aimVector, float maxDist) {
-        if (hitSomething) {
-            if (Vector3.Distance(eyeTrack.position, hit.point) < ReticleAimConstants.MinPointDist) {
+    private Vector3 ClampRay(bool hitSomething, RaycastHit hit, Vector3 aimVector, float maxDist)
+    {
+        if (hitSomething)
+        {
+            if (Vector3.Distance(eyeTrack.position, hit.point) < ReticleAimConstants.MinPointDist)
+            {
                 aimVector *= ReticleAimConstants.MinPointDist;
-            } else {
+            }
+            else
+            {
                 return hit.point;
             }
-        } else {
+        }
+        else
+        {
             aimVector *= maxDist;
         }
 
         return eyeTrack.position + aimVector;
     }
 
-    private Vector3 ClampAimAngle(float angle, Vector3 aimVector) {
+    private Vector3 ClampAimAngle(float angle, Vector3 aimVector)
+    {
         Quaternion arc = Quaternion.FromToRotation(ship.transform.forward, aimVector);
         arc = Quaternion.Slerp(Quaternion.identity, arc, ReticleAimConstants.MaxFiringAngle / angle);
         return arc * ship.transform.forward;

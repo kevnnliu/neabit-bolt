@@ -4,12 +4,14 @@
 /// Base interface for player inputs.
 /// 
 /// </summary>
-public interface IMoveInput {
+public interface IMoveInput
+{
 
     /// <summary>
     /// Usually always true except for no-idle inputs like GestureInput.
     /// </summary>
-    bool ReadInputs {
+    bool ReadInputs
+    {
         get;
     }
 
