@@ -184,8 +184,9 @@ public class BaseShip : EntityBehaviour<IShipState>
     }
 
     /// <summary>
-    /// OBSOLETE. Processes an IMoveInput instance and updates the ship's Movement instance.
+    /// Processes an IMoveInput instance and updates the ship's Movement instance.
     /// </summary>
+    [System.Obsolete]
     private void ConvertInputs()
     {
         if (input.ReadInputs)
