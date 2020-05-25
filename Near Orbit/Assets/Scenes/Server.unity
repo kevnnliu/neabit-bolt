@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 2100840174}
   - component: {fileID: 2100840173}
   m_Layer: 0
-  m_Name: ServerManager
+  m_Name: GameLiftServer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

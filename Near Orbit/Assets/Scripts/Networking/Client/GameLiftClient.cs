@@ -8,7 +8,6 @@ using UdpKit;
 using Bolt.Matchmaking;
 using Bolt.Photon;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Client)]
 public class GameLiftClient : GlobalEventListener
 {
 

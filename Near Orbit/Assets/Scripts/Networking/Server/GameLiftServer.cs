@@ -11,7 +11,6 @@ using Bolt.Matchmaking;
 using UdpKit.Platform;
 using System.Collections;
 
-[BoltGlobalBehaviour(BoltNetworkModes.Server)]
 public class GameLiftServer : GlobalEventListener
 {
     public GameSession ServerSession;
@@ -27,7 +26,7 @@ public class GameLiftServer : GlobalEventListener
         //int listeningPort = int.Parse(GetArg("-p", "-port") ?? "7777");
 
         //StartGameLiftServer(listeningPort);
-        BoltLauncher.StartServer();
+        BoltLauncher.StartServer(listeningPort);
     }
 
     void OnApplicationQuit()
@@ -133,6 +132,8 @@ public class GameLiftServer : GlobalEventListener
     {
         // Register any IProtocolToken that you are using
         BoltNetwork.RegisterTokenClass<PhotonRoomProperties>();
+        BoltNetwork.RegisterTokenClass<ClientToken>();
+        BoltNetwork.RegisterTokenClass<ProjectileToken>();
 
         LogToConsoleDispatcher("Finished registering custom token classes");
     }
