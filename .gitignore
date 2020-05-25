@@ -1,14 +1,9 @@
-# Old gitignore
 Near Orbit/.vscode/
-
 Near Orbit/Library/
-
 Near Orbit/Logs/
-
 Near Orbit/obj/Debug/
-
 Near Orbit/Temp/
-
+Near Orbit/Packages/
 
 # Created by https://www.gitignore.io/api/unity,csharp,visualstudio,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=unity,csharp,visualstudio,visualstudiocode
@@ -587,5 +582,3 @@ crashlytics-build.properties
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 
 # End of https://www.gitignore.io/api/unity,csharp,visualstudio,visualstudiocode
-
-Near Orbit/Packages/
