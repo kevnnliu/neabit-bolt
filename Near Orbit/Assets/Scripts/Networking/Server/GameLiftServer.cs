@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Aws.GameLift;
@@ -10,22 +9,52 @@ using Bolt.Photon;
 using Bolt.Matchmaking;
 using UdpKit.Platform;
 using System.Collections;
+using System.Net.NetworkInformation;
+using System.Net;
+using System.Linq;
 
 public class GameLiftServer : GlobalEventListener
 {
     public GameSession ServerSession;
 
-    private bool StartedGameLift;
+    private const float SERVER_TIMEOUT = 300f;
 
-    void Start()
+    private bool StartedGameLift = false;
+    private float ShutdownTimer = SERVER_TIMEOUT;
+
+    private void Start()
     {
         DontDestroyOnLoad(this.gameObject);
 
-        //Set the port that your game service is listening on for incoming player connections (hard-coded here for simplicity)
+        //Set the port that your game service is listening on for incoming player connections (hard-coded default)
         int listeningPort = 7777;
+        for (int a = 7777; a < 7799; a++)
+        {
+            if (PortInUse(a) == false)
+            {
+                listeningPort = a;
+                break;
+            }
+        }
         //int listeningPort = int.Parse(GetArg("-p", "-port") ?? "7777");
 
         StartGameLiftServer(listeningPort);
+    }
+
+    private void Update()
+    {
+        if (BoltNetwork.Clients.Count() == 0)
+        {
+            ShutdownTimer -= Time.deltaTime;
+            if (ShutdownTimer <= 0)
+            {
+                GameLiftServerAPI.TerminateGameSession();
+            }
+        }
+        else
+        {
+            ShutdownTimer = SERVER_TIMEOUT;
+        }
     }
 
     void OnApplicationQuit()
@@ -42,12 +71,11 @@ public class GameLiftServer : GlobalEventListener
         BoltNetwork.Shutdown();
     }
 
-    //This is an example of a simple integration with GameLift server SDK that makes game server 
-    //processes go active on Amazon GameLift
+    //This makes game server processes go active on Amazon GameLift
     public void StartGameLiftServer(int listeningPort)
     {
-        StartedGameLift = true;
         Debug.LogFormat("Starting GameLiftServer with Bolt server on port {0}", listeningPort);
+        StartedGameLift = true;
 
         //InitSDK establishes a local connection with the Amazon GameLift agent to enable 
         //further communication.
@@ -104,7 +132,7 @@ public class GameLiftServer : GlobalEventListener
                 {
                     //Here, the game server tells GameLift what set of files to upload when the game session ends.
                     //GameLift uploads everything specified here for the developers to fetch later.
-                    "/local/game/NearOrbit/server/logs"
+                    "C:\\game\\logs"
                 }));
 
             //Calling ProcessReady tells GameLift this game server is ready to receive incoming game sessions!
@@ -116,6 +144,7 @@ public class GameLiftServer : GlobalEventListener
             else
             {
                 Debug.LogErrorFormat("ProcessReady failure: {0}", processReadyOutcome.Error.ToString());
+                Application.Quit();
             }
         }
         else
@@ -123,6 +152,45 @@ public class GameLiftServer : GlobalEventListener
             Debug.LogErrorFormat("InitSDK failure: {0}", initSDKOutcome.Error.ToString());
             Application.Quit();
         }
+    }
+
+    public override void ConnectRequest(UdpEndPoint endpoint, IProtocolToken token)
+    {
+        ClientToken clientToken = (ClientToken)token;
+        LogToConsoleDispatcher(string.Format("Received client token for player session {0}", clientToken.PlayerSessionId));
+
+        //Ask GameLift to verify sessionID is valid, it will change player slot from "RESERVED" to "ACTIVE"
+        GenericOutcome outcome = GameLiftServerAPI.AcceptPlayerSession(clientToken.PlayerSessionId);
+        if (outcome.Success)
+        {
+            GameLiftServerAPI.AcceptPlayerSession(clientToken.PlayerSessionId);
+            BoltNetwork.Accept(endpoint);
+            LogToConsoleDispatcher("Connect request accepted");
+        }
+        else
+        {
+            BoltNetwork.Refuse(endpoint);
+            LogToConsoleDispatcher("Connect request refused");
+        }
+
+        /*
+        This data type is used to specify which player session(s) to retrieve. 
+        It can be used in several ways: 
+        (1) provide a PlayerSessionId to request a specific player session; 
+        (2) provide a GameSessionId to request all player sessions in the specified game session; or
+        (3) provide a PlayerId to request all player sessions for the specified player.
+        For large collections of player sessions, use the pagination parameters to retrieve results as sequential pages.
+        */
+        DescribePlayerSessionsRequest sessions = new DescribePlayerSessionsRequest()
+        {
+            PlayerSessionId = clientToken.PlayerSessionId,
+            GameSessionId = ServerSession.GameSessionId,
+            PlayerId = clientToken.UserId
+        };
+
+        DescribePlayerSessionsOutcome sessionsOutcome = GameLiftServerAPI.DescribePlayerSessions(sessions);
+        string playerId = sessionsOutcome.Result.PlayerSessions[0].PlayerId;
+        LogToConsoleDispatcher(string.Format("Connect request for player ID {0}", playerId));
     }
 
     #region Bolt Callbacks
@@ -175,51 +243,12 @@ public class GameLiftServer : GlobalEventListener
         }
     }
 
-    public override void ConnectRequest(UdpEndPoint endpoint, IProtocolToken token)
-    {
-        ClientToken clientToken = (ClientToken)token;
-        LogToConsoleDispatcher(string.Format("Received client token for player session {0}", clientToken.PlayerSessionId));
-
-        //Ask GameLift to verify sessionID is valid, it will change player slot from "RESERVED" to "ACTIVE"
-        GenericOutcome outCome = GameLiftServerAPI.AcceptPlayerSession(clientToken.PlayerSessionId);
-        if (outCome.Success)
-        {
-            BoltNetwork.Accept(endpoint);
-            LogToConsoleDispatcher("Connect request accepted");
-        }
-        else
-        {
-            BoltNetwork.Refuse(endpoint);
-            LogToConsoleDispatcher("Connect request refused");
-        }
-
-        /*
-        This data type is used to specify which player session(s) to retrieve. 
-        It can be used in several ways: 
-        (1) provide a PlayerSessionId to request a specific player session; 
-        (2) provide a GameSessionId to request all player sessions in the specified game session; or
-        (3) provide a PlayerId to request all player sessions for the specified player.
-        For large collections of player sessions, use the pagination parameters to retrieve results as sequential pages.
-        */
-        DescribePlayerSessionsRequest sessions = new DescribePlayerSessionsRequest()
-        {
-            PlayerSessionId = clientToken.PlayerSessionId,
-            GameSessionId = ServerSession.GameSessionId,
-            PlayerId = clientToken.UserId
-        };
-
-        DescribePlayerSessionsOutcome sessionsOutcome = GameLiftServerAPI.DescribePlayerSessions(sessions);
-        string playerId = sessionsOutcome.Result.PlayerSessions[0].PlayerId;
-        LogToConsoleDispatcher(string.Format("Connect request for player ID {0}", playerId));
-    }
-
     public override void Connected(BoltConnection connection)
     {
         if (BoltNetwork.IsServer)
         {
             ClientToken myToken = (ClientToken)connection.ConnectToken;
             connection.UserData = myToken.PlayerSessionId;
-            //GameLiftServerAPI.AcceptPlayerSession(myToken.PlayerSessionId);
             LogToConsoleDispatcher(string.Format("Player session {0} connected!", (string)connection.UserData));
         }
     }
@@ -249,6 +278,24 @@ public class GameLiftServer : GlobalEventListener
     private void LogToConsoleDispatcher(string logText)
     {
         UnityMainThreadDispatcher.Instance().Enqueue(() => Debug.Log(logText));
+    }
+
+    private bool PortInUse(int port)
+    {
+        bool inUse = false;
+
+        IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+        IPEndPoint[] ipEndPoints = ipProperties.GetActiveUdpListeners();
+
+        foreach (IPEndPoint endPoint in ipEndPoints)
+        {
+            if (endPoint.Port == port)
+            {
+                inUse = true;
+                break;
+            }
+        }
+        return inUse;
     }
 
     #endregion
