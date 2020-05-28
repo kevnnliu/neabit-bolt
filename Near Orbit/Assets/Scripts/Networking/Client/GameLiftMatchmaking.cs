@@ -8,7 +8,7 @@ using Amazon.GameLift.Model;
 public class GameLiftMatchmaking
 {
 
-    private AmazonGameLiftClient ClientInstance;
+    private readonly AmazonGameLiftClient ClientInstance;
     private string CurrentTicketId;
 
     public GameLiftMatchmaking(AmazonGameLiftClient client)

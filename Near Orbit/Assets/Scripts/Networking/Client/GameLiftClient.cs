@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 public class GameLiftClient : GlobalEventListener
 {
 
-    public const string FLEET_ID = "fleet-6888997d-e28b-4c28-a0b8-57c78cc4fb1d";
+    public const string FLEET_ID = "fleet-b92e270f-b7e2-4067-bcd9-cf0e29954b20";
     private const string ACCESS_KEY = "AKIAQMSDIM7CTX4W3UWH";
     private const string SECRET_KEY = "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";
 
@@ -71,8 +71,8 @@ public class GameLiftClient : GlobalEventListener
     {
         ClientConfig = new AmazonGameLiftConfig
         {
-            //ServiceURL = "http://localhost:9080" //Use for local testing, comment out for live build
-            RegionEndpoint = RegionEndpoint.USWest2 //Use for live build, comment out for local testing
+            //ServiceURL = "http://localhost:9080" //Uncomment for local testing, comment out for live build
+            RegionEndpoint = RegionEndpoint.USWest2 //Uncomment for live build, comment out for local testing
         };
 
         ClientCredentials = new Credentials
@@ -140,6 +140,11 @@ public class GameLiftClient : GlobalEventListener
 
     #region GameLift Game Sessions
 
+    /// <summary>
+    /// Retrieves the game session object for a game session ID. Returns null if no game session could be found with the requested game session ID.
+    /// </summary>
+    /// <param name="gameSessionId"></param>
+    /// <returns></returns>
     public GameSession GetGameSession(string gameSessionId)
     {
         var describeGameSessionsRequest = new DescribeGameSessionsRequest()
@@ -169,6 +174,11 @@ public class GameLiftClient : GlobalEventListener
         }
     }
 
+    /// <summary>
+    /// Creates a GameLift player session, which lets GameLift keep track of players in game sessions.
+    /// </summary>
+    /// <param name="selectedGameSession"></param>
+    /// <param name="joinImmediately"></param>
     public void CreatePlayerSession(GameSession selectedGameSession, bool joinImmediately)
     {
         if (selectedGameSession == null)
@@ -186,6 +196,7 @@ public class GameLiftClient : GlobalEventListener
             PlayerData = Launcher.Username,
             PlayerId = Launcher.UserID
         };
+        Debug.LogFormat("Created player session request for user {0}, username {1}", createPlayerSessionRequest.PlayerId, createPlayerSessionRequest.PlayerData);
 
         CreatePlayerSessionResponse createPlayerSessionResponse;
         try
@@ -200,7 +211,7 @@ public class GameLiftClient : GlobalEventListener
 
         if (createPlayerSessionResponse == null)
         {
-            Debug.LogErrorFormat("Unable to create session for player {0} with game session {1}", Launcher.UserID, selectedGameSession.GameSessionId);
+            Debug.LogWarningFormat("Unable to create session for player {0} with game session {1}", Launcher.UserID, selectedGameSession.GameSessionId);
         }
         else
         {
@@ -214,6 +225,13 @@ public class GameLiftClient : GlobalEventListener
         }
     }
 
+    /// <summary>
+    /// Directly calls GameLift to create a game session. Should not be used for matchmaking.
+    /// </summary>
+    /// <param name="maxPlayers"></param>
+    /// <param name="sessionToken"></param>
+    /// <param name="gameProperties"></param>
+    /// <param name="joinImmediately"></param>
     private void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties, bool joinImmediately)
     {
         var createGameSessionRequest = new CreateGameSessionRequest
@@ -252,7 +270,7 @@ public class GameLiftClient : GlobalEventListener
     }
 
     /// <summary>
-    /// Finds and joins the first available game session based on filterQuery and sortQuery.
+    /// Finds and joins the first available game session based on filterQuery and sortQuery. Should not be used for matchmaking.
     /// </summary>
     /// <param name="filterQuery">String containing the search criteria for the session search. 
     /// If no filter expression is included, the request returns results for all game sessions in the fleet that are in ACTIVE status.</param>

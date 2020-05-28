@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 813979055642806332}
   - component: {fileID: 813979055642806331}
   - component: {fileID: 813979055642806330}
-  - component: {fileID: 3991861448671338319}
   m_Layer: 0
   m_Name: Shield
   m_TagString: Untagged
@@ -94,19 +93,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3991861448671338319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 813979055642806329}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca870e510fce0624187067c7ca55d2a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _typeOfMod: 1
-  _energyCost: 30
-  _isPassive: 1
-  _isContinuous: 1

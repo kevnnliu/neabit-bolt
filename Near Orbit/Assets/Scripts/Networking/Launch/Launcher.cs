@@ -10,8 +10,14 @@ using Amazon.GameLift.Model;
 /// </summary>
 public static class Launcher
 {
-
+    /// <summary>
+    /// Nickname used by the player.
+    /// </summary>
     public static string Username = "";
+
+    /// <summary>
+    /// Unique ID for the player.
+    /// </summary>
     public static string UserID = "";
 
     /// <summary>

@@ -46,7 +46,7 @@ public class MatchmakingInterface : MonoBehaviour
                         Debug.LogFormat("Game session ARN: {0}", gameSessionARN);
                         Debug.LogFormat("Game session ID: {0}", gameSessionId);
 
-                        Client.CreatePlayerSession(Client.GetGameSession(gameSessionId), true);
+                        Client.CreatePlayerSession(Client.GetGameSession(gameSessionId), joinImmediately: true);
                     }
                     else if (RequestTicket.Status == MatchmakingConfigurationStatus.FAILED)
                     {
