@@ -7,13 +7,14 @@ using Bolt;
 using UdpKit;
 using Bolt.Matchmaking;
 using Bolt.Photon;
+using Amazon;
 
 public class GameLiftClient : GlobalEventListener
 {
 
-    private const string GameLiftFleetId = "testfleetid";
-    private const string AccessKey = "AKIAQMSDIM7CTX4W3UWH";
-    private const string SecretKey = "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";
+    public const string FLEET_ID = "fleet-b92e270f-b7e2-4067-bcd9-cf0e29954b20";
+    private const string ACCESS_KEY = "AKIAQMSDIM7CTX4W3UWH";
+    private const string SECRET_KEY = "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";
 
     private AmazonGameLiftConfig ClientConfig;
     private Credentials ClientCredentials;
@@ -22,40 +23,74 @@ public class GameLiftClient : GlobalEventListener
     private GameSession CurrentGameSession;
     private PlayerSession CurrentPlayerSession;
 
+    private GameLiftMatchmaking MatchmakingHandler;
+
+    [SerializeField]
+    private GameObject MatchmakingInterfacePrefab;
+
     void Start()
     {
         DontDestroyOnLoad(this.gameObject);
 
         StartGameLiftClient();
+    }
 
-        List<GameProperty> gameProperties = new List<GameProperty>
+    public void RequestMatch(string mmConfig)
+    {
+        //Hard-coded for testing purposes
+        var player = new Player()
+        {
+            PlayerId = Launcher.UserID,
+            Team = "duelist", 
+            PlayerAttributes = new Dictionary<string, AttributeValue>()
             {
-                new GameProperty
-                {
-                    Key = "m",
-                    Value = "NetworkTest"
-                }
-            };
-        CreateGameSession(4, "asdfasdfasdfasdf", gameProperties, true);
+                {"skill", new AttributeValue() { N = 10 }}
+            }
+        };
+
+        var playerList = new List<Player>()
+        {
+            player
+        };
+
+        MatchmakingHandler.RequestMatch(mmConfig, playerList);
+    }
+
+    public void CancelMatchRequest()
+    {
+        MatchmakingHandler.CancelMatchRequest();
+    }
+
+    public MatchmakingTicket CheckMatchRequest()
+    {
+        return MatchmakingHandler.CheckMatchRequest();
     }
 
     public void StartGameLiftClient()
     {
         ClientConfig = new AmazonGameLiftConfig
         {
-            ServiceURL = "http://localhost:9080" //Use for local testing, comment out for live build
-            //RegionEndpoint = RegionEndpoint.USWest2 //Use for live build, comment out for local testing
+            //ServiceURL = "http://localhost:9080" //Uncomment for local testing, comment out for live build
+            RegionEndpoint = RegionEndpoint.USWest2 //Uncomment for live build, comment out for local testing
         };
 
         ClientCredentials = new Credentials
         {
-            AccessKeyId = AccessKey,
-            SecretAccessKey = SecretKey
+            AccessKeyId = ACCESS_KEY,
+            SecretAccessKey = SECRET_KEY
         };
 
         ClientInstance = new AmazonGameLiftClient(ClientCredentials, ClientConfig);
         Debug.Log("Started GameLift client!");
+
+        MatchmakingHandler = new GameLiftMatchmaking(ClientInstance);
+        Debug.Log("Started matchmaking handler!");
+
+        GameObject matchmakingInterfaceObject = Instantiate(MatchmakingInterfacePrefab);
+        matchmakingInterfaceObject.GetComponent<MatchmakingInterface>().SetClient(this);
     }
+
+    #region Bolt Callbacks
 
     public override void BoltStartBegin()
     {
@@ -100,22 +135,72 @@ public class GameLiftClient : GlobalEventListener
         BoltLauncher.Shutdown();
     }
 
+    #endregion
+
     #region GameLift Game Sessions
 
-    public void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties, bool joinImmediately)
+    /// <summary>
+    /// Retrieves the game session object for a game session ID. Returns null if no game session could be found with the requested game session ID.
+    /// </summary>
+    /// <param name="gameSessionId"></param>
+    /// <returns></returns>
+    public GameSession GetGameSession(string gameSessionId)
     {
-        var gameSessionRequest = new CreateGameSessionRequest
+        var describeGameSessionsRequest = new DescribeGameSessionsRequest()
         {
-            IdempotencyToken = sessionToken,
-            MaximumPlayerSessionCount = maxPlayers,
-            GameProperties = gameProperties,
-            FleetId = GameLiftFleetId
+            GameSessionId = gameSessionId
         };
 
-        CreateGameSessionResponse gameSessionResponse;
+        DescribeGameSessionsResponse describeGameSessionsResponse;
         try
         {
-            gameSessionResponse = ClientInstance.CreateGameSession(gameSessionRequest);
+            describeGameSessionsResponse = ClientInstance.DescribeGameSessions(describeGameSessionsRequest);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError(exception.Message);
+            return null;
+        }
+
+        if (describeGameSessionsResponse.GameSessions.Count > 0)
+        {
+            return describeGameSessionsResponse.GameSessions[0];
+        }
+        else
+        {
+            Debug.Log("Describe game sessions response game sessions list is empty!");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Creates a GameLift player session, which lets GameLift keep track of players in game sessions.
+    /// </summary>
+    /// <param name="selectedGameSession"></param>
+    /// <param name="joinImmediately"></param>
+    public void CreatePlayerSession(GameSession selectedGameSession, bool joinImmediately)
+    {
+        if (selectedGameSession == null)
+        {
+            Debug.LogWarning("Selected game session is null!");
+            return;
+        }
+
+        Debug.LogFormat("{0}/{1} players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
+        CurrentGameSession = selectedGameSession;
+
+        var createPlayerSessionRequest = new CreatePlayerSessionRequest
+        {
+            GameSessionId = selectedGameSession.GameSessionId,
+            PlayerData = Launcher.Username,
+            PlayerId = Launcher.UserID
+        };
+        Debug.LogFormat("Created player session request for user {0}, username {1}", createPlayerSessionRequest.PlayerId, createPlayerSessionRequest.PlayerData);
+
+        CreatePlayerSessionResponse createPlayerSessionResponse;
+        try
+        {
+            createPlayerSessionResponse = ClientInstance.CreatePlayerSession(createPlayerSessionRequest);
         }
         catch (Exception exception)
         {
@@ -123,43 +208,87 @@ public class GameLiftClient : GlobalEventListener
             return;
         }
 
-        if (gameSessionResponse == null)
+        if (createPlayerSessionResponse == null)
         {
-            Debug.LogError("Could not create game session!");
-            Debug.LogError(gameSessionResponse.ResponseMetadata.ToString());
+            Debug.LogWarningFormat("Unable to create session for player {0} with game session {1}", Launcher.UserID, selectedGameSession.GameSessionId);
         }
         else
         {
-            Debug.LogFormat("Successfully created game session {0}", gameSessionResponse.GameSession.GameSessionId);
+            CurrentPlayerSession = createPlayerSessionResponse.PlayerSession;
+            Debug.LogFormat("Successfully created player session {0} with game session {1}", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
             if (joinImmediately)
             {
-                CurrentGameSession = gameSessionResponse.GameSession;
+                BoltLauncher.StartClient();
+                Debug.Log("Started Bolt client!");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Directly calls GameLift to create a game session. Should not be used for matchmaking.
+    /// </summary>
+    /// <param name="maxPlayers"></param>
+    /// <param name="sessionToken"></param>
+    /// <param name="gameProperties"></param>
+    /// <param name="joinImmediately"></param>
+    private void CreateGameSession(int maxPlayers, string sessionToken, List<GameProperty> gameProperties, bool joinImmediately)
+    {
+        var createGameSessionRequest = new CreateGameSessionRequest
+        {
+            IdempotencyToken = sessionToken,
+            MaximumPlayerSessionCount = maxPlayers,
+            GameProperties = gameProperties,
+            FleetId = FLEET_ID
+        };
+
+        CreateGameSessionResponse createGameSessionResponse;
+        try
+        {
+            createGameSessionResponse = ClientInstance.CreateGameSession(createGameSessionRequest);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError(exception.Message);
+            return;
+        }
+
+        if (createGameSessionResponse == null)
+        {
+            Debug.LogError("Could not create game session!");
+            Debug.LogError(createGameSessionResponse.ResponseMetadata.ToString());
+        }
+        else
+        {
+            Debug.LogFormat("Successfully created game session {0}", createGameSessionResponse.GameSession.GameSessionId);
+            if (joinImmediately)
+            {
+                CurrentGameSession = createGameSessionResponse.GameSession;
                 CreatePlayerSession(CurrentGameSession, true);
             }
         }
     }
 
     /// <summary>
-    /// Finds and joins the first available game session based on filterQuery and sortQuery.
+    /// Finds and joins the first available game session based on filterQuery and sortQuery. Should not be used for matchmaking.
     /// </summary>
     /// <param name="filterQuery">String containing the search criteria for the session search. 
     /// If no filter expression is included, the request returns results for all game sessions in the fleet that are in ACTIVE status.</param>
     /// <param name="sortQuery">Instructions on how to sort the search results. 
     /// If no sort expression is included, the request returns results in random order.</param>
-    public void FindGameSession(string filterQuery, string sortQuery, bool joinImmediately)
+    private void FindGameSession(string filterQuery, string sortQuery, bool joinImmediately)
     {
-        var gameSessionsRequest = new SearchGameSessionsRequest
+        var searchGameSessionsRequest = new SearchGameSessionsRequest
         {
-            FleetId = GameLiftFleetId,
+            FleetId = FLEET_ID,
             FilterExpression = filterQuery,
             SortExpression = sortQuery,
             Limit = 1
         };
 
-        SearchGameSessionsResponse gameSessionsResponse;
+        SearchGameSessionsResponse searchGameSessionsResponse;
         try
         {
-            gameSessionsResponse = ClientInstance.SearchGameSessions(gameSessionsRequest);
+            searchGameSessionsResponse = ClientInstance.SearchGameSessions(searchGameSessionsRequest);
         }
         catch (Exception exception)
         {
@@ -167,7 +296,7 @@ public class GameLiftClient : GlobalEventListener
             return;
         }
 
-        if (gameSessionsResponse == null)
+        if (searchGameSessionsResponse == null)
         {
             Debug.LogErrorFormat("Could not find any game session with the following parameters: {0}", filterQuery);
         }
@@ -176,46 +305,7 @@ public class GameLiftClient : GlobalEventListener
             Debug.LogFormat("Successfully found game session with the following parameters: {0}", filterQuery);
             if (joinImmediately)
             {
-                CreatePlayerSession(gameSessionsResponse.GameSessions[0], true);
-            }
-        }
-    }
-
-    public void CreatePlayerSession(GameSession selectedGameSession, bool joinImmediately)
-    {
-        Debug.LogFormat("{0}/{1} players in selected game session.", selectedGameSession.CurrentPlayerSessionCount, selectedGameSession.MaximumPlayerSessionCount);
-        CurrentGameSession = selectedGameSession;
-
-        var playerSessionRequest = new CreatePlayerSessionRequest
-        {
-            GameSessionId = selectedGameSession.GameSessionId,
-            PlayerData = Launcher.Username,
-            PlayerId = Launcher.UserID
-        };
-
-        CreatePlayerSessionResponse playerSessionResponse;
-        try
-        {
-            playerSessionResponse = ClientInstance.CreatePlayerSession(playerSessionRequest);
-        }
-        catch (Exception exception)
-        {
-            Debug.LogError(exception.Message);
-            return;
-        }
-
-        if (playerSessionResponse == null)
-        {
-            Debug.LogErrorFormat("Unable to create session for player {0} with game session {1}", Launcher.UserID, selectedGameSession.GameSessionId);
-        }
-        else
-        {
-            CurrentPlayerSession = playerSessionResponse.PlayerSession;
-            Debug.LogFormat("Successfully created player session {0} with game session {1}", CurrentPlayerSession.PlayerSessionId, selectedGameSession.GameSessionId);
-            if (joinImmediately)
-            {
-                BoltLauncher.StartClient();
-                Debug.Log("Started Bolt client!");
+                CreatePlayerSession(searchGameSessionsResponse.GameSessions[0], true);
             }
         }
     }
