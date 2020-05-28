@@ -17,7 +17,10 @@ public class GameLiftServer : GlobalEventListener
 {
     public GameSession ServerSession = null;
 
+    private const float SERVER_TIMEOUT = 300f;
+
     private bool GameLiftServerSDKReady = false;
+    private float TimeoutTimer = SERVER_TIMEOUT;
     private ProcessParameters ServerProcessParameters;
 
     private void Start()
@@ -25,6 +28,22 @@ public class GameLiftServer : GlobalEventListener
         DontDestroyOnLoad(this.gameObject);
 
         StartGameLiftServer();
+    }
+
+    private void Update()
+    {
+        if (ServerSession != null && BoltNetwork.IsRunning && BoltNetwork.IsServer && BoltNetwork.Clients.Count() == 0)
+        {
+            TimeoutTimer -= Time.deltaTime;
+            if (TimeoutTimer <= 0)
+            {
+                PrepareForNewGameSession();
+            }
+        }
+        else
+        {
+            TimeoutTimer = SERVER_TIMEOUT;
+        }
     }
 
     private void OnApplicationQuit()
@@ -46,15 +65,7 @@ public class GameLiftServer : GlobalEventListener
     public void StartGameLiftServer()
     {
         //Set the port for incoming player connections to Bolt (hard-coded default)
-        int listeningPort = 7777;
-        for (int p = 7777; p < 7799; p++)
-        {
-            if (PortInUse(p) == false)
-            {
-                listeningPort = p;
-                break;
-            }
-        }
+        int listeningPort = GetAvailablePort(minPort: 7777, maxPort: 7799);
 
         Debug.LogFormat("Starting server on port {0}", listeningPort);
 
@@ -333,10 +344,27 @@ public class GameLiftServer : GlobalEventListener
         UnityMainThreadDispatcher.Instance().Enqueue(() => Debug.Log(logText));
     }
 
+    /// <summary>
+    /// Searches for an available port within the range minPort-maxPort. If none available returns minPort.
+    /// </summary>
+    /// <param name="minPort"></param>
+    /// <param name="maxPort"></param>
+    /// <returns></returns>
+    private int GetAvailablePort(int minPort, int maxPort)
+    {
+        for (int p = minPort; p < maxPort; p++)
+        {
+            if (PortInUse(p) == false)
+            {
+                return p;
+            }
+        }
+
+        return minPort;
+    }
+
     private bool PortInUse(int port)
     {
-        bool inUse = false;
-
         IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
         IPEndPoint[] ipEndPoints = ipProperties.GetActiveUdpListeners();
 
@@ -344,11 +372,11 @@ public class GameLiftServer : GlobalEventListener
         {
             if (endPoint.Port == port)
             {
-                inUse = true;
-                break;
+                return true;
             }
         }
-        return inUse;
+
+        return false;
     }
 
     #endregion

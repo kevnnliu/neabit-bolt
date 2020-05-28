@@ -8,7 +8,6 @@ using UdpKit;
 using Bolt.Matchmaking;
 using Bolt.Photon;
 using Amazon;
-using System.Text.RegularExpressions;
 
 public class GameLiftClient : GlobalEventListener
 {
