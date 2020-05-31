@@ -1,0 +1,7 @@
+NearOrbitServer.exe
+-batchmode -nographics -logFile "C:\game\logs\ServerLog.txt"
+
+7777-7799
+0.0.0.0/0
+
+aws gamelift upload-build --name "NearOrbitServer(Internal)" --build-version "0.1.0" --build-root "C:\Users\crazy\Downloads\NearOrbitServer" --region us-west-2

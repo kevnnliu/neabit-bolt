@@ -1,5 +1,0 @@
-NearOrbitServer.exe
--batchmode -nographics -logFile "C:\game\logs\ServerLog.txt"
-
-7777-7799
-0.0.0.0/0
