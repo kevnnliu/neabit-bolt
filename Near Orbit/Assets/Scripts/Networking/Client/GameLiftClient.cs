@@ -12,7 +12,7 @@ using Amazon;
 public class GameLiftClient : GlobalEventListener
 {
 
-    public const string FLEET_ID = "fleet-b92e270f-b7e2-4067-bcd9-cf0e29954b20";
+    public const string FLEET_ID = "fleet-4e479896-0e99-4324-a7d0-3c65905b1769";
     private const string ACCESS_KEY = "AKIAQMSDIM7CTX4W3UWH";
     private const string SECRET_KEY = "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";
 
@@ -33,6 +33,32 @@ public class GameLiftClient : GlobalEventListener
         DontDestroyOnLoad(this.gameObject);
 
         StartGameLiftClient();
+    }
+
+    /// <summary>
+    /// This sets the current game session and player session. This is to be used in conjunction with matchmaking.
+    /// </summary>
+    /// <param name="gameSessionId"></param>
+    /// <param name="playerSession"></param>
+    /// <param name="startBoltClient"></param>
+    public void SetSessions(string gameSessionId, string playerSessionId, bool startBoltClient)
+    {
+        CurrentGameSession = new GameSession()
+        {
+            GameSessionId = gameSessionId
+        };
+        CurrentPlayerSession = new PlayerSession()
+        {
+            PlayerSessionId = playerSessionId,
+            GameSessionId = gameSessionId,
+            PlayerId = Launcher.UserID,
+            PlayerData = Launcher.Username
+        };
+
+        if (startBoltClient)
+        {
+            BoltLauncher.StartClient();
+        }
     }
 
     public void RequestMatch(string mmConfig)
@@ -144,7 +170,7 @@ public class GameLiftClient : GlobalEventListener
     /// </summary>
     /// <param name="gameSessionId"></param>
     /// <returns></returns>
-    public GameSession GetGameSession(string gameSessionId)
+    public GameSession GetCurrentGameSession(string gameSessionId)
     {
         var describeGameSessionsRequest = new DescribeGameSessionsRequest()
         {
@@ -154,6 +180,7 @@ public class GameLiftClient : GlobalEventListener
         DescribeGameSessionsResponse describeGameSessionsResponse;
         try
         {
+            Debug.LogFormat("Looking for game session {0}", gameSessionId);
             describeGameSessionsResponse = ClientInstance.DescribeGameSessions(describeGameSessionsRequest);
         }
         catch (Exception exception)
@@ -168,7 +195,7 @@ public class GameLiftClient : GlobalEventListener
         }
         else
         {
-            Debug.Log("Describe game sessions response game sessions list is empty!");
+            Debug.LogWarning("Describe game sessions response game sessions list is empty!");
             return null;
         }
     }

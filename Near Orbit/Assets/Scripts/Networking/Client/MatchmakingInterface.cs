@@ -1,8 +1,7 @@
 ﻿using Amazon.GameLift;
+using Amazon.GameLift.Model;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MatchmakingInterface : MonoBehaviour
 {
@@ -30,35 +29,7 @@ public class MatchmakingInterface : MonoBehaviour
             CheckRequestTimer -= Time.deltaTime;
             if (CheckRequestTimer <= 0)
             {
-                var RequestTicket = Client.CheckMatchRequest();
-
-                if (RequestTicket != null)
-                {
-                    IsSearching = false;
-                    
-                    if (RequestTicket.Status == MatchmakingConfigurationStatus.COMPLETED)
-                    {
-                        var gameSessionInfo = RequestTicket.GameSessionConnectionInfo;
-                        string gameSessionARN = gameSessionInfo.GameSessionArn;
-                        string prefix = string.Format("arn:aws:gamelift:us-west-2::gamesession/{0}/", GameLiftClient.FLEET_ID);
-                        string gameSessionId = gameSessionARN.Substring(prefix.Length);
-
-                        Debug.LogFormat("Game session ARN: {0}", gameSessionARN);
-                        Debug.LogFormat("Game session ID: {0}", gameSessionId);
-
-                        Client.CreatePlayerSession(Client.GetGameSession(gameSessionId), joinImmediately: true);
-                    }
-                    else if (RequestTicket.Status == MatchmakingConfigurationStatus.FAILED)
-                    {
-                        CancelMatchRequest();
-                        Debug.LogWarningFormat("Matchmaking request failed: {0}", RequestTicket.StatusMessage);
-                    }
-                    else
-                    {
-                        IsSearching = true;
-                        Debug.LogFormat("Match request status: {0}", RequestTicket.Status);
-                    }
-                }
+                CheckMatchRequest();
                 
                 CheckRequestTimer = CHECK_FREQ;
             }
@@ -91,4 +62,40 @@ public class MatchmakingInterface : MonoBehaviour
         CancelButton.SetActive(IsSearching);
     }
 
+    private void CheckMatchRequest()
+    {
+        var requestTicket = Client.CheckMatchRequest();
+
+        if (requestTicket != null)
+        {
+            IsSearching = false;
+
+            if (requestTicket.Status == MatchmakingConfigurationStatus.COMPLETED)
+            {
+                ConnectToGameSession(requestTicket);
+            }
+            else if (requestTicket.Status == MatchmakingConfigurationStatus.FAILED)
+            {
+                CancelMatchRequest();
+                Debug.LogWarningFormat("Matchmaking request failed: {0}", requestTicket.StatusMessage);
+            }
+            else
+            {
+                IsSearching = true;
+                Debug.LogFormat("Match request status: {0}", requestTicket.Status);
+            }
+        }
+    }
+
+    private void ConnectToGameSession(MatchmakingTicket requestTicket)
+    {
+        var gameSessionInfo = requestTicket.GameSessionConnectionInfo;
+
+        //We use the ARN because matchmaking creates game sessions with the ARN as the ID
+        string gameSessionARN = gameSessionInfo.GameSessionArn;
+        Debug.LogFormat("Game session ARN: {0}", gameSessionARN);
+
+        string playerSessionId = requestTicket.GameSessionConnectionInfo.MatchedPlayerSessions[0].PlayerSessionId;
+        Client.SetSessions(gameSessionARN, playerSessionId, startBoltClient: true);
+    }
 }
