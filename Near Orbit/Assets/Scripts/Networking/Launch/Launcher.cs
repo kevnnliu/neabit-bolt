@@ -1,9 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UdpKit;
-using Bolt.Matchmaking;
-using Bolt.Photon;
-using Amazon.GameLift.Model;
 
 /// <summary>
 /// Container class for player info.
