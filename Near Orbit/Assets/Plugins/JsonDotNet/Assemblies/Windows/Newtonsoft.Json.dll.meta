@@ -1,5 +1,7 @@
 fileFormatVersion: 2
-guid: 748eb70bc0d7515498ef73fed155520a
+guid: 9b6ba260dada0ea4a871a42011f8b87d
+timeCreated: 1466788355
+licenseType: Store
 PluginImporter:
   serializedVersion: 1
   iconMap: {}
@@ -14,7 +16,7 @@ PluginImporter:
       enabled: 0
       settings: {}
     Editor:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
         DefaultValueInitialized: true
@@ -35,12 +37,10 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
-    WP8:
+    SamsungTV:
       enabled: 0
       settings:
-        CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: 
+        STV_MODEL: STANDARD_13
     Win:
       enabled: 0
       settings:
@@ -50,15 +50,13 @@ PluginImporter:
       settings:
         CPU: AnyCPU
     WindowsStoreApps:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: AnyCPU
         DontProcess: False
-        PlaceholderPath: 
+        PlaceholderPath: Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll
         SDK: AnySDK
-    XboxOne:
-      enabled: 1
-      settings: {}
+        ScriptingBackend: DotNet
     iOS:
       enabled: 0
       settings:
