@@ -1,4 +1,2 @@
 # Near Orbit
-The official repository for the Near Orbit project. Near Orbit aims to be a VR multiplayer game where players pilot spacejets with unique weaponry and abilities. The networking is under a server-authoritative server-client model, where a server instance performs validation checks on in-game events and actions. This promotes consistency accross clients and mitigates server authority abuse as would be possible in a peer-to-peer model.
-
-The project uses the Oculus SDK to manage VR inputs, Photon Bolt to handle multiplayer networking. We initially integrated Photon Bolt with AWS GameLift, which handled matchmaking and server instance hosting. However, AWS GameLift pricing proved too costly to sustain a live build beyond the early development cycle. We instead opted to create a custom intermediary service to replace AWS GameLift called Near Orbit Multiplayer Service (NOMS) and to host this on our own machines.
+The official repository for Near Orbit.
