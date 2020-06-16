@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
-using Bolt;
 
-public class BaseShip : EntityBehaviour<IShipState>
+public class BaseShip : MonoBehaviour
 {
 
     #region Serialized Fields
@@ -34,78 +33,62 @@ public class BaseShip : EntityBehaviour<IShipState>
 
     public Movement Movement { get; private set; }
 
-    #region Bolt Functions
+    //public override void SimulateController()
+    //{
+    //    if (input.ReadInputs)
+    //    {
+    //        IShipCommandInput moveCommandInput = ShipCommand.Create();
 
-    public override void Attached()
-    {
-        state.SetTransforms(state.Transform, transform);
+    //        moveCommandInput.Thrust = input.GetThrustInput();
+    //        moveCommandInput.Rotation = input.GetRotationInput();
+    //        moveCommandInput.ReticlePoint = input.GetReticlePoint();
 
-        if (entity.IsOwner)
-        {
-            state.Health = baseHealth;
-        }
+    //        moveCommandInput.Fire = input.WeaponActivated();
 
-        Debug.Log("Attached");
-    }
+    //        input.MarkAsRead();
 
-    public override void SimulateController()
-    {
-        if (input.ReadInputs)
-        {
-            IShipCommandInput moveCommandInput = ShipCommand.Create();
+    //        entity.QueueInput(moveCommandInput);
+    //        //Debug.Log("Inputs queued over network");
+    //    }
+    //}
 
-            moveCommandInput.Thrust = input.GetThrustInput();
-            moveCommandInput.Rotation = input.GetRotationInput();
-            moveCommandInput.ReticlePoint = input.GetReticlePoint();
+    //public override void ExecuteCommand(Command command, bool resetState)
+    //{
+    //    ShipCommand moveCommand = (ShipCommand)command;
 
-            moveCommandInput.Fire = input.WeaponActivated();
+    //    if (resetState)
+    //    {
+    //        Movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
+    //        ApplyMovement();
 
-            input.MarkAsRead();
+    //        input.SetAimPoint(moveCommand.Result.AimPoint);
 
-            entity.QueueInput(moveCommandInput);
-            //Debug.Log("Inputs queued over network");
-        }
-    }
+    //        foreach (var weapon in weapons)
+    //        {
+    //            weapon.Firing = moveCommand.Result.Firing;
+    //        }
+    //        //Debug.Log("Reset state");
+    //    }
+    //    else
+    //    {
+    //        Movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
+    //        ApplyMovement();
 
-    public override void ExecuteCommand(Command command, bool resetState)
-    {
-        ShipCommand moveCommand = (ShipCommand)command;
+    //        input.ComputeAimPoint(moveCommand.Input.ReticlePoint);
 
-        if (resetState)
-        {
-            Movement.SetState(moveCommand.Result.Position, moveCommand.Result.Rotation);
-            ApplyMovement();
+    //        moveCommand.Result.Position = Movement.GetNewPosition();
+    //        moveCommand.Result.Rotation = Movement.GetNewRotation();
+    //        moveCommand.Result.AimPoint = input.GetAimPoint();
 
-            input.SetAimPoint(moveCommand.Result.AimPoint);
+    //        moveCommand.Result.Firing = moveCommand.Input.Fire;
 
-            foreach (var weapon in weapons)
-            {
-                weapon.Firing = moveCommand.Result.Firing;
-            }
-            //Debug.Log("Reset state");
-        }
-        else
-        {
-            Movement.ComputeNewTransform(transform, moveCommand.Input.Rotation, moveCommand.Input.Thrust);
-            ApplyMovement();
-
-            input.ComputeAimPoint(moveCommand.Input.ReticlePoint);
-
-            moveCommand.Result.Position = Movement.GetNewPosition();
-            moveCommand.Result.Rotation = Movement.GetNewRotation();
-            moveCommand.Result.AimPoint = input.GetAimPoint();
-
-            moveCommand.Result.Firing = moveCommand.Input.Fire;
-
-            foreach (var weapon in weapons)
-            {
-                weapon.Firing = moveCommand.Result.Firing;
-            }
-            //Debug.Log("Processed inputs");
-        }
-    }
-
-    #endregion
+    //        foreach (var weapon in weapons)
+    //        {
+    //            weapon.Firing = moveCommand.Result.Firing;
+    //        }
+    //        //Debug.Log("Processed inputs");
+    //    }
+    //}
 
     void Awake()
     {
@@ -141,12 +124,12 @@ public class BaseShip : EntityBehaviour<IShipState>
     {
         if (!invincible)
         {
-            BoltLog.Warn("Ouch! Took " + damage + " damage");
-            state.Health -= damage;
-            if (state.Health <= 0f)
-            {
-                Respawn();
-            }
+            Debug.Log("Ouch! Took " + damage + " damage");
+            //state.Health -= damage;
+            //if (state.Health <= 0f)
+            //{
+            //    Respawn();
+            //}
         }
     }
 

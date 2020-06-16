@@ -26,7 +26,7 @@ public class GestureInput : IMoveInput
     public GestureInput(Transform shipT)
     {
         shipTransform = shipT;
-        rightController = PlayerCamera.instance.GetTrackingSpace().Find("RightHandAnchor");
+        //rightController = PlayerCamera.instance.GetTrackingSpace().Find("RightHandAnchor");
         pointAim = new PointAim(shipT);
         UpdateInput();
     }

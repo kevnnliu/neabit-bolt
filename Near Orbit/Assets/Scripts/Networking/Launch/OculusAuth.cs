@@ -2,7 +2,6 @@ using UnityEngine;
 using Oculus.Platform;
 using Oculus.Platform.Models;
 using Photon.Realtime;
-using UdpKit.Platform;
 
 public class OculusAuth : MonoBehaviour
 {
@@ -91,14 +90,14 @@ public class OculusAuth : MonoBehaviour
 
             auth.AddAuthParameter("userid", oculusId);
             auth.AddAuthParameter("nonce", oculusNonce);
-            auth.AddAuthParameter("version", BoltNetwork.CurrentVersion);
+            //auth.AddAuthParameter("version", BoltNetwork.CurrentVersion);
 
-            var platform = new PhotonPlatform(new PhotonPlatformConfig()
-            {
-                AuthenticationValues = auth
-            });
+            //var platform = new PhotonPlatform(new PhotonPlatformConfig()
+            //{
+            //    AuthenticationValues = auth
+            //});
 
-            BoltLauncher.SetUdpPlatform(platform);
+            //BoltLauncher.SetUdpPlatform(platform);
 
             Launcher.UserID = oculusId;
             Launcher.Username = oculusNickname;

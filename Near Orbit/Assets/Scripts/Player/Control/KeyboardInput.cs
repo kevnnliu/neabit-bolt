@@ -16,7 +16,7 @@ public class KeyboardInput : IMoveInput
     public KeyboardInput(Transform shipT)
     {
         shipTransform = shipT;
-        camera = PlayerCamera.instance.GetTrackingSpace().Find("CenterEyeAnchor");
+        //camera = PlayerCamera.instance.GetTrackingSpace().Find("CenterEyeAnchor");
         reticlePoint = shipT.Find("MainReticle");
         baseScale = reticlePoint.localScale.x;
         lastPosition = new Vector3(Screen.width / 2, Screen.height / 2);

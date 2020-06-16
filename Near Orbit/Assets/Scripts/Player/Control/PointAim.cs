@@ -16,9 +16,9 @@ public class PointAim
 
     public PointAim(Transform shipT)
     {
-        Transform trackSpace = PlayerCamera.instance.GetTrackingSpace();
-        eyeTrack = trackSpace.Find("CenterEyeAnchor");
-        rightController = trackSpace.Find("RightHandAnchor");
+        //Transform trackSpace = PlayerCamera.instance.GetTrackingSpace();
+        //eyeTrack = trackSpace.Find("CenterEyeAnchor");
+        //rightController = trackSpace.Find("RightHandAnchor");
         reticlePoint = shipT.Find("MainReticle");
         baseScale = reticlePoint.localScale.x;
         ship = shipT.GetComponent<BaseShip>();
